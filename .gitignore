@@ -143,3 +143,5 @@ terraform.tfstate.backup
 /app/utils/migrations/
 *.sqlite3
 /ccf/azauth.py
+
+app/client/sphinx-docs/
