@@ -1,0 +1,13 @@
+Flask==2.0.0
+Flask-SQLAlchemy==2.4.4
+Flask-Migrate==2.6.0
+psycopg2-binary==2.8.6
+flask-admin==1.5.7
+sqlalchemy<1.4 # pinned to fix bug in flask-sqlalchemy
+flask-smorest==0.31.0
+#Testing Dependencies
+pytest==6.2.2
+factory-boy==3.2.0
+responses==0.13.2
+requests-mock==1.9.3
+requests-flask-adapter==0.1.0

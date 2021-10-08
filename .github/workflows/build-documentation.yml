@@ -1,0 +1,49 @@
+name: Build Documentation
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build documentation
+      run: |
+        python -m pip install --upgrade pip;
+        pip install sphinx sphinx-markdown-builder sphinx-autodoc-typehints;
+        cd app/client;
+        sphinx-apidoc -o sphinx-docs . sphinx-apidoc --full -A 'AirWalk Reply';
+        cd sphinx-docs;
+        make markdown;
+        mv _build/markdown/client.airviewclient.md ../../../docs/airviewclient.md;
+        cd ../../../app
+        pip install -r requirements.txt
+        FLASK_APP=./utils/debug.py flask openapi write ../docs/openapi.json
+        cd ..
+        jq -S . docs/openapi.json > docs/newopenapi.json  && mv docs/newopenapi.json docs/openapi.json
+
+
+    - name: setup git config
+      run: |
+        # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+    - name: commit
+      run: |
+        # Stage the file, commit and push
+        git add docs
+        git commit -m "Automated create client documentation"
+        git push

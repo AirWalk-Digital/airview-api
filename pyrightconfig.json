@@ -1,0 +1,12 @@
+
+{
+ "executionEnvironments": [
+    {
+      "root": "app",
+      "pythonVersion": "3.6",
+      "extraPaths": [
+        "app/airview_api"
+      ]
+    }
+  ]
+}
