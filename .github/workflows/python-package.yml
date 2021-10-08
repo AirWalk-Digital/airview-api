@@ -28,7 +28,6 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         pip install -r ./app/requirements.txt
-        pip install -r ./exclusion_engine/ccf/requirements.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -37,4 +36,4 @@ jobs:
         flake8 ./app/airview_api/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest  --ignore=snow-knowledge-export
+        pytest
