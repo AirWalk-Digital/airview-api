@@ -995,7 +995,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1003,7 +1003,7 @@
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
