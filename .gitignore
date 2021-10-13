@@ -145,3 +145,6 @@ terraform.tfstate.backup
 /ccf/azauth.py
 
 app/client/sphinx-docs/
+
+# VScode stuff
+launch.json
