@@ -105,6 +105,13 @@ class Environment(db.Model):
         "Application", back_populates="environment", lazy=True
     )
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "abbreviation",
+            name="uq_environment",
+        ),
+    )
+
     def __repr__(self):
         return f"{self.name}"
 

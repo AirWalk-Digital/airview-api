@@ -155,6 +155,27 @@ def test_environment_post_ok_response(client):
     assert items[0].abbreviation == "PRD"
 
 
+def test_environment_post_prevents_duplicate_abbreviations(client):
+    """
+    Given: A set of envrionmment in the db
+    When: When an environment definition is posted to the api with a repeated abbreviation
+    Then: The environment is rejected with a 400 status code
+    """
+    # Arrange
+    EnvironmentFactory(name="Test aaa", abbreviation="AAA")
+    db.session.commit()
+
+    # Act
+    resp = client.post(
+        "/environments/",
+        json={"name": "Other aaa", "abbreviation": "AAA"},
+    )
+    # Assert
+    assert resp.status_code == 400
+    items = db.session.query(Environment).all()
+    assert len(items) == 1
+
+
 @pytest.mark.parametrize(
     "data",
     [
