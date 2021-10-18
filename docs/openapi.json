@@ -429,7 +429,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -437,7 +437,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1078,18 +1078,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "systemId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "systemId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
