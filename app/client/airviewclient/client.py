@@ -58,6 +58,7 @@ class Backend:
             f"/referenced-applications/?type={type}&reference={application_reference}"
         )
         resp = self._session.get(url=url, headers=self._headers)
+
         if resp.status_code == 200:
             data = resp.json()
             return Application(
@@ -158,7 +159,6 @@ class Backend:
         url = self.get_url(
             f"/monitored-resources/?applicationTechnicalControlId={app_tech_control_id}&reference={reference}"
         )
-        print(url)
         resp = self._session.put(
             url=url,
             json={
