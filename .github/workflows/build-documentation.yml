@@ -45,5 +45,9 @@ jobs:
       run: |
         # Stage the file, commit and push
         git add docs
-        git commit -m "Automated create client documentation"
-        git push
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Automated add listing.json from Github actions"
+            git push
+          else
+            echo "no changes";
+          fi
