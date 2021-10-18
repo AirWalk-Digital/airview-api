@@ -159,7 +159,7 @@ def test_environment_post_prevents_duplicate_abbreviations(client):
     """
     Given: A set of envrionmment in the db
     When: When an environment definition is posted to the api with a repeated abbreviation
-    Then: The environment is rejected with a ??? status code
+    Then: The environment is rejected with a 400 status code
     """
     # Arrange
     EnvironmentFactory(name="Test aaa", abbreviation="AAA")
