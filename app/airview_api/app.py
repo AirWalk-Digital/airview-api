@@ -6,6 +6,7 @@ from airview_api import controllers
 
 
 DB_URI = os.environ.get("DATABASE_URI")
+SEARCH_BACKEND = os.environ.get("SEARCH_BACKEND")
 
 
 def create_app():
