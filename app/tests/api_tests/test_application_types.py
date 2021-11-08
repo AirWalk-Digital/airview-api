@@ -50,3 +50,27 @@ def test_application_types_post_ok(client):
     assert items[0].id == 1
     assert items[0].name == "Type One"
  
+
+def test_application_types_handle_duplicate(client):
+    """
+    Given: existing application type in db
+    When: When a call is made to persist an application type with the same name
+    Then: The item is rejected with 400
+    """
+    # Arrange
+    ApplicationTypeFactory(name="Type One")
+    db.session.commit()
+
+    # Act
+    resp = client.post("/application-types/",
+        json={
+            "name": "Type One"
+            })
+
+    # Assert
+    assert resp.status_code == 400
+
+    # Assert persistance
+    items = db.session.query(ApplicationType).all()
+    assert len(items) == 1
+ 
