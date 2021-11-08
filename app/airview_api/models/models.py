@@ -96,7 +96,7 @@ class ApplicationType(db.Model):
     __table_args__ = (
         db.UniqueConstraint(
             "name",
-            name="uq_application_type",
+            name="uq_application_type_name",
         ),
     )
 
