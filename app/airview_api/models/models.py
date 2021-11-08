@@ -93,8 +93,16 @@ class ApplicationType(db.Model):
         "Application", back_populates="application_type", lazy=True
     )
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "name",
+            name="uq_application_type",
+        ),
+    )
+
     def __repr__(self):
         return f"{self.name}"
+
 
 
 class Environment(db.Model):
@@ -148,6 +156,15 @@ class System(db.Model):
     source = db.Column(db.String(500), nullable=True)
     stage = db.Column(db.String(50), nullable=True)
     technical_controls = db.relationship("TechnicalControl", back_populates="system")
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "name",
+            name="uq_system",
+        ),
+    )
+
+
 
     def __repr__(self):
         return f"{self.name}"
