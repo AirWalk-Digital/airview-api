@@ -141,3 +141,9 @@ class ApplicationStatusSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     application_name = ma.fields.String()
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
+
+class SystemSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str()
+    source = ma.fields.Str()
+    stage = ma.fields.Str()

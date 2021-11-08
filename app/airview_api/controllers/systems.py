@@ -3,6 +3,7 @@ import flask
 from airview_api.services import (
     technical_control_service,
     exclusion_service,
+    system_service,
     application_service,
     AirViewValidationException,
     AirViewNotFoundException,
@@ -14,6 +15,7 @@ from airview_api.blueprint import Blueprint, Roles
 from airview_api.schemas import (
     ApplicationSchema,
     ExclusionResourceSchema,
+    SystemSchema,
     TechnicalControlSchema,
 )
 
@@ -41,3 +43,19 @@ class ExclusionResources(MethodView):
 
         resources = exclusion_service.get_by_system(system_id=system_id, state=state)
         return resources
+ 
+@blp.route("/")
+class Systems(MethodView):
+    @blp.arguments(SystemSchema)
+    @blp.response(200, SystemSchema)
+    @blp.role(Roles.CONTENT_WRITER)
+    def post(self, data):
+        """ Create a new system
+        Returns the newly created system
+        """
+        try:
+            app = system_service.create(data)
+            return app
+        except AirViewValidationException as e:
+            abort(400, message=str(e))
+
