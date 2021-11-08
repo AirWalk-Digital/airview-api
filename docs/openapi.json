@@ -360,6 +360,23 @@
         },
         "type": "object"
       },
+      "System": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "stage": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "TechnicalControl": {
         "properties": {
           "controlTypeId": {
@@ -429,7 +446,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -437,7 +454,7 @@
           },
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -532,6 +549,41 @@
           "application-types"
         ],
         "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdAndName"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdAndName"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new application type\nReturns the newly created application",
+        "tags": [
+          "application-types"
+        ],
+        "x-api-rbac-role": "ContentWriter"
       }
     },
     "/application-types/{application_type_id}/applications/": {
@@ -947,18 +999,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationTechnicalControlId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "applicationTechnicalControlId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
@@ -1033,6 +1085,43 @@
           "referenced-applications"
         ],
         "x-api-rbac-role": "ContentReader"
+      }
+    },
+    "/systems/": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/System"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/System"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new system\nReturns the newly created system",
+        "tags": [
+          "systems"
+        ],
+        "x-api-rbac-role": "ContentWriter"
       }
     },
     "/systems/{system_id}/exclusion-resources/": {
