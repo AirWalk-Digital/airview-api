@@ -287,12 +287,16 @@ def test_applications_get_all(client):
     """
     Given: A collection of applications in the db
     When: When a call is made to the root resource
-    Then: An array of all applications is returned with status 200
+    Then: An array of all applications is returned in alphabetical order with status 200
     """
     # Arrange
     EnvironmentFactory(id=1)
     ApplicationTypeFactory(id=1)
-    ApplicationFactory.create_batch(5)
+    ApplicationFactory(id=1, name="zzz")
+    ApplicationFactory(id=2, name="aaa")
+    ApplicationFactory(id=3, name="bbb")
+    ApplicationFactory(id=4, name="xxx")
+    ApplicationFactory(id=5, name="yyy")
 
     # Act
     resp = client.get("/applications/")
@@ -302,9 +306,13 @@ def test_applications_get_all(client):
     data = resp.get_json()
     assert len(data) == 5
 
-    assert data[3]["id"] == 3
-    assert data[3]["name"] == "App 3"
+    assert data[3]["id"] == 5
+    assert data[3]["name"] == "yyy"
     assert data[3]["applicationTypeId"] == 1
+
+
+    assert data[0]["name"] == "aaa"
+    assert data[4]["name"] == "zzz"
 
 
 def test_applications_get_by_application_type_id(client):
