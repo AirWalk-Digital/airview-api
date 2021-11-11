@@ -142,7 +142,7 @@ class ApplicationStatusSchema(CamelCaseSchema):
     application_name = ma.fields.String()
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
 
-    
+
 class SearchResultSchema(CamelCaseSchema):
     path = ma.fields.String()
     title = ma.fields.String()
