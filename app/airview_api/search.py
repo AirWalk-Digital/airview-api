@@ -34,9 +34,9 @@ class SearchBackend:
 
 
 class ElasticsearchBackend(SearchBackend):
-    def __init__(self, host: str, api_key: str, index: str):
+    def __init__(self, host: str, api_key: str, index: str, port: str = "9200"):
         super(ElasticsearchBackend, self).__init__()
-        self.host = host
+        self.host = f"{host}:{port}"
         self.api_key = api_key
         self.index = index
 
@@ -77,6 +77,7 @@ def init_search_backend() -> Optional[SearchBackend]:
         kwargs = {
             "api_key": os.environ['SEARCH_BACKEND_ELASTIC_API_TOKEN'],
             "host": os.environ['SEARCH_BACKEND_ELASTIC_HOST'],
+            "port": os.environ['SEARCH_BACKEND_ELASTIC_PORT'],
             "index": os.environ['SEARCH_BACKEND_ELASTIC_INDEX']
         }
         return ElasticsearchBackend(**kwargs)
