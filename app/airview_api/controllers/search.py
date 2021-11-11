@@ -1,9 +1,9 @@
 from flask import request
 from flask.views import MethodView
-from airview_api.blueprint import Blueprint, Roles
-from airview_api.search import init_search_backend
-from airview_api.schemas import SearchResultSchema
 
+from airview_api.blueprint import Blueprint, Roles
+from airview_api.schemas import SearchResultSchema
+from airview_api.search import init_search_backend
 
 blp = Blueprint(
     "search",
