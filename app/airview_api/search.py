@@ -8,6 +8,7 @@ SEARCH_BACKEND = os.environ.get("SEARCH_BACKEND")
 # Defaults
 SEARCH_BACKEND_ELASTIC_SSL_ENABLED = bool(int(os.environ.get("SEARCH_BACKEND_ELASTIC_SSL_ENABLED", 1)))
 SEARCH_BACKEND_ELASTIC_SSL_VERIFY_CERTS = bool(int(os.environ.get("SEARCH_BACKEND_ELASTIC_SSL_VERIFY_CERTS", 1)))
+SEARCH_BACKEND_ELASTIC_PORT = os.environ.get("SEARCH_BACKEND_ELASTIC_PORT", "9200")
 
 
 class SearchBackendNotDefinedError(Exception):
@@ -77,7 +78,7 @@ def init_search_backend() -> Optional[SearchBackend]:
         kwargs = {
             "api_key": os.environ['SEARCH_BACKEND_ELASTIC_API_TOKEN'],
             "host": os.environ['SEARCH_BACKEND_ELASTIC_HOST'],
-            "port": os.environ['SEARCH_BACKEND_ELASTIC_PORT'],
+            "port": SEARCH_BACKEND_ELASTIC_PORT,
             "index": os.environ['SEARCH_BACKEND_ELASTIC_INDEX']
         }
         return ElasticsearchBackend(**kwargs)
