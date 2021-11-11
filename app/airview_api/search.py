@@ -57,14 +57,13 @@ class ElasticsearchBackend(SearchBackend):
                 "multi_match": {
                     "query": search_term,
                     # TODO: Check if there's other fields we might want to search on
-                    "fields": ["title", "content", "path"]
+                    # "fields": ["title", "content", "path"]
                 }
             }
         }
         results = self.client.search(
             index=self.index,
-            body=body,
-            filter_path=['hits.hits.title', 'hits.hits.path', 'hits.hits.content']
+            body=body
         )
         return results
 
