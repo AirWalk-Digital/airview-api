@@ -146,5 +146,5 @@ class ApplicationStatusSchema(CamelCaseSchema):
 class SearchResultSchema(CamelCaseSchema):
     path = ma.fields.String()
     title = ma.fields.String()
-    summary = ma.fields.String()
-    content = ma.fields.String()
+    summary = ma.fields.String(required=False)
+    content = ma.fields.String(required=False)

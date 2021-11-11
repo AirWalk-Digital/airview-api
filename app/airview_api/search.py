@@ -1,5 +1,6 @@
 import os
 
+from typing import Optional
 
 # Required
 SEARCH_BACKEND = os.environ.get("SEARCH_BACKEND")
@@ -9,7 +10,7 @@ SEARCH_BACKEND_ELASTIC_SSL_ENABLED = bool(int(os.environ.get("SEARCH_BACKEND_ELA
 SEARCH_BACKEND_ELASTIC_SSL_VERIFY_CERTS = bool(int(os.environ.get("SEARCH_BACKEND_ELASTIC_SSL_VERIFY_CERTS", 1)))
 
 
-class BackendNotDefinedError(Exception):
+class SearchBackendNotDefinedError(Exception):
     """Raised when an unknown backend is configured."""
 
 
@@ -25,8 +26,11 @@ class SearchBackend:
     def create_client(self):
         raise NotImplementedError("create_client() must be defined")
 
-    def query(self, search_term):
+    def query(self, search_term: str):
         raise NotImplementedError("query() must be defined")
+
+    def serialize(self):
+        pass
 
 
 class ElasticsearchBackend(SearchBackend):
@@ -46,23 +50,30 @@ class ElasticsearchBackend(SearchBackend):
         )
         return self._client
 
-    def query(self, search_term):
+    def query(self, search_term: str):
         body = {
             "query": {
                 "multi_match": {
                     "query": search_term,
-                    # TODO: Check if there's any fields we might want to search on
-                    "fields": ["title", "content"]
+                    # TODO: Check if there's other fields we might want to search on
+                    "fields": ["title", "content", "path"]
                 }
             }
         }
-        return self.client.search(index=self.index, body=body, filter_path=['hits.hits.title', 'hits.hits.path'])
+        results = self.client.search(
+            index=self.index,
+            body=body,
+            filter_path=['hits.hits.title', 'hits.hits.path', 'hits.hits.content']
+        )
+        return results
 
 
-def init_search_backend():
+def init_search_backend() -> Optional[SearchBackend]:
+    """Initialises a configured search backend."""
     backend = SEARCH_BACKEND.lower() if SEARCH_BACKEND else None
+    if backend is None:
+        return
     if backend == "elasticsearch":
-        from elasticsearch import Elasticsearch
         kwargs = {
             "api_key": os.environ['SEARCH_BACKEND_ELASTIC_API_TOKEN'],
             "host": os.environ['SEARCH_BACKEND_ELASTIC_HOST'],
@@ -70,4 +81,4 @@ def init_search_backend():
         }
         return ElasticsearchBackend(**kwargs)
     else:
-        raise BackendNotDefinedError(f"Backend '{backend}' is not defined.")
+        raise SearchBackendNotDefinedError(f"Backend '{backend}' is not defined.")
