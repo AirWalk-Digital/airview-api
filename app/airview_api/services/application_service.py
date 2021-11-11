@@ -14,7 +14,7 @@ import re
 
 
 def get_all():
-    return Application.query.all()
+    return Application.query.order_by("name").all()
 
 
 def get_by_id(application_id: int):
