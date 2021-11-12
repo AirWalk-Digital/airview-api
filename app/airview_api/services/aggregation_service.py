@@ -41,31 +41,17 @@ current as(
       join apps a
         on a.id = atc.application_id
   ) as t1
-),
-excluded as(
-  select
-    e.application_technical_control_id,
-    r.reference,
-    r.state,
-    atc.technical_control_id
-  from exclusion e
-  join exclusion_resource r
-    on r.exclusion_id=e.id
-  join application_technical_control atc
-    on atc.id=e.application_technical_control_id
-  where
-    r.state = 'ACTIVE'
 )
 
 select
   pa.id,
   pa.name application_name,
   e.name environment,
-  sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) high,
-  sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) medium,
-  sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) low,
-  count(distinct(x.technical_control_id)) exempt_controls,
-  count(distinct case when tr.state='FLAGGED' and x.reference is null then tc.id else null end) failed_controls,
+  sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
+  sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
+  sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
+  0 exempt_controls, -- count(distinct(x.technical_control_id)) exempt_controls, TO DO: FIX
+  count(distinct case when tr.state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
   count(distinct tc.id) total_controls
 from
   current c
@@ -81,9 +67,9 @@ from
     on e.id = a.environment_id
     join application pa
     on pa.id = c.top_level_id
-  left join excluded x
-    on x.application_technical_control_id = atc.id
-    and x.reference = tr.reference
+  left join exclusion x
+    on x.id = tr.exclusion_id
+    and tr.exclusion_state = 'ACTIVE'
 group by
   pa.id,
   pa.name,
@@ -126,7 +112,7 @@ select
   tc.name,
   tr.id triggered_resource_id,
   tr.reference triggered_resource_reference,
-  x.state resource_state,
+  tr.exclusion_state, 
   tr.last_modified logged_datetime,
   tc.severity,
   e.abbreviation environment,
@@ -149,9 +135,9 @@ from
     on a.id = atc.application_id
   left join environment e
     on e.id = a.environment_id
-  left join excluded x
-    on x.application_technical_control_id = atc.id
-    and x.reference = tr.reference
+  left join exclusion x
+    on x.id = tr.exclusion_id
+    and tr.exclusion_state='ACTIVE'
 where
   tr.state = 'FLAGGED'
   -- and coalesce(x.state,'NONE') != 'ACTIVE'
@@ -160,7 +146,7 @@ order by
   tc.severity
 """
     result = db.session.execute(sql, {"application_id": application_id})
-    data = [dict(r) for r in result if r["resource_state"] != "ACTIVE"]
+    data = [dict(r) for r in result if r["exclusion_state"] != "ACTIVE"]
 
     key_func = lambda x: (
         x["id"],
@@ -185,7 +171,7 @@ order by
                 {
                     "id": g["triggered_resource_id"],
                     "name": g["triggered_resource_reference"],
-                    "state": g.get("resource_state") or ExclusionState.NONE,
+                    "state": g.get("exclusion_state") or ExclusionState.NONE,
                 }
                 for g in list_group
             ]

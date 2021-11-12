@@ -203,10 +203,15 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
         end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-2", state=ExclusionState.ACTIVE
-    )
+
+    mr = MonitoredResource.query.get(103)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
+    # ExclusionResourceFactory(
+    # id=55, exclusion_id=44, reference="res-2", state=ExclusionState.ACTIVE
+    # )
     Application.query.all()
+
     # Act
     resp = client.get("/applications/1/control-statuses")
 
@@ -349,9 +354,9 @@ def test_get_application_compliance_overview(client):
         end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, reference="res-2", exclusion_id=44, state=ExclusionState.ACTIVE
-    )
+    mr = MonitoredResource.query.get(103)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
     Application.query.all()
 
     # aggregation_service.get_application_compliance_overview()
