@@ -104,7 +104,6 @@ class ApplicationType(db.Model):
         return f"{self.name}"
 
 
-
 class Environment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
@@ -164,8 +163,6 @@ class System(db.Model):
         ),
     )
 
-
-
     def __repr__(self):
         return f"{self.name}"
 
@@ -175,7 +172,14 @@ class MonitoredResource(db.Model):
     reference = db.Column(db.String(500), nullable=False)
     state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=False)
+    last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+    exclusion_id = db.Column(
+        db.Integer,
+        db.ForeignKey("exclusion.id"),
+        nullable=True,
+    )
+    exclusion = db.relationship("Exclusion", back_populates="resources")
+    exclusion_state = db.Column(db.Enum(ExclusionState), nullable=True)
 
     application_technical_control_id = db.Column(
         db.Integer,
@@ -209,13 +213,14 @@ class ApplicationTechnicalControl(db.Model):
         "Application", back_populates="application_technical_controls"
     )
     technical_control = db.relationship(
-        "TechnicalControl", back_populates="application_technical_controls"
+        "TechnicalControl",
+        back_populates="application_technical_controls",
     )
 
     monitored_resources = db.relationship(
         "MonitoredResource",
         back_populates="application_technical_control",
-        lazy=True,
+        lazy="dynamic",
         cascade="delete",
     )
 
@@ -255,20 +260,20 @@ class Exclusion(db.Model):
     application_technical_control = db.relationship(
         "ApplicationTechnicalControl", back_populates="exclusions"
     )
-    resources = db.relationship("ExclusionResource", back_populates="exclusion")
+    resources = db.relationship("MonitoredResource", back_populates="exclusion")
 
 
-class ExclusionResource(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    exclusion_id = db.Column(
-        db.Integer,
-        db.ForeignKey("exclusion.id"),
-        nullable=False,
-    )
-    exclusion = db.relationship("Exclusion", back_populates="resources")
+# class ExclusionResource(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     exclusion_id = db.Column(
+#         db.Integer,
+#         db.ForeignKey("exclusion.id"),
+#         nullable=False,
+#     )
+#     exclusion = db.relationship("Exclusion", back_populates="resources")
 
-    reference = db.Column(db.String, nullable=False)
-    state = db.Column(db.Enum(ExclusionState), nullable=False)
+#     reference = db.Column(db.String, nullable=False)
+#     state = db.Column(db.Enum(ExclusionState), nullable=False)
 
 
 class NamedUrl:

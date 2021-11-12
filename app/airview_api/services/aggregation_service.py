@@ -79,7 +79,7 @@ from
     on a.id = atc.application_id
   left join environment e
     on e.id = a.environment_id
-  join application pa
+    join application pa
     on pa.id = c.top_level_id
   left join excluded x
     on x.application_technical_control_id = atc.id

@@ -1,7 +1,11 @@
 from tests.client_tests.common import *
 from airview_api import app
 from airview_api.database import db
-from airview_api.models import TechnicalControlSeverity, ExclusionState
+from airview_api.models import (
+    TechnicalControlSeverity,
+    ExclusionState,
+    MonitoredResourceState,
+)
 from datetime import datetime
 from tests.common import client, instance
 from tests.factories import *
@@ -44,15 +48,36 @@ def setup():
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-a", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=55,
+        exclusion_id=44,
+        reference="res-a",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
 
-    ExclusionResourceFactory(
-        id=56, exclusion_id=44, reference="res-5", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=56,
+        exclusion_id=44,
+        reference="res-5",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
-    ExclusionResourceFactory(
-        id=57, exclusion_id=44, reference="res-6", state=ExclusionState.ACTIVE
+    MonitoredResourceFactory(
+        id=57,
+        exclusion_id=44,
+        reference="res-6",
+        exclusion_state=ExclusionState.ACTIVE,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
 
 
@@ -94,6 +119,6 @@ def test_handle_exclusion_resource_updates_state(handler):
     )
 
     # Assert
-    item = ExclusionResource.query.get(55)
-    assert item.state == ExclusionState.ACTIVE
+    item = MonitoredResource.query.get(55)
+    assert item.exclusion_state == ExclusionState.ACTIVE
     print(item)

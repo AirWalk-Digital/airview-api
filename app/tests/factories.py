@@ -8,7 +8,6 @@ from airview_api.models import (
     ApplicationTechnicalControl,
     MonitoredResource,
     Exclusion,
-    ExclusionResource,
     ApplicationReference,
 )
 from airview_api.database import db
@@ -87,11 +86,6 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
 
 
-class ExclusionResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
-    class Meta:
-        model = ExclusionResource
-        sqlalchemy_session = db.session
-
 
 def reset_factories():
     TechnicalControlFactory.reset_sequence()
@@ -101,6 +95,5 @@ def reset_factories():
     EnvironmentFactory.reset_sequence()
     ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
-    ExclusionResourceFactory.reset_sequence()
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
