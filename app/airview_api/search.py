@@ -25,13 +25,13 @@ class SearchBackend:
         return self._client
 
     def create_client(self):
-        raise NotImplementedError("create_client() must be defined")
+        raise NotImplementedError("create_client() must be implemented in child class.")
 
     def query(self, search_term: str):
-        raise NotImplementedError("query() must be defined")
+        raise NotImplementedError("query() must be implemented in child class.")
 
-    def serialize(self):
-        pass
+    def serialize(self, data):
+        raise NotImplementedError("serialize() must be implemented in child class.")
 
 
 class ElasticsearchBackend(SearchBackend):
@@ -51,20 +51,41 @@ class ElasticsearchBackend(SearchBackend):
         )
         return self._client
 
+    def serialize(self, data):
+        output = []
+        try:
+            actual_data = data['hits']['hits']
+            if isinstance(actual_data, list):
+                for payload in actual_data:
+                    output.append(payload['_source'])
+            elif isinstance(actual_data, dict):
+                output = actual_data['_source']
+        except KeyError:
+            return []
+        return output
+
     def query(self, search_term: str):
         body = {
             "query": {
-                "multi_match": {
-                    "query": search_term,
-                    # TODO: Check if there's other fields we might want to search on
-                    # "fields": ["title", "content", "path"]
+                "multi_match": {  # This will returned a ranked search.
+                    "query": search_term
                 }
             }
         }
-        results = self.client.search(
+
+        search_result = self.client.search(
             index=self.index,
-            body=body
+            body=body,
+            filter_path=[
+                'hits.hits._source.path',
+                'hits.hits._source.title',
+                'hits.hits._source.content',
+                'hits.hits._source.summary'
+            ]
         )
+        results = []
+        if search_result:
+            results = self.serialize(search_result)
         return results
 
 
