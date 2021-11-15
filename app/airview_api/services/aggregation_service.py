@@ -1,20 +1,9 @@
-from pprint import pprint
-from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.log import Identified
-from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.models import (
-    Application,
     MonitoredResource,
-    ApplicationTechnicalControl,
-    TechnicalControlType,
-    TechnicalControl,
-    System,
     ExclusionState,
 )
 from airview_api.database import db
 import itertools
-from collections import defaultdict
 
 
 def get_application_compliance_overview():
@@ -50,7 +39,7 @@ select
   sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
   sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
   sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
-  0 exempt_controls, -- count(distinct(x.technical_control_id)) exempt_controls, TO DO: FIX
+  count(distinct(atc2.technical_control_id)) exempt_controls, 
   count(distinct case when tr.state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
   count(distinct tc.id) total_controls
 from
@@ -70,6 +59,8 @@ from
   left join exclusion x
     on x.id = tr.exclusion_id
     and tr.exclusion_state = 'ACTIVE'
+  left join application_technical_control atc2
+    on atc2.id = x.application_technical_control_id 
 group by
   pa.id,
   pa.name,
