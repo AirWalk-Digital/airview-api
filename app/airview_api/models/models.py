@@ -31,6 +31,19 @@ class MonitoredResourceState(Enum):
         return self.name
 
 
+class QualityModel(Enum):
+    OPERATIONAL_EXCELLENCE = 1
+    SECURITY = 2
+    RELIABILITY = 3
+    PERFORMANCE_EFFICIENCY = 4
+    COST_OPTIMISATION = 5
+    PORTABILITY = 6
+    USABILITY_AND_COMPATIBILITY = 7
+
+    def __str__(self):
+        return self.name
+
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
@@ -130,6 +143,7 @@ class TechnicalControl(db.Model):
     control_type_id = db.Column(db.Integer, nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
+    quality_model = db.Column(db.Enum(QualityModel), nullable=False)
 
     application_technical_controls = db.relationship(
         "ApplicationTechnicalControl",

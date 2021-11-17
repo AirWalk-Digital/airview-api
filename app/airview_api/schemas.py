@@ -95,6 +95,7 @@ class TechnicalControlSchema(CamelCaseSchema):
     control_type_id = ma.fields.Integer(required=True)
     system_id = ma.fields.Integer(required=True)
     severity = ma.fields.String(required=False)
+    quality_model = ma.fields.String(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):
@@ -116,6 +117,16 @@ class ExclusionResourceSchema(CamelCaseSchema):
 class NamedUrlSchema(CamelCaseSchema):
     name = ma.fields.Str()
     url = ma.fields.Str()
+
+
+class ControlOverviewSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    severity = ma.fields.Str()
+    name = ma.fields.Str()
+    applied = ma.fields.Integer()
+    exempt = ma.fields.Integer()
+    control = ma.fields.Nested(NamedUrlSchema)
+    frameworks = ma.fields.List(ma.fields.Nested(NamedUrlSchema))
 
 
 class ControlStatusDetailSchema(CamelCaseSchema):
@@ -141,6 +152,7 @@ class ApplicationStatusSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     application_name = ma.fields.String()
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
+
 
 class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()

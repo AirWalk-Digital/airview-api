@@ -132,7 +132,10 @@ class Backend:
                 return None
             control = data[0]
             return TechnicalControl(
-                id=control["id"], name=control["name"], reference=control["reference"]
+                id=control["id"],
+                name=control["name"],
+                reference=control["reference"],
+                quality_model=QualityModel[control["qualityModel"]],
             )
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
@@ -178,6 +181,7 @@ class Backend:
                 "name": technical_control.name,
                 "reference": technical_control.reference,
                 "controlTypeId": technical_control.type,
+                "qualityModel": technical_control.quality_model.name,
                 "systemId": self._backend_config.system_id,
             },
             headers=self._headers,
@@ -186,7 +190,10 @@ class Backend:
         if resp.status_code == 200:
             control = resp.json()
             return TechnicalControl(
-                id=control["id"], name=control["name"], reference=control["reference"]
+                id=control["id"],
+                name=control["name"],
+                reference=control["reference"],
+                quality_model=QualityModel[control["qualityModel"]],
             )
 
         raise BackendFailureException(f"Status code: {resp.status_code}")

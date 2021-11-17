@@ -12,7 +12,9 @@ import pytest
 from client.airviewclient import models
 
 application = models.Application(name="app one", reference="app-ref-1")
-technical_control = models.TechnicalControl(name="ctrl a", reference="tc-ref-1")
+technical_control = models.TechnicalControl(
+    name="ctrl a", reference="tc-ref-1", quality_model=models.QualityModel.SECURITY
+)
 compliance_event = models.ComplianceEvent(
     application=application,
     technical_control=technical_control,
@@ -170,7 +172,9 @@ def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control
         "GET",
         f"{base_url}/technical-controls/?systemId=111&reference=tc-ref-1",
         status_code=200,
-        json=[{"id": 222, "name": "tc1", "reference": "ref1"}],
+        json=[
+            {"id": 222, "name": "tc1", "reference": "ref1", "qualityModel": "SECURITY"}
+        ],
     )
     adapter.register_uri(
         "GET",
@@ -244,7 +248,9 @@ def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
         "GET",
         f"{base_url}/technical-controls/?systemId=111&reference=tc-ref-1",
         status_code=200,
-        json=[{"id": 222, "name": "tc1", "reference": "ref1"}],
+        json=[
+            {"id": 222, "name": "tc1", "reference": "ref1", "qualityModel": "SECURITY"}
+        ],
     )
     adapter.register_uri(
         "GET",
@@ -288,7 +294,9 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
         "GET",
         f"{base_url}/technical-controls/?systemId=111&reference=tc-ref-1",
         status_code=200,
-        json=[{"id": 222, "name": "tc1", "reference": "ref1"}],
+        json=[
+            {"id": 222, "name": "tc1", "reference": "ref1", "qualityModel": "SECURITY"}
+        ],
     )
     adapter.register_uri(
         "GET",

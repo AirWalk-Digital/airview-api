@@ -96,3 +96,12 @@ class ControlStatuses(MethodView):
     def get(self, application_id):
         """Get the current control statuses of resources/controls within this application"""
         return aggregation_service.get_control_statuses(application_id)
+
+
+@blp.route("/<int:application_id>/control-overviews")
+class ControlOverviews(MethodView):
+    @blp.response(200, ControlStatusSchema(many=True))
+    @blp.role(Roles.COMPLIANCE_READER)
+    def get(self, application_id):
+        """Get the current control statuses of resources/controls within this application"""
+        return aggregation_service.get_control_statuses(application_id)

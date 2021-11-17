@@ -98,6 +98,7 @@ def test_technical_control_get_single_not_found(client):
     # Assert
     assert resp.status_code == 404
 
+
 def test_technical_controls_post_reject_bad_reference(client):
     """
     Given: An empty technicalContols table
@@ -125,6 +126,7 @@ def test_technical_controls_post_reject_bad_reference(client):
     persisted = TechnicalControl.query.all()
     assert len(persisted) == 0
 
+
 def test_technical_controls_post_ok_new(client):
     """
     Given: An empty technicalContols table
@@ -139,6 +141,7 @@ def test_technical_controls_post_ok_new(client):
         "controlTypeId": 1,
         "systemId": 2,
         "severity": "LOW",
+        "qualityModel": "SECURITY",
     }
 
     # Act
@@ -178,6 +181,7 @@ def test_technical_controls_post_ok_sets_defaut_severity(client):
         "reference": "ctl_id_one",
         "controlTypeId": 1,
         "systemId": 2,
+        "qualityModel": "SECURITY",
     }
 
     # Act
@@ -194,6 +198,7 @@ def test_technical_controls_post_ok_sets_defaut_severity(client):
     assert data["controlTypeId"] == 1
     assert data["systemId"] == 2
     assert data["severity"] == "HIGH"
+    assert data["qualityModel"] == "SECURITY"
 
     persisted = TechnicalControl.query.all()
     assert len(persisted) == 1
@@ -220,6 +225,7 @@ def test_technical_controls_post_bad_request_for_existing(client):
         "controlTypeId": 1,
         "systemId": 1,
         "severity": "HIGH",
+        "qualityModel": "SECURITY",
     }
 
     # Act

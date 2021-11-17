@@ -6,6 +6,13 @@ from airview_api.database import db
 import itertools
 
 
+def get_control_overview_controls():
+    return []
+    sql = """
+
+    """
+
+
 def get_application_compliance_overview():
     sql = """
 with recursive apps as (
