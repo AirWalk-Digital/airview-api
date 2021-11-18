@@ -33,5 +33,6 @@ def create_app():
     api.register_blueprint(controllers.application_technical_controls.blp)
     api.register_blueprint(controllers.monitored_resources.blp)
     api.register_blueprint(controllers.exclusions.blp)
+    api.register_blueprint(controllers.search.blp)
 
     return app

@@ -155,6 +155,13 @@ class ApplicationStatusSchema(CamelCaseSchema):
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
 
 
+class SearchResultSchema(CamelCaseSchema):
+    path = ma.fields.String()
+    title = ma.fields.String()
+    summary = ma.fields.String(required=False)
+    content = ma.fields.String(required=False)
+
+
 class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
