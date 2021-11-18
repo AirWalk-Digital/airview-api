@@ -4,7 +4,6 @@ from airview_api.models import (
 )
 from airview_api.database import db
 import itertools
-from pprint import pprint
 
 
 def get_control_overviews(application_id: int, quality_model: str):
@@ -17,9 +16,9 @@ with recursive apps as (
 select
   tc.id, 
   tc.name,
-  tc.control_type,
-  s.name system_name,
-  s.stage system_stage,
+  tc.control_type controlType,
+  s.name systemName,
+  s.stage systemStage,
   sum(mr.exclusion_id is not null and mr.exclusion_state == 'ACTIVE') exempt,
   count(1) applied
 from
@@ -37,14 +36,15 @@ where
 group by
   tc.id,
   tc.name,
-  tc.control_type
+  tc.control_type,
+  s.name,
+  s.stage
   
   
     """
     result = db.session.execute(sql, {"application_id": application_id})
     data = [dict(r) for r in result]
-    pprint(data)
-    return []
+    return data
 
 
 def get_application_compliance_overview():

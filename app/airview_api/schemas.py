@@ -65,7 +65,6 @@ class ControlStatusSchema(CamelCaseSchema):
     applicationTechnicalControlId = ma.fields.Integer()
     controlType = ma.fields.Str()
     systemName = ma.fields.Str()
-    systemSource = ma.fields.Str()
     systemStage = ma.fields.Str()
     severity = ma.fields.Str()
     name = ma.fields.Str()
@@ -123,9 +122,11 @@ class ControlOverviewSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     severity = ma.fields.Str()
     name = ma.fields.Str()
+    controlType = ma.fields.Str()
+    systemName = ma.fields.Str()
+    systemStage = ma.fields.Str()
     applied = ma.fields.Integer()
     exempt = ma.fields.Integer()
-    control = ma.fields.Nested(NamedUrlSchema)
     frameworks = ma.fields.List(ma.fields.Nested(NamedUrlSchema))
 
 

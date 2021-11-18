@@ -4,7 +4,6 @@ from airview_api.blueprint import Blueprint, Roles
 from airview_api.services import (
     application_service,
     aggregation_service,
-    exclusion_service,
     AirViewValidationException,
     AirViewNotFoundException,
 )
@@ -16,7 +15,7 @@ from airview_api.schemas import (
     ApplicationSchema,
     ControlStatusSchema,
     EnvironmentSchema,
-    ExclusionSchema,
+    ControlOverviewSchema,
 )
 
 blp = Blueprint(
@@ -101,7 +100,7 @@ class ControlStatuses(MethodView):
 
 @blp.route("/<int:application_id>/control-overviews")
 class ControlOverviews(MethodView):
-    @blp.response(200, ControlStatusSchema(many=True))
+    @blp.response(200, ControlOverviewSchema(many=True))
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self, application_id):
         quality_model = flask.request.args.get("qualityModel")

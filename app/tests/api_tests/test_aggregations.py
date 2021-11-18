@@ -424,8 +424,25 @@ def test_get_application_control_overview(client):
 
     # Assert
     data = resp.get_json()
-
-    expected = []
+    expected = [
+        {
+            "applied": 3,
+            "controlType": "SECURITY",
+            "exempt": 1,
+            "id": 22,
+            "name": "ctl1",
+            "systemName": "one",
+            "systemStage": "build",
+        },
+        {
+            "applied": 1,
+            "controlType": "TASK",
+            "exempt": 0,
+            "id": 23,
+            "name": "ctl2",
+            "systemName": "one",
+            "systemStage": "build",
+        },
+    ]
 
     assert expected == data
-    pprint(data)
