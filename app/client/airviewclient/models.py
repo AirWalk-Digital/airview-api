@@ -36,6 +36,15 @@ class QualityModel(Enum):
         return self.name
 
 
+class TechnicalControlType(Enum):
+    SECURITY = 1
+    OPERATIONAL = 2
+    TASK = 3
+
+    def __str__(self):
+        return self.name
+
+
 @dataclass
 class BackendConfig:
     """Configuration data for connecting to a backend"""
@@ -90,8 +99,8 @@ class TechnicalControl:
     reference: str
     #:Quality model of the techincal control
     quality_model: QualityModel
-    #: Id for type of control
-    type: int = 1
+    #: Type of control
+    type: TechnicalControlType
     #: Internal id of the techincal control
     id: Optional[int] = None
 
