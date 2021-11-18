@@ -17,6 +17,9 @@ with recursive apps as (
 select
   tc.id, 
   tc.name,
+  tc.control_type,
+  s.name system_name,
+  s.stage system_stage,
   sum(mr.exclusion_id is not null and mr.exclusion_state == 'ACTIVE') exempt,
   count(1) applied
 from
@@ -27,11 +30,14 @@ from
     on tc.id = atc.technical_control_id
   join monitored_resource mr
     on mr.application_technical_control_id=atc.id
+  join system s
+    on s.id = tc.system_id
 where
   top_level_id=:application_id
 group by
   tc.id,
-  tc.name 
+  tc.name,
+  tc.control_type
   
   
     """
@@ -145,8 +151,7 @@ select
   a.name application_name,
   tr.application_technical_control_id,
   s.name system_name,
-  s.stage system_stage,
-  s.source system_source
+  s.stage system_stage
 from
   monitored_resource tr
   join application_technical_control as atc
@@ -181,7 +186,6 @@ order by
         x["environment"],
         x["application_name"],
         x["system_name"],
-        x["system_source"],
         x["system_stage"],
     )
     d = list()
@@ -211,8 +215,7 @@ order by
             "environment": key[3],
             "application": key[4],
             "systemName": key[5],
-            "systemSource": key[6],
-            "systemStage": key[7],
+            "systemStage": key[6],
             "resources": res,
             "raisedDateTime": mr.last_modified,
             "tickets": [],

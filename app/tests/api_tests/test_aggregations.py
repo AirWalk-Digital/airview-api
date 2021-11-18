@@ -19,7 +19,7 @@ def setup():
 
 
 def _prepare_aggregation_mock_data():
-    SystemFactory(id=1, name="one", source="aws-one", stage="build")
+    SystemFactory(id=1, name="one", stage="build")
     EnvironmentFactory(id=1, abbreviation="DEV", name="aaa")
     EnvironmentFactory(id=2, abbreviation="PRD", name="bbb")
     ApplicationTypeFactory(id=1)
@@ -39,7 +39,7 @@ def _prepare_aggregation_mock_data():
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlType.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
     )
@@ -180,7 +180,6 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -194,7 +193,6 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "DEV",
             "application": "svc 13",
@@ -207,7 +205,6 @@ def test_get_control_status_aggregation(client):
             "controlType": "security",
             "severity": "low",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "name": "ctl2",
             "environment": "PRD",
@@ -261,7 +258,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "DEV",
             "application": "svc 13",
@@ -275,7 +271,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -325,7 +320,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -339,7 +333,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",

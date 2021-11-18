@@ -157,5 +157,4 @@ class ApplicationStatusSchema(CamelCaseSchema):
 class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
-    source = ma.fields.Str()
     stage = ma.fields.Str()

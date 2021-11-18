@@ -175,7 +175,6 @@ class TechnicalControl(db.Model):
 class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
-    source = db.Column(db.String(500), nullable=True)
     stage = db.Column(db.String(50), nullable=True)
     technical_controls = db.relationship("TechnicalControl", back_populates="system")
 
