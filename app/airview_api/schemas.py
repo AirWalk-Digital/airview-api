@@ -38,8 +38,8 @@ class ApplicationSchema(CamelCaseSchema):
 
 class MonitoredResourceSchema(CamelCaseSchema):
     application_technical_control_id = ma.fields.Integer(required=True)
-    reference = ma.fields.String(required=True, validate=is_allowed_reference)
-    state = ma.fields.String(required=True)
+    reference = ma.fields.Str(required=True, validate=is_allowed_reference)
+    state = ma.fields.Str(required=True)
 
 
 class EnvironmentSchema(CamelCaseSchema):
@@ -92,10 +92,10 @@ class TechnicalControlSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
-    control_type_id = ma.fields.Integer(required=True)
+    control_type = ma.fields.Str(required=True)
     system_id = ma.fields.Integer(required=True)
-    severity = ma.fields.String(required=False)
-    quality_model = ma.fields.String(required=True)
+    severity = ma.fields.Str(required=False)
+    quality_model = ma.fields.Str(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):
@@ -150,7 +150,7 @@ class EnvirionmentStatusSchema(CamelCaseSchema):
 
 class ApplicationStatusSchema(CamelCaseSchema):
     id = ma.fields.Integer()
-    application_name = ma.fields.String()
+    application_name = ma.fields.Str()
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
 
 

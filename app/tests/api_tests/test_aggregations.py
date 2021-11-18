@@ -10,6 +10,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     ExclusionState,
     MonitoredResourceState,
+    TechnicalControlType,
 )
 
 
@@ -30,7 +31,7 @@ def _prepare_aggregation_mock_data():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -38,7 +39,7 @@ def _prepare_aggregation_mock_data():
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
     )
@@ -46,7 +47,7 @@ def _prepare_aggregation_mock_data():
         id=24,
         name="ctl3",
         reference="control_c",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
     )
@@ -120,6 +121,41 @@ def _prepare_aggregation_mock_data():
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
     # Items not created until something is invoked, probably because of underlying raw query
+    Application.query.all()
+
+
+def _prepare_additional_data():  # Add additional exemptions
+    MonitoredResourceFactory(
+        id=108,
+        application_technical_control_id=37,
+        reference="res-1-other-2",
+        state=MonitoredResourceState.SUPPRESSED,
+        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+    )
+
+    MonitoredResourceFactory(
+        id=109,
+        application_technical_control_id=37,
+        reference="res-1-other-3",
+        state=MonitoredResourceState.SUPPRESSED,
+        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+    )
+    ExclusionFactory(
+        id=44,
+        application_technical_control_id=33,
+        summary="sss",
+        mitigation="mmm",
+        impact=3,
+        probability=4,
+        is_limited_exclusion=True,
+        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
+        notes="nnn",
+    )
+    mr = MonitoredResource.query.get(103)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
     Application.query.all()
 
 
@@ -320,44 +356,12 @@ def test_get_application_compliance_overview(client):
     """
     Given: A populated database of triggered resources
     When: When a request is made to list the triggered resources by application using an invalid id
-    Then: An empty list is returned. 200 status
+    Then: An aggregated response of the data is returned. 200 status
     """
     # Arrange
     _prepare_aggregation_mock_data()
-
-    # Add additional exemptions
-    MonitoredResourceFactory(
-        id=108,
-        application_technical_control_id=37,
-        reference="res-1-other-2",
-        state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-    )
-
-    MonitoredResourceFactory(
-        id=109,
-        application_technical_control_id=37,
-        reference="res-1-other-3",
-        state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-    )
-    ExclusionFactory(
-        id=44,
-        application_technical_control_id=33,
-        summary="sss",
-        mitigation="mmm",
-        impact=3,
-        probability=4,
-        is_limited_exclusion=True,
-        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
-        notes="nnn",
-    )
-    mr = MonitoredResource.query.get(103)
-    mr.exclusion_id = 44
-    mr.exclusion_state = ExclusionState.ACTIVE
-    Application.query.all()
+    # Add additional data
+    _prepare_additional_data()
 
     # aggregation_service.get_application_compliance_overview()
     # Act
@@ -409,3 +413,26 @@ def test_get_application_compliance_overview(client):
     ]
 
     assert expected == data
+
+
+def test_get_application_control_overview(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the control data
+    Then: An aggregated response of the data is returned. 200 status
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/control-overviews?qualityModel=SECURITY")
+
+    # Assert
+    data = resp.get_json()
+
+    expected = []
+
+    assert expected == data
+    pprint(data)

@@ -7,6 +7,7 @@ from airview_api.models import (
     Exclusion,
     ExclusionState,
     MonitoredResourceState,
+    TechnicalControlType,
 )
 from tests.common import client
 from tests.factories import *
@@ -28,7 +29,7 @@ def setup():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -36,7 +37,7 @@ def setup():
         id=230,
         name="ctl2",
         reference="control_5",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )

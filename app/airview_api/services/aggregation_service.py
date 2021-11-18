@@ -4,13 +4,41 @@ from airview_api.models import (
 )
 from airview_api.database import db
 import itertools
+from pprint import pprint
 
 
-def get_control_overview_controls():
-    return []
+def get_control_overviews(application_id: int, quality_model: str):
     sql = """
-
+with recursive apps as (
+  select application.id top_level_id, id from application where parent_id is null
+  union all
+  select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
+)  
+select
+  tc.id, 
+  tc.name,
+  sum(mr.exclusion_id is not null and mr.exclusion_state == 'ACTIVE') exempt,
+  count(1) applied
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join technical_control tc
+    on tc.id = atc.technical_control_id
+  join monitored_resource mr
+    on mr.application_technical_control_id=atc.id
+where
+  top_level_id=:application_id
+group by
+  tc.id,
+  tc.name 
+  
+  
     """
+    result = db.session.execute(sql, {"application_id": application_id})
+    data = [dict(r) for r in result]
+    pprint(data)
+    return []
 
 
 def get_application_compliance_overview():

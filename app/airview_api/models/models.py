@@ -44,6 +44,15 @@ class QualityModel(Enum):
         return self.name
 
 
+class TechnicalControlType(Enum):
+    SECURITY = 1
+    OPERATIONAL = 2
+    TASK = 3
+
+    def __str__(self):
+        return self.name
+
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
@@ -140,7 +149,7 @@ class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    control_type_id = db.Column(db.Integer, nullable=False)
+    control_type = db.Column(db.Enum(TechnicalControlType), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)
@@ -306,9 +315,3 @@ class ControlStatusDetail:
         self.frameworks = frameworks
         self.assignment_group = assignment_group
         self.assignee = assignee
-
-
-class TechnicalControlType(Enum):
-    SECURITY = 1
-    OPERATIONAL = 2
-    TASK = 3

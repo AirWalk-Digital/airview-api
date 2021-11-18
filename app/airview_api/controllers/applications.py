@@ -10,6 +10,7 @@ from airview_api.services import (
 )
 from flask.views import MethodView
 from flask_smorest import abort
+import flask
 
 from airview_api.schemas import (
     ApplicationSchema,
@@ -103,5 +104,6 @@ class ControlOverviews(MethodView):
     @blp.response(200, ControlStatusSchema(many=True))
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self, application_id):
+        quality_model = flask.request.args.get("qualityModel")
         """Get the current control statuses of resources/controls within this application"""
-        return aggregation_service.get_control_statuses(application_id)
+        return aggregation_service.get_control_overviews(application_id, quality_model)
