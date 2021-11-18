@@ -127,18 +127,7 @@ with recursive apps as (
   union all
   select application.id from application join apps on apps.id = application.parent_id
 
-),
-
-excluded as(
-  select
-    e.application_technical_control_id,
-    r.reference,
-    r.state
-  from exclusion e
-  join exclusion_resource r
-    on r.exclusion_id=e.id
 )
-
 select
   atc.id,
   tc.name,
