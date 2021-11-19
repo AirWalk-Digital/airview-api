@@ -13,6 +13,7 @@ import flask
 
 from airview_api.schemas import (
     ApplicationSchema,
+    ControlOverviewResourceSchema,
     ControlStatusSchema,
     EnvironmentSchema,
     ControlOverviewSchema,
@@ -106,4 +107,17 @@ class ControlOverviews(MethodView):
         quality_model = flask.request.args.get("qualityModel")
         """Get the current control statuses of resources/controls within this application"""
         data = aggregation_service.get_control_overviews(application_id, quality_model)
+        return data
+
+
+@blp.route("/<int:application_id>/monitored-resources")
+class ControlOverviews(MethodView):
+    @blp.response(200, ControlOverviewResourceSchema(many=True))
+    @blp.role(Roles.COMPLIANCE_READER)
+    def get(self, application_id):
+        technical_control_id = flask.request.args.get("technicalControlId")
+        """Get the current control statuses of resources/controls within this application"""
+        data = aggregation_service.get_control_overview_resources(
+            application_id, technical_control_id
+        )
         return data

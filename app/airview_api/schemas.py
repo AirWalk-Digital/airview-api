@@ -131,6 +131,17 @@ class ControlOverviewSchema(CamelCaseSchema):
     frameworks = ma.fields.List(ma.fields.Nested(NamedUrlSchema))
 
 
+class ControlOverviewResourceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    type = ma.fields.Str()
+    reference = ma.fields.Str()
+    control_type = ma.fields.Str()
+    last_seen = ma.fields.DateTime()
+    state = ma.fields.Str()
+    environment = ma.fields.Str()
+    pending = ma.fields.Boolean()
+
+
 class ControlStatusDetailSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     application_name = ma.fields.Str()
