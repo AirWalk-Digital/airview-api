@@ -17,6 +17,7 @@ select
   tc.id, 
   tc.name,
   tc.control_type control_type,
+  tc.severity,
   s.name system_name,
   s.stage system_stage,
   sum(cast(mr.exclusion_id is not null and mr.exclusion_state = 'ACTIVE' as int)) exempt,
@@ -35,6 +36,7 @@ group by
   tc.id,
   tc.name,
   tc.control_type,
+  tc.severity,
   s.name,
   s.stage
   

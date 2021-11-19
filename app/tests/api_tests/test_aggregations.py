@@ -430,6 +430,7 @@ def test_get_application_control_overview(client):
             "controlType": "SECURITY",
             "exempt": 1,
             "id": 22,
+            "severity": "HIGH",
             "name": "ctl1",
             "systemName": "one",
             "systemStage": "build",
@@ -439,6 +440,7 @@ def test_get_application_control_overview(client):
             "controlType": "TASK",
             "exempt": 0,
             "id": 23,
+            "severity": "LOW",
             "name": "ctl2",
             "systemName": "one",
             "systemStage": "build",
@@ -471,6 +473,7 @@ def test_get_application_control_overview_hides_parents(client):
             "exempt": 0,
             "id": 22,
             "name": "ctl1",
+            "severity": "HIGH",
             "systemName": "one",
             "systemStage": "build",
         }
