@@ -446,3 +446,33 @@ def test_get_application_control_overview(client):
     ]
 
     assert expected == data
+
+
+def test_get_application_control_overview_hides_parents(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the control data for a sub-application
+    Then: An aggregated response of the data is returned. 200 status
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/13/control-overviews?qualityModel=SECURITY")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "applied": 1,
+            "controlType": "SECURITY",
+            "exempt": 0,
+            "id": 22,
+            "name": "ctl1",
+            "systemName": "one",
+            "systemStage": "build",
+        }
+    ]
+    assert expected == data

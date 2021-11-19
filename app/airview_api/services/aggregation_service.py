@@ -9,7 +9,7 @@ import itertools
 def get_control_overviews(application_id: int, quality_model: str):
     sql = """
 with recursive apps as (
-  select application.id top_level_id, id from application where parent_id is null
+  select application.id top_level_id, id from application where id=:application_id
   union all
   select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
 )  
@@ -19,7 +19,7 @@ select
   tc.control_type controlType,
   s.name systemName,
   s.stage systemStage,
-  sum(mr.exclusion_id is not null and mr.exclusion_state == 'ACTIVE') exempt,
+  sum(cast(mr.exclusion_id is not null and mr.exclusion_state = 'ACTIVE' as int)) exempt,
   count(1) applied
 from
   apps a
@@ -31,8 +31,6 @@ from
     on mr.application_technical_control_id=atc.id
   join system s
     on s.id = tc.system_id
-where
-  top_level_id=:application_id
 group by
   tc.id,
   tc.name,
