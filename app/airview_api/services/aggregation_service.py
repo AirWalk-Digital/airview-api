@@ -1,6 +1,9 @@
 from airview_api.models import (
     MonitoredResource,
     ExclusionState,
+    ApplicationTechnicalControl,
+    Application,
+    Environment,
 )
 from airview_api.database import db
 import itertools
@@ -55,21 +58,13 @@ with recursive apps as (
   select apps.top_level_id, application.id, application.environment_id from application join apps on apps.id = application.parent_id
 )  
 select
-  mr.id, 
-  mr.reference as type, 
-  mr.reference, 
-  mr.last_seen,
-  mr.state,
-  e.name environment,
-  case when mr.exclusion_state = 'PENDING' then true else false end pending
+    mr.id
 from
   apps a
   join application_technical_control as atc
     on atc.application_id = a.id
   join monitored_resource mr
     on mr.application_technical_control_id=atc.id
-  join environment e
-    on e.id=a.environment_id
 where
   atc.technical_control_id=:technical_control_id
   
@@ -81,8 +76,35 @@ where
             "technical_control_id": technical_control_id,
         },
     )
-    data = [dict(r) for r in result]
-    return data
+    ids = [dict(r)["id"] for r in result]
+
+    data = (
+        db.session.query(
+            MonitoredResource.id,
+            MonitoredResource.state.name,
+            MonitoredResource.reference,
+            MonitoredResource.last_seen,
+            Environment.name,
+            MonitoredResource.exclusion_state.name,
+        )
+        .join(ApplicationTechnicalControl)
+        .join(Application)
+        .join(Environment)
+        .filter(MonitoredResource.id.in_(ids))
+    )
+
+    items = [
+        {
+            "id": x[0],
+            "state": x[1],
+            "reference": x[2],
+            "last_seen": x[3],
+            "environment": x[4],
+            "pending": x[5] is not None and x[5] is "ACTIVE",
+        }
+        for x in data.all()
+    ]
+    return items
 
 
 def get_application_compliance_overview():

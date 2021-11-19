@@ -479,3 +479,32 @@ def test_get_application_control_overview_hides_parents(client):
         }
     ]
     assert expected == data
+
+
+def test_get_control_overview_resources_no_children(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with no children
+    Then: The resources belonging to the application is returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/13/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        }
+    ]
+    assert expected == data
