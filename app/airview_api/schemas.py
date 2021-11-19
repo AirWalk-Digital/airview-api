@@ -123,6 +123,7 @@ class ControlOverviewSchema(CamelCaseSchema):
     severity = ma.fields.Str()
     name = ma.fields.Str()
     control_type = ma.fields.Str()
+    severity = ma.fields.Str()
     system_name = ma.fields.Str()
     system_stage = ma.fields.Str()
     applied = ma.fields.Integer()
