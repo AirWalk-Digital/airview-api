@@ -44,7 +44,44 @@ group by
     """
     result = db.session.execute(sql, {"application_id": application_id})
     data = [dict(r) for r in result]
-    print(data)
+    return data
+
+
+def get_control_overview_resources(application_id: int, technical_control_id: int):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id, environment_id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id, application.environment_id from application join apps on apps.id = application.parent_id
+)  
+select
+  mr.id, 
+  mr.reference as type, 
+  mr.reference, 
+  mr.last_seen,
+  mr.state,
+  e.name environment,
+  case when mr.exclusion_state = 'PENDING' then true else false end pending
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join monitored_resource mr
+    on mr.application_technical_control_id=atc.id
+  join environment e
+    on e.id=a.environment_id
+where
+  atc.technical_control_id=:technical_control_id
+  
+    """
+    result = db.session.execute(
+        sql,
+        {
+            "application_id": application_id,
+            "technical_control_id": technical_control_id,
+        },
+    )
+    data = [dict(r) for r in result]
     return data
 
 
