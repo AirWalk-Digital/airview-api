@@ -16,9 +16,9 @@ with recursive apps as (
 select
   tc.id, 
   tc.name,
-  tc.control_type controlType,
-  s.name systemName,
-  s.stage systemStage,
+  tc.control_type control_type,
+  s.name system_name,
+  s.stage system_stage,
   sum(cast(mr.exclusion_id is not null and mr.exclusion_state = 'ACTIVE' as int)) exempt,
   count(1) applied
 from
@@ -42,6 +42,7 @@ group by
     """
     result = db.session.execute(sql, {"application_id": application_id})
     data = [dict(r) for r in result]
+    print(data)
     return data
 
 

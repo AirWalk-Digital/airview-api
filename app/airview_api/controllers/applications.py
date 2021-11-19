@@ -105,4 +105,5 @@ class ControlOverviews(MethodView):
     def get(self, application_id):
         quality_model = flask.request.args.get("qualityModel")
         """Get the current control statuses of resources/controls within this application"""
-        return aggregation_service.get_control_overviews(application_id, quality_model)
+        data = aggregation_service.get_control_overviews(application_id, quality_model)
+        return data
