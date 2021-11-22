@@ -106,7 +106,7 @@ class ControlOverviews(MethodView):
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self, application_id):
         quality_model = flask.request.args.get("qualityModel")
-        """Get the current control statuses of resources/controls within this application"""
+        """Get the current control overviews by quality model for resources/controls within this application"""
         data = aggregation_service.get_control_overviews(application_id, quality_model)
         return data
 
@@ -117,7 +117,7 @@ class ControlOverviews(MethodView):
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self, application_id):
         technical_control_id = flask.request.args.get("technicalControlId")
-        """Get the current control statuses of resources/controls within this application"""
+        """Get the current resources for a given technical control within this application"""
         data = aggregation_service.get_control_overview_resources(
             application_id, technical_control_id
         )
@@ -129,6 +129,6 @@ class ControlOverviews(MethodView):
     @blp.response(200, QualityModelSchema(many=True))
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self, application_id):
-        """Get the current control statuses of resources/controls within this application"""
+        """Get the quality models in use by this application"""
         data = aggregation_service.get_quality_models(application_id)
         return data
