@@ -118,6 +118,7 @@ where
             MonitoredResource.last_seen,
             Environment.name,
             MonitoredResource.exclusion_state.name,
+            MonitoredResource.exclusion_id,
         )
         .join(ApplicationTechnicalControl)
         .join(Application)
@@ -132,7 +133,7 @@ where
             "reference": x[2],
             "last_seen": x[3],
             "environment": x[4],
-            "pending": x[5] is not None and x[5] == "ACTIVE",
+            "pending": x[6] is not None and x[5] is not None and x[5] == "PENDING",
         }
         for x in data.all()
     ]
