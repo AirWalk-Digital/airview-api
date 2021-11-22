@@ -17,6 +17,7 @@ from airview_api.schemas import (
     ControlStatusSchema,
     EnvironmentSchema,
     ControlOverviewSchema,
+    QualityModelSchema,
 )
 
 blp = Blueprint(
@@ -120,4 +121,14 @@ class ControlOverviews(MethodView):
         data = aggregation_service.get_control_overview_resources(
             application_id, technical_control_id
         )
+        return data
+
+
+@blp.route("/<int:application_id>/quality-models")
+class ControlOverviews(MethodView):
+    @blp.response(200, QualityModelSchema(many=True))
+    @blp.role(Roles.COMPLIANCE_READER)
+    def get(self, application_id):
+        """Get the current control statuses of resources/controls within this application"""
+        data = aggregation_service.get_quality_models(application_id)
         return data

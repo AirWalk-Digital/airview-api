@@ -4,9 +4,37 @@ from airview_api.models import (
     ApplicationTechnicalControl,
     Application,
     Environment,
+    QualityModel,
 )
 from airview_api.database import db
 import itertools
+
+
+def get_quality_models(application_id: int):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
+)  
+select distinct
+  tc.quality_model
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join technical_control tc
+    on tc.id = atc.technical_control_id
+  
+  
+    """
+    result = db.session.execute(sql, {"application_id": application_id})
+    mapped = []
+    for r in result:
+        d = dict(r)
+        m = QualityModel[d["quality_model"]]
+        mapped.append(m)
+    return mapped
 
 
 def get_control_overviews(application_id: int, quality_model: str):
