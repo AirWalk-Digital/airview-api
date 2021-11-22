@@ -38,8 +38,8 @@ class ApplicationSchema(CamelCaseSchema):
 
 class MonitoredResourceSchema(CamelCaseSchema):
     application_technical_control_id = ma.fields.Integer(required=True)
-    reference = ma.fields.String(required=True, validate=is_allowed_reference)
-    state = ma.fields.String(required=True)
+    reference = ma.fields.Str(required=True, validate=is_allowed_reference)
+    state = ma.fields.Str(required=True)
 
 
 class EnvironmentSchema(CamelCaseSchema):
@@ -65,7 +65,6 @@ class ControlStatusSchema(CamelCaseSchema):
     applicationTechnicalControlId = ma.fields.Integer()
     controlType = ma.fields.Str()
     systemName = ma.fields.Str()
-    systemSource = ma.fields.Str()
     systemStage = ma.fields.Str()
     severity = ma.fields.Str()
     name = ma.fields.Str()
@@ -92,9 +91,10 @@ class TechnicalControlSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
-    control_type_id = ma.fields.Integer(required=True)
+    control_type = ma.fields.Str(required=True)
     system_id = ma.fields.Integer(required=True)
-    severity = ma.fields.String(required=False)
+    severity = ma.fields.Str(required=False)
+    quality_model = ma.fields.Str(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):
@@ -118,6 +118,30 @@ class NamedUrlSchema(CamelCaseSchema):
     url = ma.fields.Str()
 
 
+class ControlOverviewSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    severity = ma.fields.Str()
+    name = ma.fields.Str()
+    control_type = ma.fields.Str()
+    severity = ma.fields.Str()
+    system_name = ma.fields.Str()
+    system_stage = ma.fields.Str()
+    applied = ma.fields.Integer()
+    exempt = ma.fields.Integer()
+    frameworks = ma.fields.List(ma.fields.Nested(NamedUrlSchema))
+
+
+class ControlOverviewResourceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    type = ma.fields.Str()
+    reference = ma.fields.Str()
+    control_type = ma.fields.Str()
+    last_seen = ma.fields.DateTime()
+    state = ma.fields.Str()
+    environment = ma.fields.Str()
+    pending = ma.fields.Boolean()
+
+
 class ControlStatusDetailSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     application_name = ma.fields.Str()
@@ -139,11 +163,15 @@ class EnvirionmentStatusSchema(CamelCaseSchema):
 
 class ApplicationStatusSchema(CamelCaseSchema):
     id = ma.fields.Integer()
-    application_name = ma.fields.String()
+    application_name = ma.fields.Str()
     environments = ma.fields.List(ma.fields.Nested(EnvirionmentStatusSchema))
+
 
 class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
-    source = ma.fields.Str()
     stage = ma.fields.Str()
+
+
+class QualityModelSchema(CamelCaseSchema):
+    name = ma.fields.Str()

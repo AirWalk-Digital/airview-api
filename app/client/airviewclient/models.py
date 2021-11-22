@@ -23,6 +23,28 @@ class MonitoredResourceState(Enum):
         return self.name
 
 
+class QualityModel(Enum):
+    OPERATIONAL_EXCELLENCE = 1
+    SECURITY = 2
+    RELIABILITY = 3
+    PERFORMANCE_EFFICIENCY = 4
+    COST_OPTIMISATION = 5
+    PORTABILITY = 6
+    USABILITY_AND_COMPATIBILITY = 7
+
+    def __str__(self):
+        return self.name
+
+
+class TechnicalControlType(Enum):
+    SECURITY = 1
+    OPERATIONAL = 2
+    TASK = 3
+
+    def __str__(self):
+        return self.name
+
+
 @dataclass
 class BackendConfig:
     """Configuration data for connecting to a backend"""
@@ -75,8 +97,10 @@ class TechnicalControl:
     name: str
     #: Unique reference for the control within the connecting system
     reference: str
-    #: Id for type of control
-    type: int = 1
+    #:Quality model of the techincal control
+    quality_model: QualityModel
+    #: Type of control
+    type: TechnicalControlType
     #: Internal id of the techincal control
     id: Optional[int] = None
 

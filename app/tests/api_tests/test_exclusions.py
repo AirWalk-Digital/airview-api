@@ -5,8 +5,9 @@ from airview_api.models import (
     Application,
     TechnicalControlSeverity,
     Exclusion,
-    ExclusionResource,
     ExclusionState,
+    MonitoredResourceState,
+    TechnicalControlType,
 )
 from tests.common import client
 from tests.factories import *
@@ -28,7 +29,7 @@ def setup():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -36,7 +37,7 @@ def setup():
         id=230,
         name="ctl2",
         reference="control_5",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -60,8 +61,15 @@ def add_get_items_to_db():
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-a", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=55,
+        exclusion_id=44,
+        reference="res-a",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
 
     # unexpected other data
@@ -84,21 +92,109 @@ def add_get_items_to_db():
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=56, exclusion_id=45, reference="res-5", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=56,
+        exclusion_id=45,
+        reference="res-5",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=340,
     )
-    ExclusionResourceFactory(
-        id=57, exclusion_id=45, reference="res-6", state=ExclusionState.ACTIVE
+    MonitoredResourceFactory(
+        id=57,
+        exclusion_id=45,
+        reference="res-6",
+        exclusion_state=ExclusionState.ACTIVE,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=340,
     )
 
 
-def test_exclusions_post_ok(client):
+def test_exclusions_post_ok_for_new_resources(client):
     """
-    Given: An empty exclusions colllection, linked app controls
+    Given: An empty exclusions colllection, linked app controls, existing resources
     When: When the api is called with an exclusion request
-    Then: The exclusions request is persisted, 201 status
+    Then: The exclusions request is persisted & linked to existing resources, 201 status
     """
     # Arrange
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-a",
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-b",
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+
+    data = {
+        "applicationTechnicalControlId": 33,
+        "summary": "sum a",
+        "mitigation": "mit b",
+        "probability": 1,
+        "impact": 2,
+        "resources": ["res-c", "res-d"],
+        "isLimitedExclusion": True,
+        "endDate": "2022-01-01T00:00:00.000000Z",
+        "notes": "notes c",
+    }
+
+    # Act
+    resp = client.post("/exclusions/", json=data)
+
+    print(resp.get_json())
+    # Assert
+    assert resp.status_code == 201
+
+    exclusion = db.session.query(Exclusion).first()
+    assert exclusion.application_technical_control_id == 33
+    assert exclusion.summary == data["summary"]
+    assert exclusion.mitigation == data["mitigation"]
+    assert exclusion.probability == data["probability"]
+    assert exclusion.impact == data["impact"]
+    assert exclusion.is_limited_exclusion == data["isLimitedExclusion"]
+    assert exclusion.end_date == datetime(2022, 1, 1, 0, 0)
+    assert exclusion.notes == data["notes"]
+
+    assert len(exclusion.resources) == 2
+    assert exclusion.resources[0].reference == "res-c"
+    assert exclusion.resources[1].reference == "res-d"
+    assert exclusion.resources[0].exclusion_state == ExclusionState.PENDING
+    assert exclusion.resources[1].exclusion_state == ExclusionState.PENDING
+    assert exclusion.resources[0].exclusion_id == exclusion.id
+    assert exclusion.resources[1].exclusion_id == exclusion.id
+
+
+def test_exclusions_post_ok_for_existing_resources(client):
+    """
+    Given: An empty exclusions colllection, linked app controls, existing resources
+    When: When the api is called with an exclusion request
+    Then: The exclusions request is persisted & linked to existing resources, 201 status
+    """
+    # Arrange
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-a",
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-b",
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
 
     data = {
         "applicationTechnicalControlId": 33,
@@ -132,8 +228,10 @@ def test_exclusions_post_ok(client):
     assert len(exclusion.resources) == 2
     assert exclusion.resources[0].reference == "res-a"
     assert exclusion.resources[1].reference == "res-b"
-    assert exclusion.resources[0].state == ExclusionState.PENDING
-    assert exclusion.resources[1].state == ExclusionState.PENDING
+    assert exclusion.resources[0].exclusion_state == ExclusionState.PENDING
+    assert exclusion.resources[1].exclusion_state == ExclusionState.PENDING
+    assert exclusion.resources[0].exclusion_id == exclusion.id
+    assert exclusion.resources[1].exclusion_id == exclusion.id
 
 
 def test_exclusions_bad_request_for_missing_app_tech_control(client):
@@ -183,8 +281,15 @@ def test_exclusions_post_bad_request_for_duplicate_resources(client):
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-a", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=55,
+        exclusion_id=44,
+        reference="res-a",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
 
     data = {
@@ -206,7 +311,7 @@ def test_exclusions_post_bad_request_for_duplicate_resources(client):
     assert resp.status_code == 400
 
     assert len(db.session.query(Exclusion).all()) == 1
-    assert len(db.session.query(ExclusionResource).all()) == 1
+    assert len(db.session.query(MonitoredResource).all()) == 1
 
 
 def test_exclusions_post_ok_for_different_resources_resources(client):
@@ -228,8 +333,15 @@ def test_exclusions_post_ok_for_different_resources_resources(client):
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-a", state=ExclusionState.PENDING
+    MonitoredResourceFactory(
+        id=55,
+        exclusion_id=44,
+        reference="res-a",
+        exclusion_state=ExclusionState.PENDING,
+        state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+        application_technical_control_id=33,
     )
 
     data = {
@@ -251,7 +363,7 @@ def test_exclusions_post_ok_for_different_resources_resources(client):
     assert resp.status_code == 201
 
     assert len(db.session.query(Exclusion).all()) == 2
-    assert len(db.session.query(ExclusionResource).all()) == 3
+    assert len(db.session.query(MonitoredResource).all()) == 3
 
     exclusion = db.session.query(Exclusion).filter(Exclusion.id != 44).first()
     assert exclusion.application_technical_control_id == 33
@@ -354,8 +466,8 @@ def test_exclusion_resources_put_bad_request_for_id_mismatch(client):
     # Assert
     assert resp.status_code == 400
 
-    item = db.session.query(ExclusionResource).get(55)
-    assert item.state == ExclusionState.PENDING
+    item = db.session.query(MonitoredResource).get(55)
+    assert item.exclusion_state == ExclusionState.PENDING
 
 
 def test_exclusion_resources_put_conflict_for_invalid_exclusion(client):
@@ -380,8 +492,8 @@ def test_exclusion_resources_put_conflict_for_invalid_exclusion(client):
     # Assert
     assert resp.status_code == 409
 
-    item = db.session.query(ExclusionResource).get(55)
-    assert item.state == ExclusionState.PENDING
+    item = db.session.query(MonitoredResource).get(55)
+    assert item.exclusion_state == ExclusionState.PENDING
 
 
 def test_exclusion_resources_put_updates_record(client):
@@ -406,8 +518,8 @@ def test_exclusion_resources_put_updates_record(client):
     # Assert
     assert resp.status_code == 204
 
-    item = db.session.query(ExclusionResource).get(55)
-    assert item.state == ExclusionState.ACTIVE
+    item = db.session.query(MonitoredResource).get(55)
+    assert item.exclusion_state == ExclusionState.ACTIVE
 
 
 def test_exclusion_resources_put_updates_record_with_sparse_response(client):
@@ -430,5 +542,5 @@ def test_exclusion_resources_put_updates_record_with_sparse_response(client):
     # Assert
     assert resp.status_code == 204
 
-    item = db.session.query(ExclusionResource).get(55)
-    assert item.state == ExclusionState.ACTIVE
+    item = db.session.query(MonitoredResource).get(55)
+    assert item.exclusion_state == ExclusionState.ACTIVE
