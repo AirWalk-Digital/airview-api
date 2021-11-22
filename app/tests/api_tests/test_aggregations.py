@@ -423,7 +423,7 @@ def test_get_application_control_overview(client):
     _prepare_additional_data()
 
     # Act
-    resp = client.get("/applications/1/control-overviews?qualityModel=SECURITY")
+    resp = client.get("/applications/1/control-overviews?qualityModel=RELIABILITY")
 
     # Assert
     data = resp.get_json()
@@ -435,16 +435,6 @@ def test_get_application_control_overview(client):
             "id": 22,
             "severity": "HIGH",
             "name": "ctl1",
-            "systemName": "one",
-            "systemStage": "build",
-        },
-        {
-            "applied": 1,
-            "controlType": "TASK",
-            "exempt": 0,
-            "id": 23,
-            "severity": "LOW",
-            "name": "ctl2",
             "systemName": "one",
             "systemStage": "build",
         },
@@ -465,7 +455,7 @@ def test_get_application_control_overview_hides_parents(client):
     _prepare_additional_data()
 
     # Act
-    resp = client.get("/applications/13/control-overviews?qualityModel=SECURITY")
+    resp = client.get("/applications/13/control-overviews?qualityModel=RELIABILITY")
 
     # Assert
     data = resp.get_json()

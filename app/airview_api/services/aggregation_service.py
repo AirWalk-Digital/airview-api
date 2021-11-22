@@ -63,6 +63,8 @@ from
     on mr.application_technical_control_id=atc.id
   join system s
     on s.id = tc.system_id
+where
+  tc.quality_model = :quality_model
 group by
   tc.id,
   tc.name,
@@ -73,7 +75,9 @@ group by
   
   
     """
-    result = db.session.execute(sql, {"application_id": application_id})
+    result = db.session.execute(
+        sql, {"application_id": application_id, "quality_model": quality_model}
+    )
     data = [dict(r) for r in result]
     return data
 
