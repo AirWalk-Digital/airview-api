@@ -102,6 +102,71 @@
         ],
         "type": "object"
       },
+      "ControlOverview": {
+        "properties": {
+          "applied": {
+            "type": "integer"
+          },
+          "controlType": {
+            "type": "string"
+          },
+          "exempt": {
+            "type": "integer"
+          },
+          "frameworks": {
+            "items": {
+              "$ref": "#/components/schemas/NamedUrl"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "systemName": {
+            "type": "string"
+          },
+          "systemStage": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ControlOverviewResource": {
+        "properties": {
+          "controlType": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "lastSeen": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "pending": {
+            "type": "boolean"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ControlStatus": {
         "properties": {
           "application": {
@@ -139,9 +204,6 @@
             "type": "string"
           },
           "systemName": {
-            "type": "string"
-          },
-          "systemSource": {
             "type": "string"
           },
           "systemStage": {
@@ -360,15 +422,20 @@
         },
         "type": "object"
       },
+      "QualityModel": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "System": {
         "properties": {
           "id": {
             "type": "integer"
           },
           "name": {
-            "type": "string"
-          },
-          "source": {
             "type": "string"
           },
           "stage": {
@@ -379,13 +446,16 @@
       },
       "TechnicalControl": {
         "properties": {
-          "controlTypeId": {
-            "type": "integer"
+          "controlType": {
+            "type": "string"
           },
           "id": {
             "type": "integer"
           },
           "name": {
+            "type": "string"
+          },
+          "qualityModel": {
             "type": "string"
           },
           "reference": {
@@ -399,8 +469,9 @@
           }
         },
         "required": [
-          "controlTypeId",
+          "controlType",
           "name",
+          "qualityModel",
           "reference",
           "systemId"
         ],
@@ -446,7 +517,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -454,7 +525,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -750,6 +821,43 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
+    "/applications/{application_id}/control-overviews": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ControlOverview"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "applications"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
     "/applications/{application_id}/control-statuses": {
       "get": {
         "responses": {
@@ -822,6 +930,81 @@
           "schema": {
             "minLength": 1,
             "type": "string"
+          }
+        }
+      ]
+    },
+    "/applications/{application_id}/monitored-resources": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ControlOverviewResource"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "applications"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/applications/{application_id}/quality-models": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QualityModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get the quality models in use by this application",
+        "tags": [
+          "applications"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
           }
         }
       ]
@@ -999,18 +1182,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationTechnicalControlId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "applicationTechnicalControlId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
@@ -1047,7 +1230,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -1055,7 +1238,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1167,18 +1350,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "systemId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "systemId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
