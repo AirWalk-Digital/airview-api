@@ -132,7 +132,7 @@ where
             "reference": x[2],
             "last_seen": x[3],
             "environment": x[4],
-            "pending": x[5] is not None and x[5] is "ACTIVE",
+            "pending": x[5] is not None and x[5] == "ACTIVE",
         }
         for x in data.all()
     ]
