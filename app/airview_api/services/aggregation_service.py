@@ -1,9 +1,40 @@
 from airview_api.models import (
     MonitoredResource,
     ExclusionState,
+    ApplicationTechnicalControl,
+    Application,
+    Environment,
+    QualityModel,
 )
 from airview_api.database import db
 import itertools
+
+
+def get_quality_models(application_id: int):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
+)  
+select distinct
+  tc.quality_model
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join technical_control tc
+    on tc.id = atc.technical_control_id
+  
+  
+    """
+    result = db.session.execute(sql, {"application_id": application_id})
+    mapped = []
+    for r in result:
+        d = dict(r)
+        m = QualityModel[d["quality_model"]]
+        mapped.append(m)
+    return mapped
 
 
 def get_control_overviews(application_id: int, quality_model: str):
@@ -32,6 +63,8 @@ from
     on mr.application_technical_control_id=atc.id
   join system s
     on s.id = tc.system_id
+where
+  tc.quality_model = :quality_model
 group by
   tc.id,
   tc.name,
@@ -42,7 +75,9 @@ group by
   
   
     """
-    result = db.session.execute(sql, {"application_id": application_id})
+    result = db.session.execute(
+        sql, {"application_id": application_id, "quality_model": quality_model}
+    )
     data = [dict(r) for r in result]
     return data
 
@@ -55,21 +90,13 @@ with recursive apps as (
   select apps.top_level_id, application.id, application.environment_id from application join apps on apps.id = application.parent_id
 )  
 select
-  mr.id, 
-  mr.reference as type, 
-  mr.reference, 
-  mr.last_seen,
-  mr.state,
-  e.name environment,
-  case when mr.exclusion_state = 'PENDING' then true else false end pending
+    mr.id
 from
   apps a
   join application_technical_control as atc
     on atc.application_id = a.id
   join monitored_resource mr
     on mr.application_technical_control_id=atc.id
-  join environment e
-    on e.id=a.environment_id
 where
   atc.technical_control_id=:technical_control_id
   
@@ -81,8 +108,35 @@ where
             "technical_control_id": technical_control_id,
         },
     )
-    data = [dict(r) for r in result]
-    return data
+    ids = [dict(r)["id"] for r in result]
+
+    data = (
+        db.session.query(
+            MonitoredResource.id,
+            MonitoredResource.state.name,
+            MonitoredResource.reference,
+            MonitoredResource.last_seen,
+            Environment.name,
+            MonitoredResource.exclusion_state.name,
+        )
+        .join(ApplicationTechnicalControl)
+        .join(Application)
+        .join(Environment)
+        .filter(MonitoredResource.id.in_(ids))
+    )
+
+    items = [
+        {
+            "id": x[0],
+            "state": x[1],
+            "reference": x[2],
+            "last_seen": x[3],
+            "environment": x[4],
+            "pending": x[5] is not None and x[5] is "ACTIVE",
+        }
+        for x in data.all()
+    ]
+    return items
 
 
 def get_application_compliance_overview():

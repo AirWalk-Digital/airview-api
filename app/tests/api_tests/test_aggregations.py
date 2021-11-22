@@ -34,6 +34,7 @@ def _prepare_aggregation_mock_data():
         control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
+        quality_model=QualityModel.RELIABILITY,
     )
     TechnicalControlFactory(
         id=23,
@@ -42,6 +43,7 @@ def _prepare_aggregation_mock_data():
         control_type=TechnicalControlType.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
+        quality_model=QualityModel.COST_OPTIMISATION,
     )
     TechnicalControlFactory(
         id=24,
@@ -50,6 +52,7 @@ def _prepare_aggregation_mock_data():
         control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
+        quality_model=QualityModel.COST_OPTIMISATION,
     )
     ApplicationTechnicalControlFactory(
         id=33, application_id=12, technical_control_id=22
@@ -420,7 +423,7 @@ def test_get_application_control_overview(client):
     _prepare_additional_data()
 
     # Act
-    resp = client.get("/applications/1/control-overviews?qualityModel=SECURITY")
+    resp = client.get("/applications/1/control-overviews?qualityModel=RELIABILITY")
 
     # Assert
     data = resp.get_json()
@@ -432,16 +435,6 @@ def test_get_application_control_overview(client):
             "id": 22,
             "severity": "HIGH",
             "name": "ctl1",
-            "systemName": "one",
-            "systemStage": "build",
-        },
-        {
-            "applied": 1,
-            "controlType": "TASK",
-            "exempt": 0,
-            "id": 23,
-            "severity": "LOW",
-            "name": "ctl2",
             "systemName": "one",
             "systemStage": "build",
         },
@@ -462,7 +455,7 @@ def test_get_application_control_overview_hides_parents(client):
     _prepare_additional_data()
 
     # Act
-    resp = client.get("/applications/13/control-overviews?qualityModel=SECURITY")
+    resp = client.get("/applications/13/control-overviews?qualityModel=RELIABILITY")
 
     # Assert
     data = resp.get_json()
@@ -477,5 +470,109 @@ def test_get_application_control_overview_hides_parents(client):
             "systemName": "one",
             "systemStage": "build",
         }
+    ]
+    assert expected == data
+
+
+def test_get_control_overview_resources_with_children(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with children
+    Then: The resources belonging to the application and its children are returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    print(data)
+    expected = [
+        {
+            "environment": "bbb",
+            "id": 102,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "environment": "bbb",
+            "id": 103,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "FLAGGED",
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
+def test_get_control_overview_resources_no_children(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with no children
+    Then: The resources belonging to the application is returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/13/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        }
+    ]
+    assert expected == data
+
+
+def test_get_quality_models_for_app(client):
+    """
+    Given: A populated database of app tech controls
+    When: When a request is made to list the quality models for the application
+    Then: The subset of used quality models is returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/quality-models")
+
+    # Assert
+    data = resp.get_json()
+    print(data)
+    expected = [
+        {
+            "name": "RELIABILITY",
+        },
+        {
+            "name": "COST_OPTIMISATION",
+        },
     ]
     assert expected == data

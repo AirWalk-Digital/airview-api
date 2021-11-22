@@ -178,3 +178,7 @@ class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
     stage = ma.fields.Str()
+
+
+class QualityModelSchema(CamelCaseSchema):
+    name = ma.fields.Str()
