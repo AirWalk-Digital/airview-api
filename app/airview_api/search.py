@@ -58,6 +58,7 @@ class ElasticsearchBackend(SearchBackend):
             for payload in actual_data:
                 try:
                     highlight = payload.get('highlight')
+                    content = ""
                     if highlight:
                         content = "\n".join(highlight.get('content', []))
                     sections = {
