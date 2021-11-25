@@ -1,20 +1,143 @@
-from pprint import pprint
-from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.log import Identified
-from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.models import (
-    Application,
     MonitoredResource,
-    ApplicationTechnicalControl,
-    TechnicalControlType,
-    TechnicalControl,
-    System,
     ExclusionState,
+    ApplicationTechnicalControl,
+    Application,
+    Environment,
+    QualityModel,
 )
 from airview_api.database import db
 import itertools
-from collections import defaultdict
+
+
+def get_quality_models(application_id: int):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
+)  
+select distinct
+  tc.quality_model
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join technical_control tc
+    on tc.id = atc.technical_control_id
+  
+  
+    """
+    result = db.session.execute(sql, {"application_id": application_id})
+    mapped = []
+    for r in result:
+        d = dict(r)
+        m = QualityModel[d["quality_model"]]
+        mapped.append(m)
+    return mapped
+
+
+def get_control_overviews(application_id: int, quality_model: str):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
+)  
+select
+  tc.id, 
+  tc.name,
+  tc.control_type control_type,
+  tc.severity,
+  s.name system_name,
+  s.stage system_stage,
+  sum(cast(mr.exclusion_id is not null and mr.exclusion_state = 'ACTIVE' as int)) exempt,
+  count(1) applied
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join technical_control tc
+    on tc.id = atc.technical_control_id
+  join monitored_resource mr
+    on mr.application_technical_control_id=atc.id
+  join system s
+    on s.id = tc.system_id
+where
+  tc.quality_model = :quality_model
+group by
+  tc.id,
+  tc.name,
+  tc.control_type,
+  tc.severity,
+  s.name,
+  s.stage
+  
+  
+    """
+    result = db.session.execute(
+        sql, {"application_id": application_id, "quality_model": quality_model}
+    )
+    data = [dict(r) for r in result]
+    return data
+
+
+def get_control_overview_resources(application_id: int, technical_control_id: int):
+    sql = """
+with recursive apps as (
+  select application.id top_level_id, id, environment_id from application where id=:application_id
+  union all
+  select apps.top_level_id, application.id, application.environment_id from application join apps on apps.id = application.parent_id
+)  
+select
+    mr.id
+from
+  apps a
+  join application_technical_control as atc
+    on atc.application_id = a.id
+  join monitored_resource mr
+    on mr.application_technical_control_id=atc.id
+where
+  atc.technical_control_id=:technical_control_id
+  
+    """
+    result = db.session.execute(
+        sql,
+        {
+            "application_id": application_id,
+            "technical_control_id": technical_control_id,
+        },
+    )
+    ids = [dict(r)["id"] for r in result]
+
+    data = (
+        db.session.query(
+            MonitoredResource.id,
+            MonitoredResource.state.name,
+            MonitoredResource.reference,
+            MonitoredResource.last_seen,
+            Environment.name,
+            MonitoredResource.exclusion_state.name,
+            MonitoredResource.exclusion_id,
+        )
+        .join(ApplicationTechnicalControl)
+        .join(Application)
+        .join(Environment)
+        .filter(MonitoredResource.id.in_(ids))
+    )
+
+    items = [
+        {
+            "id": x[0],
+            "state": x[1],
+            "reference": x[2],
+            "last_seen": x[3],
+            "environment": x[4],
+            "pending": x[6] is not None and x[5] is not None and x[5] == "PENDING",
+        }
+        for x in data.all()
+    ]
+    return items
 
 
 def get_application_compliance_overview():
@@ -41,31 +164,17 @@ current as(
       join apps a
         on a.id = atc.application_id
   ) as t1
-),
-excluded as(
-  select
-    e.application_technical_control_id,
-    r.reference,
-    r.state,
-    atc.technical_control_id
-  from exclusion e
-  join exclusion_resource r
-    on r.exclusion_id=e.id
-  join application_technical_control atc
-    on atc.id=e.application_technical_control_id
-  where
-    r.state = 'ACTIVE'
 )
 
 select
   pa.id,
   pa.name application_name,
   e.name environment,
-  sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) high,
-  sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) medium,
-  sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and x.reference is null then 1 else 0 end) low,
-  count(distinct(x.technical_control_id)) exempt_controls,
-  count(distinct case when tr.state='FLAGGED' and x.reference is null then tc.id else null end) failed_controls,
+  sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
+  sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
+  sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
+  count(distinct(atc2.technical_control_id)) exempt_controls, 
+  count(distinct case when tr.state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
   count(distinct tc.id) total_controls
 from
   current c
@@ -79,11 +188,13 @@ from
     on a.id = atc.application_id
   left join environment e
     on e.id = a.environment_id
-  join application pa
+    join application pa
     on pa.id = c.top_level_id
-  left join excluded x
-    on x.application_technical_control_id = atc.id
-    and x.reference = tr.reference
+  left join exclusion x
+    on x.id = tr.exclusion_id
+    and tr.exclusion_state = 'ACTIVE'
+  left join application_technical_control atc2
+    on atc2.id = x.application_technical_control_id 
 group by
   pa.id,
   pa.name,
@@ -109,32 +220,20 @@ with recursive apps as (
   union all
   select application.id from application join apps on apps.id = application.parent_id
 
-),
-
-excluded as(
-  select
-    e.application_technical_control_id,
-    r.reference,
-    r.state
-  from exclusion e
-  join exclusion_resource r
-    on r.exclusion_id=e.id
 )
-
 select
   atc.id,
   tc.name,
   tr.id triggered_resource_id,
   tr.reference triggered_resource_reference,
-  x.state resource_state,
+  tr.exclusion_state, 
   tr.last_modified logged_datetime,
   tc.severity,
   e.abbreviation environment,
   a.name application_name,
   tr.application_technical_control_id,
   s.name system_name,
-  s.stage system_stage,
-  s.source system_source
+  s.stage system_stage
 from
   monitored_resource tr
   join application_technical_control as atc
@@ -149,9 +248,9 @@ from
     on a.id = atc.application_id
   left join environment e
     on e.id = a.environment_id
-  left join excluded x
-    on x.application_technical_control_id = atc.id
-    and x.reference = tr.reference
+  left join exclusion x
+    on x.id = tr.exclusion_id
+    and tr.exclusion_state='ACTIVE'
 where
   tr.state = 'FLAGGED'
   -- and coalesce(x.state,'NONE') != 'ACTIVE'
@@ -160,7 +259,7 @@ order by
   tc.severity
 """
     result = db.session.execute(sql, {"application_id": application_id})
-    data = [dict(r) for r in result if r["resource_state"] != "ACTIVE"]
+    data = [dict(r) for r in result if r["exclusion_state"] != "ACTIVE"]
 
     key_func = lambda x: (
         x["id"],
@@ -169,7 +268,6 @@ order by
         x["environment"],
         x["application_name"],
         x["system_name"],
-        x["system_source"],
         x["system_stage"],
     )
     d = list()
@@ -185,7 +283,7 @@ order by
                 {
                     "id": g["triggered_resource_id"],
                     "name": g["triggered_resource_reference"],
-                    "state": g.get("resource_state") or ExclusionState.NONE,
+                    "state": g.get("exclusion_state") or ExclusionState.NONE,
                 }
                 for g in list_group
             ]
@@ -199,8 +297,7 @@ order by
             "environment": key[3],
             "application": key[4],
             "systemName": key[5],
-            "systemSource": key[6],
-            "systemStage": key[7],
+            "systemStage": key[6],
             "resources": res,
             "raisedDateTime": mr.last_modified,
             "tickets": [],

@@ -31,6 +31,28 @@ class MonitoredResourceState(Enum):
         return self.name
 
 
+class QualityModel(Enum):
+    OPERATIONAL_EXCELLENCE = 1
+    SECURITY = 2
+    RELIABILITY = 3
+    PERFORMANCE_EFFICIENCY = 4
+    COST_OPTIMISATION = 5
+    PORTABILITY = 6
+    USABILITY_AND_COMPATIBILITY = 7
+
+    def __str__(self):
+        return self.name
+
+
+class TechnicalControlType(Enum):
+    SECURITY = 1
+    OPERATIONAL = 2
+    TASK = 3
+
+    def __str__(self):
+        return self.name
+
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
@@ -104,7 +126,6 @@ class ApplicationType(db.Model):
         return f"{self.name}"
 
 
-
 class Environment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
@@ -128,9 +149,10 @@ class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    control_type_id = db.Column(db.Integer, nullable=False)
+    control_type = db.Column(db.Enum(TechnicalControlType), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
+    quality_model = db.Column(db.Enum(QualityModel), nullable=False)
 
     application_technical_controls = db.relationship(
         "ApplicationTechnicalControl",
@@ -153,7 +175,6 @@ class TechnicalControl(db.Model):
 class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
-    source = db.Column(db.String(500), nullable=True)
     stage = db.Column(db.String(50), nullable=True)
     technical_controls = db.relationship("TechnicalControl", back_populates="system")
 
@@ -164,8 +185,6 @@ class System(db.Model):
         ),
     )
 
-
-
     def __repr__(self):
         return f"{self.name}"
 
@@ -175,7 +194,14 @@ class MonitoredResource(db.Model):
     reference = db.Column(db.String(500), nullable=False)
     state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=False)
+    last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+    exclusion_id = db.Column(
+        db.Integer,
+        db.ForeignKey("exclusion.id"),
+        nullable=True,
+    )
+    exclusion = db.relationship("Exclusion", back_populates="resources")
+    exclusion_state = db.Column(db.Enum(ExclusionState), nullable=True)
 
     application_technical_control_id = db.Column(
         db.Integer,
@@ -209,13 +235,14 @@ class ApplicationTechnicalControl(db.Model):
         "Application", back_populates="application_technical_controls"
     )
     technical_control = db.relationship(
-        "TechnicalControl", back_populates="application_technical_controls"
+        "TechnicalControl",
+        back_populates="application_technical_controls",
     )
 
     monitored_resources = db.relationship(
         "MonitoredResource",
         back_populates="application_technical_control",
-        lazy=True,
+        lazy="dynamic",
         cascade="delete",
     )
 
@@ -255,20 +282,7 @@ class Exclusion(db.Model):
     application_technical_control = db.relationship(
         "ApplicationTechnicalControl", back_populates="exclusions"
     )
-    resources = db.relationship("ExclusionResource", back_populates="exclusion")
-
-
-class ExclusionResource(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    exclusion_id = db.Column(
-        db.Integer,
-        db.ForeignKey("exclusion.id"),
-        nullable=False,
-    )
-    exclusion = db.relationship("Exclusion", back_populates="resources")
-
-    reference = db.Column(db.String, nullable=False)
-    state = db.Column(db.Enum(ExclusionState), nullable=False)
+    resources = db.relationship("MonitoredResource", back_populates="exclusion")
 
 
 class NamedUrl:
@@ -287,9 +301,3 @@ class ControlStatusDetail:
         self.frameworks = frameworks
         self.assignment_group = assignment_group
         self.assignee = assignee
-
-
-class TechnicalControlType(Enum):
-    SECURITY = 1
-    OPERATIONAL = 2
-    TASK = 3

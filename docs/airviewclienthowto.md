@@ -73,8 +73,14 @@ The method will attempt to create a basic representation of the provided applica
 The method will attempt to create the definition of the technical control if it does not exist.
 
 ```
+
 application = models.Application(name="Test App One", reference="local-app-identifier")
-technical_control = models.TechnicalControl(name="technical control one", reference="local_control_identifier")
+technical_control = models.TechnicalControl(
+    name="All servers should be patched",
+    reference="local_control_identifier",
+    quality_model=models.QualityModel.SECURITY,
+    type=models.TechnicalControlType.TASK,
+)
 compliance_event = models.ComplianceEvent(
 	application=application,
 	technical_control=technical_control,
