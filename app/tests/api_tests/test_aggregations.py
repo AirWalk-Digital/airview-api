@@ -550,6 +550,56 @@ def test_get_control_overview_resources_no_children(client):
     assert expected == data
 
 
+def test_get_control_overview_resources_pending(client):
+    """
+    Given: Monitored resource with state pending
+    When: When a request is made to list the resources for an appliction
+    Then: The resource marked pending is flagged as such
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    mr = MonitoredResource.query.get(105)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.PENDING
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "bbb",
+            "id": 102,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "environment": "bbb",
+            "id": 103,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "FLAGGED",
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": True,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
 def test_get_quality_models_for_app(client):
     """
     Given: A populated database of app tech controls

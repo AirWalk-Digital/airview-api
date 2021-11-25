@@ -371,13 +371,33 @@ An enumeration.
 
 #### SUPPRESSED( = 2)
 
-### class client.airviewclient.models.TechnicalControl(name, reference, type=1, id=None)
+### class client.airviewclient.models.QualityModel(value)
+Bases: `enum.Enum`
+
+An enumeration.
+
+
+#### COST_OPTIMISATION( = 5)
+
+#### OPERATIONAL_EXCELLENCE( = 1)
+
+#### PERFORMANCE_EFFICIENCY( = 4)
+
+#### PORTABILITY( = 6)
+
+#### RELIABILITY( = 3)
+
+#### SECURITY( = 2)
+
+#### USABILITY_AND_COMPATIBILITY( = 7)
+
+### class client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None)
 Bases: `object`
 
 Dataclass representing technical control definition
 
 
-#### \__init__(name, reference, type=1, id=None)
+#### \__init__(name, reference, quality_model, type, id=None)
 
 #### id(: Optional[int] = None)
 Internal id of the techincal control
@@ -387,11 +407,27 @@ Internal id of the techincal control
 The name of the technical control
 
 
+#### quality_model(: client.airviewclient.models.QualityModel)
+Quality model of the techincal control
+
+
 #### reference(: str)
 Unique reference for the control within the connecting system
 
 
-#### type(: int = 1)
-Id for type of control
+#### type(: client.airviewclient.models.TechnicalControlType)
+Type of control
 
+
+### class client.airviewclient.models.TechnicalControlType(value)
+Bases: `enum.Enum`
+
+An enumeration.
+
+
+#### OPERATIONAL( = 2)
+
+#### SECURITY( = 1)
+
+#### TASK( = 3)
 ## Module contents

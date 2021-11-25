@@ -285,19 +285,6 @@ class Exclusion(db.Model):
     resources = db.relationship("MonitoredResource", back_populates="exclusion")
 
 
-# class ExclusionResource(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     exclusion_id = db.Column(
-#         db.Integer,
-#         db.ForeignKey("exclusion.id"),
-#         nullable=False,
-#     )
-#     exclusion = db.relationship("Exclusion", back_populates="resources")
-
-#     reference = db.Column(db.String, nullable=False)
-#     state = db.Column(db.Enum(ExclusionState), nullable=False)
-
-
 class NamedUrl:
     def __init__(self, name, url):
         self.name = name
