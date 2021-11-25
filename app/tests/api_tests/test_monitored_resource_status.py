@@ -7,12 +7,14 @@ from airview_api.models import (
     ApplicationTechnicalControl,
     MonitoredResource,
     TechnicalControlSeverity,
-    MonitoredResourceState
+    TechnicalControlType,
+    MonitoredResourceState,
 )
 
 
 def setup():
     reset_factories()
+
 
 def test_create_rejects_bad_reference(client):
     """
@@ -34,7 +36,6 @@ def test_create_rejects_bad_reference(client):
     assert len(items) == 0
 
 
-
 def test_create_adds_when_new(client):
     """
     Given: existing linked apps and controls
@@ -49,7 +50,7 @@ def test_create_adds_when_new(client):
         id=101,
         reference="1",
         name="one",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -88,7 +89,7 @@ def test_create_updates_when_existing_different_state(client):
         id=101,
         reference="1",
         name="one",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -138,7 +139,7 @@ def test_create_updates_when_existing_same_state(client):
         id=101,
         reference="1",
         name="one",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
