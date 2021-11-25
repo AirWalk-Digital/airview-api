@@ -10,6 +10,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     ExclusionState,
     MonitoredResourceState,
+    TechnicalControlType,
 )
 
 
@@ -18,7 +19,7 @@ def setup():
 
 
 def _prepare_aggregation_mock_data():
-    SystemFactory(id=1, name="one", source="aws-one", stage="build")
+    SystemFactory(id=1, name="one", stage="build")
     EnvironmentFactory(id=1, abbreviation="DEV", name="aaa")
     EnvironmentFactory(id=2, abbreviation="PRD", name="bbb")
     ApplicationTypeFactory(id=1)
@@ -30,25 +31,28 @@ def _prepare_aggregation_mock_data():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
+        quality_model=QualityModel.RELIABILITY,
     )
     TechnicalControlFactory(
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type_id=1,
+        control_type=TechnicalControlType.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
+        quality_model=QualityModel.COST_OPTIMISATION,
     )
     TechnicalControlFactory(
         id=24,
         name="ctl3",
         reference="control_c",
-        control_type_id=1,
+        control_type=TechnicalControlType.SECURITY,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
+        quality_model=QualityModel.COST_OPTIMISATION,
     )
     ApplicationTechnicalControlFactory(
         id=33, application_id=12, technical_control_id=22
@@ -123,6 +127,41 @@ def _prepare_aggregation_mock_data():
     Application.query.all()
 
 
+def _prepare_additional_data():  # Add additional exemptions
+    MonitoredResourceFactory(
+        id=108,
+        application_technical_control_id=37,
+        reference="res-1-other-2",
+        state=MonitoredResourceState.SUPPRESSED,
+        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+    )
+
+    MonitoredResourceFactory(
+        id=109,
+        application_technical_control_id=37,
+        reference="res-1-other-3",
+        state=MonitoredResourceState.SUPPRESSED,
+        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+    )
+    ExclusionFactory(
+        id=44,
+        application_technical_control_id=33,
+        summary="sss",
+        mitigation="mmm",
+        impact=3,
+        probability=4,
+        is_limited_exclusion=True,
+        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
+        notes="nnn",
+    )
+    mr = MonitoredResource.query.get(103)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
+    Application.query.all()
+
+
 def test_get_control_status_aggregation(client):
     """
     Given: A populated database of triggered resources
@@ -144,7 +183,6 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -158,7 +196,6 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "DEV",
             "application": "svc 13",
@@ -171,7 +208,6 @@ def test_get_control_status_aggregation(client):
             "controlType": "security",
             "severity": "low",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "name": "ctl2",
             "environment": "PRD",
@@ -203,10 +239,15 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
         end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
         notes="nnn",
     )
-    ExclusionResourceFactory(
-        id=55, exclusion_id=44, reference="res-2", state=ExclusionState.ACTIVE
-    )
+
+    mr = MonitoredResource.query.get(103)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
+    # ExclusionResourceFactory(
+    # id=55, exclusion_id=44, reference="res-2", state=ExclusionState.ACTIVE
+    # )
     Application.query.all()
+
     # Act
     resp = client.get("/applications/1/control-statuses")
 
@@ -220,7 +261,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "DEV",
             "application": "svc 13",
@@ -234,7 +274,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -284,7 +323,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -298,7 +336,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemSource": "aws-one",
             "systemStage": "build",
             "environment": "PRD",
             "application": "svc 12",
@@ -315,44 +352,12 @@ def test_get_application_compliance_overview(client):
     """
     Given: A populated database of triggered resources
     When: When a request is made to list the triggered resources by application using an invalid id
-    Then: An empty list is returned. 200 status
+    Then: An aggregated response of the data is returned. 200 status
     """
     # Arrange
     _prepare_aggregation_mock_data()
-
-    # Add additional exemptions
-    MonitoredResourceFactory(
-        id=108,
-        application_technical_control_id=37,
-        reference="res-1-other-2",
-        state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-    )
-
-    MonitoredResourceFactory(
-        id=109,
-        application_technical_control_id=37,
-        reference="res-1-other-3",
-        state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-    )
-    ExclusionFactory(
-        id=44,
-        application_technical_control_id=33,
-        summary="sss",
-        mitigation="mmm",
-        impact=3,
-        probability=4,
-        is_limited_exclusion=True,
-        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
-        notes="nnn",
-    )
-    ExclusionResourceFactory(
-        id=55, reference="res-2", exclusion_id=44, state=ExclusionState.ACTIVE
-    )
-    Application.query.all()
+    # Add additional data
+    _prepare_additional_data()
 
     # aggregation_service.get_application_compliance_overview()
     # Act
@@ -403,4 +408,221 @@ def test_get_application_compliance_overview(client):
         },
     ]
 
+    assert expected == data
+
+
+def test_get_application_control_overview(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the control data
+    Then: An aggregated response of the data is returned. 200 status
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/control-overviews?qualityModel=RELIABILITY")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "applied": 3,
+            "controlType": "SECURITY",
+            "exempt": 1,
+            "id": 22,
+            "severity": "HIGH",
+            "name": "ctl1",
+            "systemName": "one",
+            "systemStage": "build",
+        },
+    ]
+
+    assert expected == data
+
+
+def test_get_application_control_overview_hides_parents(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the control data for a sub-application
+    Then: An aggregated response of the data is returned. 200 status
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/13/control-overviews?qualityModel=RELIABILITY")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "applied": 1,
+            "controlType": "SECURITY",
+            "exempt": 0,
+            "id": 22,
+            "name": "ctl1",
+            "severity": "HIGH",
+            "systemName": "one",
+            "systemStage": "build",
+        }
+    ]
+    assert expected == data
+
+
+def test_get_control_overview_resources_with_children(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with children
+    Then: The resources belonging to the application and its children are returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    print(data)
+    expected = [
+        {
+            "environment": "bbb",
+            "id": 102,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "environment": "bbb",
+            "id": 103,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "FLAGGED",
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
+def test_get_control_overview_resources_no_children(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with no children
+    Then: The resources belonging to the application is returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/13/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        }
+    ]
+    assert expected == data
+
+
+def test_get_control_overview_resources_pending(client):
+    """
+    Given: Monitored resource with state pending
+    When: When a request is made to list the resources for an appliction
+    Then: The resource marked pending is flagged as such
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    mr = MonitoredResource.query.get(105)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.PENDING
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "bbb",
+            "id": 102,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "environment": "bbb",
+            "id": 103,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "FLAGGED",
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": True,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
+def test_get_quality_models_for_app(client):
+    """
+    Given: A populated database of app tech controls
+    When: When a request is made to list the quality models for the application
+    Then: The subset of used quality models is returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    # Act
+    resp = client.get("/applications/1/quality-models")
+
+    # Assert
+    data = resp.get_json()
+    print(data)
+    expected = [
+        {
+            "name": "RELIABILITY",
+        },
+        {
+            "name": "COST_OPTIMISATION",
+        },
+    ]
     assert expected == data
