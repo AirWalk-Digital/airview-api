@@ -53,22 +53,29 @@ class ElasticsearchBackend(SearchBackend):
 
     def serialize(self, data):
         output = []
-        try:
-            actual_data = data['hits']['hits']
-            if isinstance(actual_data, list):
-                for payload in actual_data:
+        actual_data = data['hits']['hits']
+        if isinstance(actual_data, list):
+            for payload in actual_data:
+                try:
+                    highlight = payload.get('highlight')
+                    if highlight:
+                        content = "\n".join(highlight.get('content', []))
                     sections = {
-                        "summary": "\n".join(payload['highlight']['content']),
+                        "summary": content,
                         **payload['_source']
                     }
                     output.append(sections)
-            elif isinstance(actual_data, dict):
+                except KeyError:
+                    pass
+        elif isinstance(actual_data, dict):
+            try:
                 output = [{
                     "summary": "\n".join(actual_data['highlight']['content']),
                     **actual_data['_source']
                 }]
-        except KeyError:
-            return []
+            except KeyError:
+                pass
+
         return output
 
     def query(self, q: str = None, limit: int = 20, context_size: int = 100):
