@@ -26,6 +26,6 @@ class Search(MethodView):
         Searches matching terms in a configured search backend.
         """
         results = []
-        if search_backend and q:
+        if search_backend and args:
             results = search_backend.query(**args)
         return results
