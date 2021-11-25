@@ -57,35 +57,57 @@ class ElasticsearchBackend(SearchBackend):
             actual_data = data['hits']['hits']
             if isinstance(actual_data, list):
                 for payload in actual_data:
-                    output.append(payload['_source'])
+                    sections = {
+                        "summary": "\n".join(payload['highlight']['content']),
+                        **payload['_source']
+                    }
+                    output.append(sections)
             elif isinstance(actual_data, dict):
-                output = actual_data['_source']
+                output = [{
+                    "summary": "\n".join(actual_data['highlight']['content']),
+                    **actual_data['_source']
+                }]
         except KeyError:
             return []
         return output
 
-    def query(self, search_term: str):
+    def query(self, q: str = None, limit: int = 20, context_size: int = 100):
         body = {
             "query": {
-                "multi_match": {  # This will returned a ranked search.
-                    "query": search_term
+                # Returns a ranked search.
+                "multi_match": {
+                    "query": q
+                }
+            },
+            # Returns context of the matched search
+            "highlight": {
+                "fragment_size": context_size,
+                "order": "score",
+                "pre_tags": [""],
+                "post_tags": [""],
+                "fields": {
+                    "content": {}
                 }
             }
         }
 
-        search_result = self.client.search(
-            index=self.index,
-            body=body,
-            filter_path=[
-                'hits.hits._source.path',
-                'hits.hits._source.title',
-                'hits.hits._source.content',
-                'hits.hits._source.summary'
-            ]
-        )
+
         results = []
-        if search_result:
-            results = self.serialize(search_result)
+        if q:
+            search_result = self.client.search(
+                index=self.index,
+                body=body,
+                filter_path=[
+                    'hits.hits._source.path',
+                    'hits.hits._source.title',
+                    'hits.hits.highlight.content'
+                ],
+                size=limit
+            )
+
+            if search_result:
+                results = self.serialize(search_result)
+
         return results
 
 
