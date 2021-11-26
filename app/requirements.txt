@@ -5,6 +5,7 @@ psycopg2-binary==2.8.6
 flask-admin==1.5.7
 sqlalchemy<1.4 # pinned to fix bug in flask-sqlalchemy
 flask-smorest==0.31.0
+elasticsearch==7.13.0
 #Testing Dependencies
 pytest==6.2.2
 factory-boy==3.2.0
