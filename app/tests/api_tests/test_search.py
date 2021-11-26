@@ -66,7 +66,7 @@ def test_elasticsearch_backend_is_initialised():
         "SEARCH_BACKEND_ELASTIC_HOST": "local",
         "SEARCH_BACKEND_ELASTIC_INDEX": "test"
     }
-    with patch. dict(os.environ, mock_env_vars, clear=True):
+    with patch.dict(os.environ, mock_env_vars, clear=True):
         backend = init_search_backend()
         assert isinstance(backend, ElasticsearchBackend)
 
