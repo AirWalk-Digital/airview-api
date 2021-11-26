@@ -99,7 +99,6 @@ class ElasticsearchBackend(SearchBackend):
             }
         }
 
-
         results = []
         if q:
             search_result = self.client.search(
