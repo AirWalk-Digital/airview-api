@@ -430,6 +430,23 @@
         },
         "type": "object"
       },
+      "SearchResult": {
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary"
+        ],
+        "type": "object"
+      },
       "System": {
         "properties": {
           "id": {
@@ -517,7 +534,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -525,7 +542,7 @@
           },
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1182,18 +1199,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "applicationTechnicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1230,7 +1247,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -1238,7 +1255,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1266,6 +1283,62 @@
         "summary": "Get a refererenced application which matches the provided query params\nReturns the application definition matching the required params",
         "tags": [
           "referenced-applications"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      }
+    },
+    "/search/": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contextSize",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SearchResult"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Searches matching terms in a configured search backend.",
+        "tags": [
+          "search"
         ],
         "x-api-rbac-role": "ContentReader"
       }
@@ -1350,18 +1423,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1512,6 +1585,10 @@
     {
       "description": "Exclusion related resources",
       "name": "exclusions"
+    },
+    {
+      "description": "Search endpoint to query existing documents.",
+      "name": "search"
     }
   ]
 }
