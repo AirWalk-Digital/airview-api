@@ -1,0 +1,11 @@
+[
+    [
+        "insecure-package",
+        "<0.2.0",
+        "0.1",
+        "This is an insecure package with lots of exploitable security vulnerabilities.",
+        "25853",
+        null,
+        null
+    ]
+]

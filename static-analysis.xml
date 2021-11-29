@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<testsuites disabled="0" errors="0" failures="1" tests="1" time="0.0">
+	<testsuite disabled="0" errors="0" failures="1" name="semgrep results" skipped="0" tests="1" time="0">
+		<testcase classname="app/admin/admin.py" file="app/admin/admin.py" line="35" name="python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host">
+			<failure message="Running flask app with host 0.0.0.0 could expose the server publicly." type="WARNING">['    app.run(host=&quot;0.0.0.0&quot;, port=&quot;8000&quot;)\n']</failure>
+		</testcase>
+	</testsuite>
+</testsuites>
