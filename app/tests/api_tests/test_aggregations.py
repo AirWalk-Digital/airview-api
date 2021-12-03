@@ -600,6 +600,55 @@ def test_get_control_overview_resources_pending(client):
     assert expected == data
 
 
+def test_get_control_overview_resources_null_environment(client):
+    """
+    Given: Monitored resource with null environments for the application
+    When: When a request is made to list the resources for an appliction
+    Then: The resources are returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    app = Application.query.get(12)
+    app.environment_id = None
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "id": 102,
+            "environment": None,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "id": 103,
+            "environment": None,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "FLAGGED",
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
 def test_get_quality_models_for_app(client):
     """
     Given: A populated database of app tech controls

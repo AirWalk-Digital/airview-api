@@ -122,7 +122,7 @@ where
         )
         .join(ApplicationTechnicalControl)
         .join(Application)
-        .join(Environment)
+        .join(Environment, isouter=True)
         .filter(MonitoredResource.id.in_(ids))
     )
 
