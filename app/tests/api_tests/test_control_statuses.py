@@ -36,7 +36,7 @@ def test_control_status_detail_returns_correct_detail(client):
         id=111,
         application_technical_control_id=33,
         reference="ref-1",
-        state=MonitoredResourceState.SUPPRESSED,
+        monitoring_state=MonitoredResourceState.SUPPRESSED,
         last_seen=datetime.utcnow(),
         last_modified=datetime.utcnow(),
     )

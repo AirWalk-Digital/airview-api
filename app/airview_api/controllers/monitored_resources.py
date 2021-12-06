@@ -32,7 +32,7 @@ class MonitoredResource(MethodView):
         MonitoredResourceSchema(only=("application_technical_control_id", "reference")),
         location="query",
     )
-    @blp.arguments(MonitoredResourceSchema(only=["state"]))
+    @blp.arguments(MonitoredResourceSchema(only=["monitoring_state"]))
     @blp.role(Roles.COMPLIANCE_WRITER)
     def put(self, args, data):
         """Persists the status of a monitored resource which is uniquely identified by the incoming query params"""

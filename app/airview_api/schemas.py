@@ -39,7 +39,8 @@ class ApplicationSchema(CamelCaseSchema):
 class MonitoredResourceSchema(CamelCaseSchema):
     application_technical_control_id = ma.fields.Integer(required=True)
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
-    state = ma.fields.Str(required=True)
+    monitoring_state = ma.fields.Str(required=True)
+    state = ma.fields.Str(required=False)
 
 
 class EnvironmentSchema(CamelCaseSchema):
