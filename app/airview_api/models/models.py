@@ -1,6 +1,8 @@
 from datetime import timezone
 from enum import Enum
 from airview_api.database import db
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import case
 
 
 class TechnicalControlSeverity(Enum):
@@ -192,7 +194,7 @@ class System(db.Model):
 class MonitoredResource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reference = db.Column(db.String(500), nullable=False)
-    state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
+    monitoring_state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
     last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
     exclusion_id = db.Column(
@@ -211,6 +213,22 @@ class MonitoredResource(db.Model):
     application_technical_control = db.relationship(
         "ApplicationTechnicalControl", back_populates="monitored_resources"
     )
+
+    @hybrid_property
+    def state(self):
+        return (
+            self.exclusion_state
+            if self.exclusion_state == ExclusionState.ACTIVE
+            else self.monitoring_state
+        )
+
+    @state.expression
+    def state(cls):
+        return case(
+            {"ACTIVE": MonitoredResourceState.SUPPRESSED.name},
+            cls.exclusion_state,
+            cls.monitoring_state,
+        )
 
     __table_args__ = (
         db.UniqueConstraint(

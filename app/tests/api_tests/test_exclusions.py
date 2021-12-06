@@ -66,7 +66,7 @@ def add_get_items_to_db():
         exclusion_id=44,
         reference="res-a",
         exclusion_state=ExclusionState.PENDING,
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=33,
@@ -97,7 +97,7 @@ def add_get_items_to_db():
         exclusion_id=45,
         reference="res-5",
         exclusion_state=ExclusionState.PENDING,
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=340,
@@ -107,7 +107,7 @@ def add_get_items_to_db():
         exclusion_id=45,
         reference="res-6",
         exclusion_state=ExclusionState.ACTIVE,
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=340,
@@ -124,14 +124,14 @@ def test_exclusions_post_ok_for_new_resources(client):
     MonitoredResourceFactory(
         application_technical_control_id=33,
         reference="res-a",
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
     MonitoredResourceFactory(
         application_technical_control_id=33,
         reference="res-b",
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
@@ -184,14 +184,14 @@ def test_exclusions_post_ok_for_existing_resources(client):
     MonitoredResourceFactory(
         application_technical_control_id=33,
         reference="res-a",
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
     MonitoredResourceFactory(
         application_technical_control_id=33,
         reference="res-b",
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
@@ -286,7 +286,7 @@ def test_exclusions_post_bad_request_for_duplicate_resources(client):
         exclusion_id=44,
         reference="res-a",
         exclusion_state=ExclusionState.PENDING,
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=33,
@@ -338,7 +338,7 @@ def test_exclusions_post_ok_for_different_resources_resources(client):
         exclusion_id=44,
         reference="res-a",
         exclusion_state=ExclusionState.PENDING,
-        state=MonitoredResourceState.FIXED_AUTO,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=33,

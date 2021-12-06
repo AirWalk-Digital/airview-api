@@ -85,7 +85,7 @@ def create(data: dict):
                 exclusion.resources.append(
                     MonitoredResource(
                         reference=r,
-                        state=MonitoredResourceState.FIXED_AUTO,
+                        monitoring_state=MonitoredResourceState.FIXED_AUTO,
                         last_modified=datetime.now(timezone.utc),
                         application_technical_control_id=app_tech_control.id,
                         exclusion_state=ExclusionState.PENDING,

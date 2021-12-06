@@ -5,6 +5,7 @@ from airview_api.models import (
     Application,
     Environment,
     QualityModel,
+    MonitoredResourceState,
 )
 from airview_api.database import db
 import itertools
@@ -113,18 +114,22 @@ where
     data = (
         db.session.query(
             MonitoredResource.id,
-            MonitoredResource.state.name,
+            MonitoredResource.state,
             MonitoredResource.reference,
             MonitoredResource.last_seen,
             Environment.name,
-            MonitoredResource.exclusion_state.name,
+            MonitoredResource.exclusion_state,
             MonitoredResource.exclusion_id,
+            MonitoredResource.monitoring_state,
         )
         .join(ApplicationTechnicalControl)
         .join(Application)
-        .join(Environment)
+        .join(Environment, isouter=True)
         .filter(MonitoredResource.id.in_(ids))
     )
+    print(data)
+    d = data.all()
+    print(d)
 
     items = [
         {
@@ -133,7 +138,9 @@ where
             "reference": x[2],
             "last_seen": x[3],
             "environment": x[4],
-            "pending": x[6] is not None and x[5] is not None and x[5] == "PENDING",
+            "pending": x[6] is not None
+            and x[5] is not None
+            and x[5] == ExclusionState.PENDING,
         }
         for x in data.all()
     ]
@@ -156,7 +163,7 @@ current as(
     select
       tr.id,
       a.top_level_id,
-      tr.state
+      tr.monitoring_state
     from
       monitored_resource tr
       join application_technical_control as atc
@@ -170,11 +177,11 @@ select
   pa.id,
   pa.name application_name,
   e.name environment,
-  sum(case when tc.severity = 'HIGH' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
-  sum(case when tc.severity = 'MEDIUM' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
-  sum(case when tc.severity = 'LOW' and tr.state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
+  sum(case when tc.severity = 'HIGH' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
+  sum(case when tc.severity = 'MEDIUM' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
+  sum(case when tc.severity = 'LOW' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
   count(distinct(atc2.technical_control_id)) exempt_controls, 
-  count(distinct case when tr.state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
+  count(distinct case when tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
   count(distinct tc.id) total_controls
 from
   current c
@@ -252,7 +259,7 @@ from
     on x.id = tr.exclusion_id
     and tr.exclusion_state='ACTIVE'
 where
-  tr.state = 'FLAGGED'
+    tr.monitoring_state = 'FLAGGED'
   -- and coalesce(x.state,'NONE') != 'ACTIVE'
 order by
   tc.name,

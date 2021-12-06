@@ -75,7 +75,7 @@ def _prepare_aggregation_mock_data():
         id=102,
         application_technical_control_id=33,
         reference="res-1",
-        state=MonitoredResourceState.SUPPRESSED,
+        monitoring_state=MonitoredResourceState.SUPPRESSED,
         last_seen=datetime(2, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(2, 1, 1, tzinfo=timezone.utc),
     )
@@ -84,7 +84,7 @@ def _prepare_aggregation_mock_data():
         id=103,
         application_technical_control_id=33,
         reference="res-2",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(3, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(3, 1, 1, tzinfo=timezone.utc),
     )
@@ -93,7 +93,7 @@ def _prepare_aggregation_mock_data():
         id=104,
         application_technical_control_id=34,
         reference="res-3",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(4, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(4, 1, 1, tzinfo=timezone.utc),
     )
@@ -102,7 +102,7 @@ def _prepare_aggregation_mock_data():
         id=105,
         application_technical_control_id=35,
         reference="res-4",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(5, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(5, 1, 1, tzinfo=timezone.utc),
     )
@@ -111,7 +111,7 @@ def _prepare_aggregation_mock_data():
         id=106,
         application_technical_control_id=36,
         reference="res-1-x",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
@@ -119,7 +119,7 @@ def _prepare_aggregation_mock_data():
         id=107,
         application_technical_control_id=37,
         reference="res-1-x",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
@@ -132,7 +132,7 @@ def _prepare_additional_data():  # Add additional exemptions
         id=108,
         application_technical_control_id=37,
         reference="res-1-other-2",
-        state=MonitoredResourceState.SUPPRESSED,
+        monitoring_state=MonitoredResourceState.SUPPRESSED,
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
         last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
@@ -141,7 +141,7 @@ def _prepare_additional_data():  # Add additional exemptions
         id=109,
         application_technical_control_id=37,
         reference="res-1-other-3",
-        state=MonitoredResourceState.SUPPRESSED,
+        monitoring_state=MonitoredResourceState.SUPPRESSED,
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
         last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
@@ -243,9 +243,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
     mr = MonitoredResource.query.get(103)
     mr.exclusion_id = 44
     mr.exclusion_state = ExclusionState.ACTIVE
-    # ExclusionResourceFactory(
-    # id=55, exclusion_id=44, reference="res-2", state=ExclusionState.ACTIVE
-    # )
     Application.query.all()
 
     # Act
@@ -506,7 +503,7 @@ def test_get_control_overview_resources_with_children(client):
             "lastSeen": "0003-01-01T00:00:00",
             "pending": False,
             "reference": "res-2",
-            "state": "FLAGGED",
+            "state": "SUPPRESSED",  # Suppressed via exclusion
         },
         {
             "environment": "aaa",
@@ -585,13 +582,62 @@ def test_get_control_overview_resources_pending(client):
             "lastSeen": "0003-01-01T00:00:00",
             "pending": False,
             "reference": "res-2",
-            "state": "FLAGGED",
+            "state": "SUPPRESSED",  # Suppressed via exclusion
         },
         {
             "environment": "aaa",
             "id": 105,
             "lastSeen": "0005-01-01T00:00:00",
             "pending": True,
+            "reference": "res-4",
+            "state": "FLAGGED",
+        },
+    ]
+
+    assert expected == data
+
+
+def test_get_control_overview_resources_null_environment(client):
+    """
+    Given: Monitored resource with null environments for the application
+    When: When a request is made to list the resources for an appliction
+    Then: The resources are returned
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    app = Application.query.get(12)
+    app.environment_id = None
+
+    # Act
+    resp = client.get("/applications/1/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "id": 102,
+            "environment": None,
+            "lastSeen": "0002-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-1",
+            "state": "SUPPRESSED",
+        },
+        {
+            "id": 103,
+            "environment": None,
+            "lastSeen": "0003-01-01T00:00:00",
+            "pending": False,
+            "reference": "res-2",
+            "state": "SUPPRESSED",  # Suppressed via exclusion
+        },
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "0005-01-01T00:00:00",
+            "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
         },

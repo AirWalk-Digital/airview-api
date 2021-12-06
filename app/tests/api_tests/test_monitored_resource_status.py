@@ -23,7 +23,7 @@ def test_create_rejects_bad_reference(client):
     Then: 422 status, no data persisted
     """
     # Arrange
-    input_data = {"state": "FLAGGED"}
+    input_data = {"monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
@@ -58,7 +58,7 @@ def test_create_adds_when_new(client):
         id=201, application_id=1, technical_control_id=101
     )
 
-    input_data = {"state": "FLAGGED"}
+    input_data = {"monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
@@ -73,6 +73,7 @@ def test_create_adds_when_new(client):
     persisted = MonitoredResource.query.first()
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
+    assert persisted.monitoring_state == MonitoredResourceState.FLAGGED
 
 
 def test_create_updates_when_existing_different_state(client):
@@ -99,13 +100,13 @@ def test_create_updates_when_existing_different_state(client):
     MonitoredResourceFactory(
         id=301,
         reference="ref-1",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         application_technical_control_id=201,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
 
-    input_data = {"state": "SUPPRESSED"}
+    input_data = {"monitoringState": "SUPPRESSED"}
     # Act
 
     resp = client.put(
@@ -149,13 +150,13 @@ def test_create_updates_when_existing_same_state(client):
     MonitoredResourceFactory(
         id=301,
         reference="ref-1",
-        state=MonitoredResourceState.FLAGGED,
+        monitoring_state=MonitoredResourceState.FLAGGED,
         application_technical_control_id=201,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
 
-    input_data = {"state": "FLAGGED"}
+    input_data = {"monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
