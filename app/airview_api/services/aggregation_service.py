@@ -140,10 +140,7 @@ where
             "environment": x[4],
             "pending": x[6] is not None
             and x[5] is not None
-            and x[5] == ExclusionState.PENDING
-            # "state": MonitoredResourceState.SUPPRESSED
-            # if x[5] == ExclusionState.ACTIVE
-            # else x[1],
+            and x[5] == ExclusionState.PENDING,
         }
         for x in data.all()
     ]
