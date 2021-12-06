@@ -166,7 +166,7 @@ class Backend:
         resp = self._session.put(
             url=url,
             json={
-                "state": state,
+                "monitoringState": state,
             },
             headers=self._headers,
         )
