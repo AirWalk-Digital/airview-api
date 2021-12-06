@@ -33,12 +33,20 @@ DATABASE_URI=sqlite:////tmp/new.sqlite3 python -m data_loader.load_all
 SQLAlchemy can automatically roll forward the database to match the api codebase
 The development codebase can be used to initiate the tracking of schema changes
 ```
-cd ./app/utils
-FLASK_APP=./migrate.py DATABASE_URI=sqlite:///dev.sqlite3 flask db init
-FLASK_APP=./migrate.py DATABASE_URI=sqlite:///dev.sqlite3 flask db migrate -m "My Message"
-FLASK_APP=./migrate.py DATABASE_URI=sqlite:///dev.sqlite3 flask db upgrade
+cd ./app
+
+# One time initialisation
+FLASK_APP=./utils/migrate.py DATABASE_URI=postgresql://postgres:postgres@db/postgres flask db init
+# Prepare scripts
+FLASK_APP=./utils/migrate.py DATABASE_URI=postgresql://postgres:postgres@db/postgres flask db migrate
+# Roll forward
+FLASK_APP=./utils/migrate.py DATABASE_URI=postgresql://postgres:postgres@db/postgres flask db upgrade
+
 ```
-Then the app can be run in the debug server without creating the db first
+To roll forward a different copy of the db, the same ```flask db upgrade``` can be used against a different target
+
+
+
 ```
 FLASK_APP=./utils/debug.py FLASK_DEBUG=True DATABASE_URI=sqlite:///dev.sqlite3 flask run
 ```
