@@ -30,7 +30,8 @@ def handler(session):
     backend_config = BackendConfig(
         base_url=base_url,
         token="dummy_token",
-        system_id=111,
+        system_name="one",
+        system_stage="build",
         referencing_type="aws_account_id",
     )
     handler = _get_handler(session=session, backend_config=backend_config)

@@ -53,8 +53,10 @@ class BackendConfig:
     base_url: str
     #: Access token to be used when interacting with the backend
     token: str
-    #: System id which is used to identify this integration with airview
-    system_id: int
+    #: Unique name which identifies this system
+    system_name: str
+    #: Stage at which this instance monitors
+    system_stage: str
     #: Type of reference which will be used when identifying an application. e.g. aws_account_id
     referencing_type: str
 
