@@ -1,6 +1,6 @@
 import pytest
 from pprint import pprint
-from airview_api.models import Application
+from airview_api.models import Application, SystemStage
 
 from tests.common import client
 from tests.factories import *
@@ -72,7 +72,7 @@ def test_application_post_ok_response(client):
     # Arrange
     EnvironmentFactory(id=1)
     ApplicationTypeFactory(id=1)
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
 
     # Act
     resp = client.post(
@@ -126,7 +126,7 @@ def test_application_post_handles_existing_app(client):
 
     EnvironmentFactory(id=1)
     ApplicationTypeFactory(id=1)
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
 
     # Act
     resp = client.post(
@@ -163,7 +163,7 @@ def test_application_post_handles_duplication_loop(client):
     # Arrange
     EnvironmentFactory(id=1)
     ApplicationTypeFactory(id=1)
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationFactory(id=99)
     ApplicationReferenceFactory(
         application_id=99, type="_internal_reference", reference="app_1"
@@ -309,7 +309,6 @@ def test_applications_get_all(client):
     assert data[3]["id"] == 5
     assert data[3]["name"] == "yyy"
     assert data[3]["applicationTypeId"] == 1
-
 
     assert data[0]["name"] == "aaa"
     assert data[4]["name"] == "zzz"

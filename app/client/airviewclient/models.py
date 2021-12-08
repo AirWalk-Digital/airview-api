@@ -64,7 +64,7 @@ class BackendConfig:
     #: Unique name which identifies this system
     system_name: str
     #: Stage at which this instance monitors
-    system_stage: str
+    system_stage: SystemStage
     #: Type of reference which will be used when identifying an application. e.g. aws_account_id
     referencing_type: str
 

@@ -9,6 +9,7 @@ from airview_api.models import (
     MonitoredResource,
     TechnicalControlSeverity,
     TechnicalControlType,
+    SystemStage,
 )
 
 
@@ -23,7 +24,7 @@ def test_application_technical_control_get_single_ok(client):
     Then: The corrisponding application technical control is returned with status 200
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     ApplicationFactory(id=2)
@@ -63,7 +64,7 @@ def test_application_technical_control_not_found(client):
     Then: 404 status
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     ApplicationFactory(id=2)
@@ -98,7 +99,7 @@ def test_application_technical_control_post_ok(client):
     Then: 200 status, new object returned
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
@@ -132,7 +133,7 @@ def test_application_technical_control_post_conflict_when_exist(client):
     Then: 200 status, new object returned
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(

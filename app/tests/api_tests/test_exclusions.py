@@ -8,6 +8,7 @@ from airview_api.models import (
     ExclusionState,
     MonitoredResourceState,
     TechnicalControlType,
+    SystemStage,
 )
 from tests.common import client
 from tests.factories import *
@@ -17,8 +18,8 @@ from dateutil import parser
 def setup():
     reset_factories()
 
-    SystemFactory(id=1, name="one")
-    SystemFactory(id=2, name="two")
+    SystemFactory(id=1, name="one", stage=SystemStage.BUILD)
+    SystemFactory(id=2, name="two", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=11, parent_id=None, name="svc 13", environment_id=1)

@@ -53,7 +53,7 @@ class Backend:
             return [Environment(**item) for item in resp.json()]
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
-    def create_system(self, name: str, stage: str) -> Environment:
+    def create_system(self, name: str, stage: SystemStage) -> Environment:
         """
         Create a new system
         """
@@ -63,7 +63,7 @@ class Backend:
             headers=self._headers,
             json={
                 "name": name,
-                "stage": stage,
+                "stage": stage.name,
             },
         )
         if resp.status_code == 200:
