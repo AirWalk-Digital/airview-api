@@ -43,14 +43,15 @@ class ExclusionResources(MethodView):
 
         resources = exclusion_service.get_by_system(system_id=system_id, state=state)
         return resources
- 
+
+
 @blp.route("/")
 class Systems(MethodView):
     @blp.arguments(SystemSchema)
     @blp.response(200, SystemSchema)
     @blp.role(Roles.CONTENT_WRITER)
     def post(self, data):
-        """ Create a new system
+        """Create a new system
         Returns the newly created system
         """
         try:
@@ -59,3 +60,14 @@ class Systems(MethodView):
         except AirViewValidationException as e:
             abort(400, message=str(e))
 
+    @blp.response(200, SystemSchema())
+    @blp.arguments(SystemSchema(only=("name",)), location="query")
+    @blp.role(Roles.CONTENT_READER)
+    def get(self, args):
+        """Get a list of all technical controls"""
+        try:
+            data = system_service.get_by_name(**args)
+            return data
+
+        except AirViewNotFoundException:
+            abort(404)
