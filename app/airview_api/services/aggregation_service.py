@@ -66,6 +66,7 @@ from
     on s.id = tc.system_id
 where
   tc.quality_model = :quality_model
+  and mr.monitoring_state != 'CANCELLED'
 group by
   tc.id,
   tc.name,
@@ -126,6 +127,7 @@ where
         .join(Application)
         .join(Environment, isouter=True)
         .filter(MonitoredResource.id.in_(ids))
+        .filter(MonitoredResource.monitoring_state != MonitoredResourceState.CANCELLED)
     )
     print(data)
     d = data.all()

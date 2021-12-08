@@ -28,6 +28,8 @@ class MonitoredResourceState(Enum):
     SUPPRESSED = 2
     FIXED_AUTO = 3
     FIXED_OTHER = 4
+    MONITORING = 5
+    CANCELLED = 6
 
     def __str__(self):
         return self.name
