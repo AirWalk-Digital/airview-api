@@ -95,6 +95,7 @@ class TechnicalControlSchema(CamelCaseSchema):
     control_type = ma.fields.Str(required=True)
     system_id = ma.fields.Integer(required=True)
     severity = ma.fields.Str(required=False)
+
     quality_model = ma.fields.Str(required=True)
 
 

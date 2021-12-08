@@ -19,6 +19,7 @@ def create(data: dict):
 
 
 def get_by_name(name):
+    # system = db.session.query(System).filter(System.name == name).first()
     system = System.query.filter_by(name=name).first()
     if system is not None:
         return system
