@@ -34,6 +34,16 @@ Create a new environment
 
 
 
+#### create_system(name, stage)
+Create a new system
+
+
+* **Return type**
+
+    `Environment`
+
+
+
 #### create_technical_control(technical_control)
 
 * **Return type**
@@ -57,6 +67,8 @@ Get a list of environments
 #### get_exclusion_resources(state)
 Get a list of exclusion resources by state
 
+
+#### get_system_id_by_name(name)
 
 #### get_technical_control(reference)
 Get a Technical Control by its reference
@@ -107,6 +119,8 @@ Set the state of an exclusion resource
     `None`
 
 
+
+#### property system_id()
 
 #### update_application(application, environment_id)
 
@@ -185,7 +199,7 @@ Helper method to get an Azure AD token for use with the client
 
 
 
-### client.airviewclient.client.get_handler(base_url, system_id, referencing_type, token)
+### client.airviewclient.client.get_handler(base_url, system_name, referencing_type, token)
 Get an instance of handler using the configuration provided
 
 
@@ -195,7 +209,7 @@ Get an instance of handler using the configuration provided
     * **base_url** (`str`) – The base url at which the AirView API is located
 
 
-    * **system_id** (`int`) – The pre allocated id which will be used to uniquely identify this system in AirView
+    * **system_name** (`str`) – The unique name which identifies this system
 
 
     * **referencing_type** (`str`) – The common reference type which will be used to identify/deduplicate applications e.g. aws_account_id
@@ -245,13 +259,13 @@ Unique reference of application within the system. e.g. aws account id, azure su
 ID for type of application.
 
 
-### class client.airviewclient.models.BackendConfig(base_url, token, system_id, referencing_type)
+### class client.airviewclient.models.BackendConfig(base_url, token, system_name, system_stage, referencing_type)
 Bases: `object`
 
 Configuration data for connecting to a backend
 
 
-#### \__init__(base_url, token, system_id, referencing_type)
+#### \__init__(base_url, token, system_name, system_stage, referencing_type)
 
 #### base_url(: str)
 Base url of the AirView api
@@ -261,8 +275,12 @@ Base url of the AirView api
 Type of reference which will be used when identifying an application. e.g. aws_account_id
 
 
-#### system_id(: int)
-System id which is used to identify this integration with airview
+#### system_name(: str)
+Unique name which identifies this system
+
+
+#### system_stage(: client.airviewclient.models.SystemStage)
+Stage at which this instance monitors
 
 
 #### token(: str)
@@ -390,6 +408,16 @@ An enumeration.
 #### SECURITY( = 2)
 
 #### USABILITY_AND_COMPATIBILITY( = 7)
+
+### class client.airviewclient.models.SystemStage(value)
+Bases: `enum.Enum`
+
+An enumeration.
+
+
+#### BUILD( = 1)
+
+#### MONITOR( = 2)
 
 ### class client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None)
 Bases: `object`
