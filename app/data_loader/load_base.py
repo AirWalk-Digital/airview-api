@@ -25,9 +25,9 @@ def load():
 
     # Systems
     if System.query.filter_by(name="AWS").first() is None:
-        db.session.add(System(name="AWS"))
+        db.session.add(System(name="AWS", stage=SystemStage.BUILD))
     if System.query.filter_by(name="Azure").first() is None:
-        db.session.add(System(name="Azure"))
+        db.session.add(System(name="Azure", stage=SystemStage.BUILD))
 
     db.session.commit()
     ctx.pop()
