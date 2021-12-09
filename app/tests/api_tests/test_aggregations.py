@@ -124,6 +124,15 @@ def _prepare_aggregation_mock_data():
         last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
     )
+    # Cancelled Resource -  should be ignored
+    MonitoredResourceFactory(
+        id=110,
+        application_technical_control_id=33,
+        reference="res-55",
+        monitoring_state=MonitoredResourceState.CANCELLED,
+        last_seen=datetime(4, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(4, 1, 1, tzinfo=timezone.utc),
+    )
     # Items not created until something is invoked, probably because of underlying raw query
     Application.query.all()
 
