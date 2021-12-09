@@ -14,6 +14,14 @@ class TechnicalControlSeverity(Enum):
         return self.name
 
 
+class SystemStage(Enum):
+    BUILD = 1
+    MONITOR = 2
+
+    def __str__(self):
+        return self.name
+
+
 class ExclusionState(Enum):
     NONE = 1
     PENDING = 2
@@ -177,7 +185,7 @@ class TechnicalControl(db.Model):
 class System(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
-    stage = db.Column(db.String(50), nullable=True)
+    stage = db.Column(db.Enum(SystemStage), nullable=False)
     technical_controls = db.relationship("TechnicalControl", back_populates="system")
 
     __table_args__ = (

@@ -8,6 +8,7 @@ from airview_api.models import (
     MonitoredResource,
     TechnicalControlSeverity,
     TechnicalControlType,
+    SystemStage,
 )
 
 
@@ -22,7 +23,7 @@ def test_technical_control_get_single_ok(client):
     Then: The corrisponding technical control is returned with status 200
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     TechnicalControlFactory(
         id=701,
         reference="1",
@@ -67,7 +68,7 @@ def test_technical_control_get_single_not_found(client):
     Then: Status 404 is returned with an empty response
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     TechnicalControlFactory(
         id=701,
         reference="1",
@@ -107,7 +108,7 @@ def test_technical_controls_post_reject_bad_reference(client):
     Then: 402 status, no data stored
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     input_data = {
         "name": "Ctrl1",
         "reference": "bad$reference",
@@ -135,7 +136,7 @@ def test_technical_controls_post_ok_new(client):
     Then: The technical control is returned with status 200 and stored in db
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
@@ -176,7 +177,7 @@ def test_technical_controls_post_ok_sets_defaut_severity(client):
     Then: The technical control is returned with status 200 and stored in db, severity defaults to HIGh
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
@@ -247,8 +248,8 @@ def test_technical_controls_get_with_filter(client):
     Then: An array of application is returned with status 200
     """
     # Arrange
-    SystemFactory(id=11, name="sysabc")
-    SystemFactory(id=12, name="aaasysabc")
+    SystemFactory(id=11, name="sysabc", stage=SystemStage.BUILD)
+    SystemFactory(id=12, name="aaasysabc", stage=SystemStage.BUILD)
 
     TechnicalControlFactory(
         id=1,

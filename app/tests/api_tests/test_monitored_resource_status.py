@@ -9,6 +9,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     TechnicalControlType,
     MonitoredResourceState,
+    SystemStage,
 )
 
 
@@ -27,7 +28,7 @@ def test_create_rejects_bad_reference(client):
     # Act
 
     resp = client.put(
-        "/monitored-resources/?applicationTechnicalControlId=201&reference=ref$1",
+        "/monitored-resources/?applicationTechnicalControlid=2,stage=SystemStage.BUILD01&reference=ref$1",
         json=input_data,
     )
     assert resp.status_code == 422
@@ -43,7 +44,7 @@ def test_create_adds_when_new(client):
     Then: 204 status, no data returned, data persisted
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
@@ -83,7 +84,7 @@ def test_create_updates_when_existing_different_state(client):
     Then: 204 status, no data returned, last_updated updates, last_modified not
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
@@ -133,7 +134,7 @@ def test_create_updates_when_existing_same_state(client):
     Then: 204 status, no data returned, last_updated updates, last_modified not
     """
     # Arrange
-    SystemFactory(id=2)
+    SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(

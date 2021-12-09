@@ -15,6 +15,27 @@ class Backend:
         self._session = session
         self._backend_config = backend_config
         self._headers = {"Authorization": backend_config.token}
+        self._system_id = None
+
+    @property
+    def system_id(self):
+        if self._system_id is None:
+            system_id = self.get_system_id_by_name(self._backend_config.system_name)
+            if system_id is None:
+                system_id = self.create_system(
+                    self._backend_config.system_name, self._backend_config.system_stage
+                )
+            self._system_id = system_id
+
+        return self._system_id
+
+    def get_system_id_by_name(self, name):
+        url = self.get_url(f"/systems/?name={name}")
+        resp = self._session.get(url=url, headers=self._headers)
+        if resp.status_code == 200:
+            data = resp.json()
+            return data["id"]
+        return None
 
     def get_url(self, route) -> str:
         """
@@ -30,6 +51,23 @@ class Backend:
         resp = self._session.get(url=url, headers=self._headers)
         if resp.status_code == 200:
             return [Environment(**item) for item in resp.json()]
+        raise BackendFailureException(f"Status code: {resp.status_code}")
+
+    def create_system(self, name: str, stage: SystemStage) -> Environment:
+        """
+        Create a new system
+        """
+
+        resp = self._session.post(
+            url=self.get_url("/systems/"),
+            headers=self._headers,
+            json={
+                "name": name,
+                "stage": stage.name,
+            },
+        )
+        if resp.status_code == 200:
+            return resp.json()["id"]
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
     def create_environment(self, environment: Environment) -> Environment:
@@ -122,7 +160,7 @@ class Backend:
         """
         resp = self._session.get(
             url=self.get_url(
-                f"/technical-controls/?systemId={self._backend_config.system_id}&reference={reference}"
+                f"/technical-controls/?systemId={self.system_id}&reference={reference}"
             ),
             headers=self._headers,
         )
@@ -183,7 +221,7 @@ class Backend:
                 "reference": technical_control.reference,
                 "controlType": technical_control.type.name,
                 "qualityModel": technical_control.quality_model.name,
-                "systemId": self._backend_config.system_id,
+                "systemId": self.system_id,
             },
             headers=self._headers,
         )
@@ -226,7 +264,7 @@ class Backend:
         """Get a list of exclusion resources by state"""
         resp = self._session.get(
             url=self.get_url(
-                f"/systems/{self._backend_config.system_id}/exclusion-resources/?state={state.name}"
+                f"/systems/{self.system_id}/exclusion-resources/?state={state.name}"
             ),
             headers=self._headers,
         )
@@ -391,19 +429,19 @@ def _get_handler(session: requests.Session, backend_config: BackendConfig):
 
 
 def get_handler(
-    base_url: str, system_id: int, referencing_type: str, token: str
+    base_url: str, system_name: str, referencing_type: str, token: str
 ) -> Handler:
     """Get an instance of handler using the configuration provided
 
     :param base_url: The base url at which the AirView API is located
-    :param system_id: The pre allocated id which will be used to uniquely identify this system in AirView
+    :param system_name: The unique name which identifies this system
     :param referencing_type: The common reference type which will be used to identify/deduplicate applications e.g. aws_account_id
     :param token: The access token to be used to authenticate with the API
     """
 
     backed_config = BackendConfig(
         base_url=base_url,
-        system_id=system_id,
+        system_name=system_name,
         referencing_type=referencing_type,
         token=token,
     )

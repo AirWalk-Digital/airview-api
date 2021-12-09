@@ -7,6 +7,7 @@ from airview_api.models import (
     MonitoredResource,
     MonitoredResourceState,
     TechnicalControlSeverity,
+    SystemStage,
 )
 
 
@@ -17,7 +18,7 @@ def test_control_status_detail_returns_correct_detail(client):
     Then: The detail is returned, 200 status
     """
     # Arrange
-    SystemFactory(id=1, name="one")
+    SystemFactory(id=1, name="one", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1, name="aaa")
     ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1, application_type_id=1)

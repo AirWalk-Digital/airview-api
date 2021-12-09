@@ -2,7 +2,7 @@ from airview_api.models import MonitoredResourceState
 from tests.client_tests.common import *
 from airview_api import app
 from airview_api.database import db
-from airview_api import models
+from airview_api import models as api_models
 from tests.common import client, instance
 from tests.factories import *
 import requests_mock
@@ -30,6 +30,37 @@ def setup():
     setup_factories()
 
 
+def test_monitored_resource_creates_missing_system(handler):
+    """
+    Given: A missing system
+    When: When a call is made to set a monitored resource
+    Then: The monitored resource is persisted against a new system
+    """
+    # Arrange
+    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ApplicationFactory(id=2, application_type_id=1, environment_id=1)
+    ApplicationReferenceFactory(
+        application_id=2, type="aws_account_id", reference="app-ref-1"
+    )
+
+    # Act
+    handler.handle_compliance_event(compliance_event)
+
+    # Assert
+    monitored = MonitoredResource.query.all()
+    assert len(monitored) == 1
+    assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].reference == "res-ref-1"
+    assert (
+        monitored[0].application_technical_control.technical_control.system.name
+        == "one"
+    )
+    assert (
+        monitored[0].application_technical_control.technical_control.system.stage.name
+        == "BUILD"
+    )
+
+
 def test_monitored_resource_persisted_for_linked(handler):
     """
     Given: An existing linked application
@@ -42,7 +73,7 @@ def test_monitored_resource_persisted_for_linked(handler):
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
-    SystemFactory(id=111)
+    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
     TechnicalControlFactory(id=4, system_id=111, reference="tc-ref-1", severity="HIGH")
     ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
 
@@ -64,13 +95,12 @@ def test_triggered_resource_creates_new_control(handler):
     Then: New control created and linked, the triggerend resource is sent to the backend
     """
     # Arrange
-    # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ApplicationFactory(id=2, application_type_id=1, environment_id=1)
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
-    SystemFactory(id=111)
+    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
     TechnicalControlFactory(
         id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
     )
@@ -99,7 +129,7 @@ def test_triggered_resource_creates_new_app(handler):
     Then: A new application is created, linked and triggered
     """
     # Arrange
-    SystemFactory(id=111)
+    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
 
     # Act
     handler.handle_compliance_event(compliance_event)
@@ -126,6 +156,16 @@ def test_account_cache_handle_unexpected_code_for_get_control(handler, adapter):
     Then: An exception is raised
     """
     # Arrange
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/systems/?name=one",
+        status_code=200,
+        json={
+            "id": 111,
+            "name": "name",
+        },
+    )
+
     adapter.register_uri(
         "GET",
         f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
@@ -158,6 +198,15 @@ def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control
     Then: An exception is raised
     """
     # Arrange
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/systems/?name=one",
+        status_code=200,
+        json={
+            "id": 111,
+            "name": "name",
+        },
+    )
     adapter.register_uri(
         "GET",
         f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
@@ -205,6 +254,15 @@ def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
     """
     adapter.register_uri(
         "GET",
+        f"{base_url}/systems/?name=one",
+        status_code=200,
+        json={
+            "id": 111,
+            "name": "name",
+        },
+    )
+    adapter.register_uri(
+        "GET",
         f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
@@ -240,6 +298,15 @@ def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
     When: When a call is made to set a triggered resource
     Then: An exception is raised
     """
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/systems/?name=one",
+        status_code=200,
+        json={
+            "id": 111,
+            "name": "name",
+        },
+    )
     adapter.register_uri(
         "GET",
         f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
@@ -292,6 +359,15 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
     When: When a call is made to set a triggered resource
     Then: An exception is raised
     """
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/systems/?name=one",
+        status_code=200,
+        json={
+            "id": 111,
+            "name": "name",
+        },
+    )
     adapter.register_uri(
         "GET",
         f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",

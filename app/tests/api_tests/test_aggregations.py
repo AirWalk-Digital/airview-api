@@ -11,6 +11,7 @@ from airview_api.models import (
     ExclusionState,
     MonitoredResourceState,
     TechnicalControlType,
+    SystemStage,
 )
 
 
@@ -19,7 +20,7 @@ def setup():
 
 
 def _prepare_aggregation_mock_data():
-    SystemFactory(id=1, name="one", stage="build")
+    SystemFactory(id=1, name="one", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1, abbreviation="DEV", name="aaa")
     EnvironmentFactory(id=2, abbreviation="PRD", name="bbb")
     ApplicationTypeFactory(id=1)
@@ -183,7 +184,7 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
@@ -196,7 +197,7 @@ def test_get_control_status_aggregation(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "DEV",
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
@@ -208,7 +209,7 @@ def test_get_control_status_aggregation(client):
             "controlType": "security",
             "severity": "low",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "name": "ctl2",
             "environment": "PRD",
             "application": "svc 12",
@@ -258,7 +259,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "DEV",
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
@@ -271,7 +272,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
@@ -320,7 +321,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
@@ -333,7 +334,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
@@ -433,7 +434,7 @@ def test_get_application_control_overview(client):
             "severity": "HIGH",
             "name": "ctl1",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
         },
     ]
 
@@ -465,7 +466,7 @@ def test_get_application_control_overview_hides_parents(client):
             "name": "ctl1",
             "severity": "HIGH",
             "systemName": "one",
-            "systemStage": "build",
+            "systemStage": "BUILD",
         }
     ]
     assert expected == data

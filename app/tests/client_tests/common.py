@@ -4,7 +4,7 @@ import requests_mock
 from requests_flask_adapter import Session
 import pytest
 from client.airviewclient.client import _get_handler
-from client.airviewclient.models import BackendConfig
+from client.airviewclient.models import BackendConfig, SystemStage
 
 base_url = "mock://someres"
 
@@ -30,7 +30,8 @@ def handler(session):
     backend_config = BackendConfig(
         base_url=base_url,
         token="dummy_token",
-        system_id=111,
+        system_name="one",
+        system_stage=SystemStage.BUILD,
         referencing_type="aws_account_id",
     )
     handler = _get_handler(session=session, backend_config=backend_config)

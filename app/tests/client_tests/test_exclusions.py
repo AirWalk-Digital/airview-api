@@ -6,6 +6,7 @@ from airview_api.models import (
     ExclusionState,
     MonitoredResourceState,
     TechnicalControlType,
+    SystemStage,
 )
 from datetime import datetime
 from tests.common import client, instance
@@ -20,7 +21,7 @@ from client.airviewclient import models
 def setup():
     setup_factories()
 
-    SystemFactory(id=111, name="one")
+    SystemFactory(id=111, name="one", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1)
     ApplicationFactory(id=11, parent_id=None, name="svc 13", environment_id=1)
     ApplicationReferenceFactory(
