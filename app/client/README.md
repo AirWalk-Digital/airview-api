@@ -42,7 +42,8 @@ token = client.get_azure_token(
 
 client_handler = client.get_handler(
     base_url=base_url,
-    system_id=system_id,
+    system_name=system_name,
+    system_stage=models.SystemStage.BUILD,
     referencing_type=referencing_type,
     token=token,
 )
