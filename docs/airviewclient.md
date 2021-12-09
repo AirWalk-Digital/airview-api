@@ -199,7 +199,7 @@ Helper method to get an Azure AD token for use with the client
 
 
 
-### client.airviewclient.client.get_handler(base_url, system_name, referencing_type, token)
+### client.airviewclient.client.get_handler(base_url, system_name, system_stage, referencing_type, token)
 Get an instance of handler using the configuration provided
 
 

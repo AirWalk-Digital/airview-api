@@ -534,7 +534,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -542,7 +542,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1199,18 +1199,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "applicationTechnicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1247,7 +1247,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1255,7 +1255,7 @@
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -1292,7 +1292,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "contextSize",
+            "name": "limit",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1300,7 +1300,7 @@
           },
           {
             "in": "query",
-            "name": "limit",
+            "name": "contextSize",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1458,18 +1458,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
