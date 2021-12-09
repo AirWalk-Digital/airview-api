@@ -429,7 +429,11 @@ def _get_handler(session: requests.Session, backend_config: BackendConfig):
 
 
 def get_handler(
-    base_url: str, system_name: str, referencing_type: str, token: str
+    base_url: str,
+    system_name: str,
+    system_stage: SystemStage,
+    referencing_type: str,
+    token: str,
 ) -> Handler:
     """Get an instance of handler using the configuration provided
 
@@ -442,6 +446,7 @@ def get_handler(
     backed_config = BackendConfig(
         base_url=base_url,
         system_name=system_name,
+        system_stage=system_stage,
         referencing_type=referencing_type,
         token=token,
     )
