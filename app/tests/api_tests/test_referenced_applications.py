@@ -8,34 +8,34 @@ from tests.factories import *
 
 def setup():
     ApplicationFactory.reset_sequence()
-    ApplicationTypeFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     SystemFactory.reset_sequence()
 
 
 def setup_app_refs():
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(
         id=1,
         name="app one",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
     ApplicationReferenceFactory(application_id=1, type="account", reference="ref-1")
-    ApplicationReferenceFactory(application_id=1, type="other-account", reference="ref-1")
+    ApplicationReferenceFactory(
+        application_id=1, type="other-account", reference="ref-1"
+    )
 
     ApplicationFactory(
         id=2,
         name="app two",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
     ApplicationReferenceFactory(application_id=2, type="account", reference="ref-2")
     ApplicationFactory(
         id=3,
         name="app three",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
     ApplicationReferenceFactory(application_id=3, type="account", reference="ref-3")

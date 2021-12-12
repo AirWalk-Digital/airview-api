@@ -6,6 +6,7 @@ from airview_api.models import (
     Application,
     System,
     ApplicationReference,
+    ApplicationType,
 )
 from airview_api.database import db
 import itertools
@@ -13,8 +14,11 @@ from collections import defaultdict
 import re
 
 
-def get_all():
-    return Application.query.order_by("name").all()
+def get_all(application_type: None):
+
+    results = db.session.query(Application)
+    if application_type is not None:
+        results = results.filter(application_type == application_type)
 
 
 def get_by_id(application_id: int):
@@ -29,8 +33,10 @@ def get_by_reference(type, reference):
     return link.application
 
 
-def get_by_type(application_type_id: int):
-    return Application.query.filter_by(application_type_id=application_type_id).all()
+def get_by_type(application_type: str):
+    return Application.query.filter_by(
+        application_type=ApplicationType[application_type]
+    ).all()
 
 
 def get_environments(application_id: int):
@@ -91,7 +97,7 @@ def update(data: dict):
     if app is None:
         raise AirViewNotFoundException()
     app.name = data["name"]
-    app.application_type_id = data["application_type_id"]
+    app.application_type = ApplicationType[data["application_type"]]
     app.parent_id = data.get("parent_id")
     app.environment_id = data.get("environment_id")
     try:

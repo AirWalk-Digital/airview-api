@@ -62,9 +62,15 @@ class Application(MethodView):
 class Applications(MethodView):
     @blp.response(200, ApplicationSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
-    def get(self):
+    @blp.arguments(
+        ApplicationSchema(only=("application_type")),
+        location="query",
+    )
+    def get(self, args):
         """Get all applications"""
-        return application_service.get_all()
+
+        type = ApplicationType[args["application_type"]]
+        return application_service.get_all(type)
 
     @blp.arguments(ApplicationSchema)
     @blp.response(200, ApplicationSchema)

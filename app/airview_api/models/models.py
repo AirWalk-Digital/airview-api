@@ -65,15 +65,19 @@ class TechnicalControlType(Enum):
         return self.name
 
 
+class ApplicationType(Enum):
+    BUSINESS_APPLICATION = 1
+    TECHNICAL_SERVICE = 2
+    APPLICATION_SERVICE = 3
+
+    def __str__(self):
+        return self.name
+
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
-    application_type_id = db.Column(
-        db.Integer, db.ForeignKey("application_type.id"), nullable=False
-    )
-    application_type = db.relationship(
-        "ApplicationType", back_populates="applications", lazy=True
-    )
+    application_type = db.Column(db.Enum(ApplicationType), nullable=False)
     environment_id = db.Column(
         db.Integer, db.ForeignKey("environment.id"), nullable=True
     )
@@ -118,24 +122,6 @@ class ApplicationReference(db.Model):
     )
 
     application = db.relationship("Application", back_populates="references")
-
-
-class ApplicationType(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
-    applications = db.relationship(
-        "Application", back_populates="application_type", lazy=True
-    )
-
-    __table_args__ = (
-        db.UniqueConstraint(
-            "name",
-            name="uq_application_type_name",
-        ),
-    )
-
-    def __repr__(self):
-        return f"{self.name}"
 
 
 class Environment(db.Model):
