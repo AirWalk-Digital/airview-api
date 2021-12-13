@@ -17,11 +17,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.close()
 
 
-# if os.environ.get("CREATE_DB", "") == "True":
-# from data_loader import load_all
-
-# load_all.load()
-
 instance = app.create_app()
 
 
