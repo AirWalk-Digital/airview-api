@@ -22,7 +22,6 @@ def create_app():
 
     api = Api(app)
     api.register_blueprint(controllers.applications.blp)
-    api.register_blueprint(controllers.application_types.blp)
     api.register_blueprint(controllers.technical_controls.blp)
     api.register_blueprint(controllers.systems.blp)
     api.register_blueprint(controllers.environments.blp)

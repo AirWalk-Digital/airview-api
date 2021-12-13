@@ -28,7 +28,7 @@ class ApplicationReferenceSchema(CamelCaseSchema):
 class ApplicationSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
-    application_type_id = ma.fields.Integer(required=True)
+    application_type = ma.fields.Str(required=True)
     parent_id = ma.fields.Integer(allow_none=True)
     environment_id = ma.fields.Integer(allow_none=True)
     references = ma.fields.Nested(

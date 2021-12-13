@@ -40,4 +40,3 @@ def handler(session):
 
 def setup_factories():
     reset_factories()
-    ApplicationTypeFactory(id=1)

@@ -25,7 +25,6 @@ def test_application_technical_control_get_single_ok(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     ApplicationFactory(id=2)
     TechnicalControlFactory(
@@ -65,7 +64,6 @@ def test_application_technical_control_not_found(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     ApplicationFactory(id=2)
     TechnicalControlFactory(
@@ -100,7 +98,6 @@ def test_application_technical_control_post_ok(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
         id=101,
@@ -134,7 +131,6 @@ def test_application_technical_control_post_conflict_when_exist(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
         id=101,

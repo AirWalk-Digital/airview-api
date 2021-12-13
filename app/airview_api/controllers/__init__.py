@@ -1,6 +1,5 @@
 from airview_api.controllers import (
     applications,
-    application_types,
     technical_controls,
     systems,
     control_statuses,
@@ -11,5 +10,5 @@ from airview_api.controllers import (
     referenced_applications,
     application_technical_controls,
     monitored_resources,
-    search
+    search,
 )

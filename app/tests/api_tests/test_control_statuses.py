@@ -20,8 +20,7 @@ def test_control_status_detail_returns_correct_detail(client):
     # Arrange
     SystemFactory(id=1, name="one", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1, name="aaa")
-    ApplicationTypeFactory(id=1)
-    ApplicationFactory(id=1, application_type_id=1)
+    ApplicationFactory(id=1, application_type=ApplicationType.BUSINESS_APPLICATION)
     ApplicationFactory(id=12, parent_id=1, environment_id=1, name="App Svc 2")
     TechnicalControlFactory(
         id=22,

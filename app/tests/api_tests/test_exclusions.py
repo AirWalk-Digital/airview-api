@@ -21,7 +21,6 @@ def setup():
     SystemFactory(id=1, name="one", stage=SystemStage.BUILD)
     SystemFactory(id=2, name="two", stage=SystemStage.BUILD)
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=11, parent_id=None, name="svc 13", environment_id=1)
     ApplicationReferenceFactory(
         id=311, application_id=11, type="app-ref", reference="app-11"

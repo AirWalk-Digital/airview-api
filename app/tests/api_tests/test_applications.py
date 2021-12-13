@@ -8,7 +8,6 @@ from tests.factories import *
 
 def setup():
     ApplicationFactory.reset_sequence()
-    ApplicationTypeFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     SystemFactory.reset_sequence()
 
@@ -21,12 +20,19 @@ def test_application_get_single_ok(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
-    ApplicationTypeFactory(id=2)
     # ApplicationFactory.create_batch(5)
-    ApplicationFactory(id=1, environment_id=1, application_type_id=1)
-    ApplicationFactory(id=2, name="myapp1", environment_id=1, application_type_id=2)
-    ApplicationFactory(id=3, environment_id=1, application_type_id=1)
+    ApplicationFactory(
+        id=1, environment_id=1, application_type=ApplicationType.BUSINESS_APPLICATION
+    )
+    ApplicationFactory(
+        id=2,
+        name="myapp1",
+        environment_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=3, environment_id=1, application_type=ApplicationType.BUSINESS_APPLICATION
+    )
     ApplicationReferenceFactory(
         id=3, application_id=2, type="type123", reference="valabc"
     )
@@ -39,7 +45,7 @@ def test_application_get_single_ok(client):
     assert resp.status_code == 200
     assert data["id"] == 2
     assert data["name"] == "myapp1"
-    assert data["applicationTypeId"] == 2
+    assert data["applicationType"] == "BUSINESS_APPLICATION"
     assert len(data["references"]) == 1
     assert data["references"][0]["type"] == "type123"
     assert data["references"][0]["reference"] == "valabc"
@@ -53,7 +59,6 @@ def test_application_get_single_not_found(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory.create_batch(5)
 
     # Act
@@ -71,7 +76,6 @@ def test_application_post_ok_response(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     SystemFactory(id=2, stage=SystemStage.BUILD)
 
     # Act
@@ -79,7 +83,7 @@ def test_application_post_ok_response(client):
         "/applications/",
         json={
             "name": "App 1",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
             "references": [
                 {"type": "type1", "reference": "val1"},
                 {"type": "type2", "reference": "val2"},
@@ -125,7 +129,6 @@ def test_application_post_handles_existing_app(client):
     )
 
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     SystemFactory(id=2, stage=SystemStage.BUILD)
 
     # Act
@@ -133,7 +136,7 @@ def test_application_post_handles_existing_app(client):
         "/applications/",
         json={
             "name": "App 1",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
         },
     )
 
@@ -162,7 +165,6 @@ def test_application_post_handles_duplication_loop(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationFactory(id=99)
     ApplicationReferenceFactory(
@@ -179,7 +181,7 @@ def test_application_post_handles_duplication_loop(client):
         "/applications/",
         json={
             "name": "App 1",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
         },
     )
 
@@ -202,7 +204,7 @@ def test_application_post_rejects_bad_reference_type(client):
         "/applications/",
         json={
             "name": "App 1",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
             "references": [{"type": "bad key", "reference": "good_ref"}],
         },
     )
@@ -226,7 +228,7 @@ def test_application_post_rejects_bad_reference_value(client):
         "/applications/",
         json={
             "name": "App 1",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
             "references": [{"type": "good_key", "reference": "bad&ref"}],
         },
     )
@@ -248,7 +250,10 @@ def test_application_post_bad_request_for_unknown_app_type(client):
     # Act
     resp = client.post(
         "/applications/",
-        json={"name": "App 1", "applicationTypeId": 1},
+        json={
+            "name": "App 1",
+            "applicationType": "UNKNOWN_APPLICATION",
+        },
     )
 
     # Assert
@@ -259,11 +264,28 @@ def test_application_post_bad_request_for_unknown_app_type(client):
     "data",
     [
         {},
-        {"xxxname": "App 1", "reference": "ref_1", "applicationTypeId": 1},
-        {"name": "App 1", "xxxreference": "ref_1", "applicationTypeId": 1},
-        {"name": "App 1", "reference": "ref_1", "xxxapplicationTypeId": 1},
+        {
+            "xxxname": "App 1",
+            "reference": "ref_1",
+            "applicationType": "BUSINESS_APPLICATION",
+        },
+        {
+            "name": "App 1",
+            "xxxreference": "ref_1",
+            "applicationType": "BUSINESS_APPLICATION",
+        },
+        {
+            "name": "App 1",
+            "reference": "ref_1",
+            "xxxapplicationType": "BUSINESS_APPLICATION",
+        },
         {"id": 123, "name": "App 1", "reference": "ref_1"},
-        {"id": 0, "name": "App 1", "reference": "ref_1", "applicationTypeId": 1},
+        {
+            "id": 0,
+            "name": "App 1",
+            "reference": "ref_1",
+            "applicationType": "BUSINESS_APPLICATION",
+        },
     ],
 )
 def test_application_post_bad_request_for_id(client, data):
@@ -291,7 +313,6 @@ def test_applications_get_all(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1, name="zzz")
     ApplicationFactory(id=2, name="aaa")
     ApplicationFactory(id=3, name="bbb")
@@ -306,32 +327,46 @@ def test_applications_get_all(client):
     data = resp.get_json()
     assert len(data) == 5
 
-    assert data[3]["id"] == 5
-    assert data[3]["name"] == "yyy"
-    assert data[3]["applicationTypeId"] == 1
+    assert data[2]["id"] == 3
+    assert data[2]["name"] == "bbb"
+    assert data[2]["applicationType"] == "BUSINESS_APPLICATION"
 
-    assert data[0]["name"] == "aaa"
-    assert data[4]["name"] == "zzz"
+    assert data[0]["name"] == "zzz"
+    assert data[4]["name"] == "yyy"
 
 
-def test_applications_get_by_application_type_id(client):
+def test_applications_get_by_application_type(client):
     """
     Given: A collection of applications in the db
     When: When a request is made for a specifc type of application
     Then: Only appications with the correct type are returned
     """
     # Arrange
-    ApplicationTypeFactory(id=1)
-    ApplicationTypeFactory(id=2)
     EnvironmentFactory(id=11)
-    ApplicationFactory(id=1, name="App 1", application_type_id=1, environment_id=11)
-    ApplicationFactory(id=2, name="App 2", application_type_id=1)
-    ApplicationFactory(id=3, name="App 3", application_type_id=2, environment_id=11)
-    ApplicationFactory(id=4, name="App 4", application_type_id=2)
-    ApplicationFactory(id=5, name="App 5", application_type_id=1)
+    ApplicationFactory(
+        id=1,
+        name="App 1",
+        application_type=ApplicationType.APPLICATION_SERVICE,
+        environment_id=11,
+    )
+    ApplicationFactory(
+        id=2, name="App 2", application_type=ApplicationType.TECHNICAL_SERVICE
+    )
+    ApplicationFactory(
+        id=3,
+        name="App 3",
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+        environment_id=11,
+    )
+    ApplicationFactory(
+        id=4, name="App 4", application_type=ApplicationType.BUSINESS_APPLICATION
+    )
+    ApplicationFactory(
+        id=5, name="App 5", application_type=ApplicationType.APPLICATION_SERVICE
+    )
 
     # Act
-    resp = client.get("/application-types/2/applications/")
+    resp = client.get("/applications/?applicationType=BUSINESS_APPLICATION")
 
     # Assert
     assert resp.status_code == 200
@@ -340,7 +375,7 @@ def test_applications_get_by_application_type_id(client):
 
     assert data[0]["id"] == 3
     assert data[0]["name"] == "App 3"
-    assert data[0]["applicationTypeId"] == 2
+    assert data[0]["applicationType"] == "BUSINESS_APPLICATION"
 
 
 def test_applications_post_child_application_ok(client):
@@ -351,14 +386,13 @@ def test_applications_post_child_application_ok(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationTypeFactory(id=2)
-    ApplicationFactory(id=3, application_type_id=2)
+    ApplicationFactory(id=3, application_type=ApplicationType.BUSINESS_APPLICATION)
 
     resp = client.post(
         "/applications/",
         json={
             "name": "App Service 1",
-            "applicationTypeId": 2,
+            "applicationType": "BUSINESS_APPLICATION",
             "parentId": 3,
         },
     )
@@ -384,11 +418,10 @@ def test_application_post_bad_request_for_missing_parent(client):
     Then: The api returns with status 400 and no data is persisted to the database
     """
     # Arrange
-    ApplicationTypeFactory(id=1)
     EnvironmentFactory(id=3)
     input_data = {
         "name": "App 1",
-        "applicationTypeId": 1,
+        "applicationType": "BUSINESS_APPLICATION",
         "parentId": 2,
         "environmentId": 3,
     }
@@ -410,11 +443,10 @@ def test_application_post_bad_request_for_missing_environment(client):
     Then: The api returns with status 400 and no data is persisted to the database
     """
     # Arrange
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=2)
     input_data = {
         "name": "App 1",
-        "applicationTypeId": 1,
+        "applicationType": "BUSINESS_APPLICATION",
         "parentId": 2,
         "environmentId": 3,
     }
@@ -436,12 +468,11 @@ def test_application_post_bad_request_for_missing_app_type(client):
     Then: The api returns with status 400 and no data is persisted to the database
     """
     # Arrange
-    ApplicationTypeFactory(id=99)
-    ApplicationFactory(id=2, application_type_id=99)
+    ApplicationFactory(id=2)
     EnvironmentFactory(id=3)
     input_data = {
         "name": "App 1",
-        "applicationTypeId": 1,
+        "applicationType": "NONE_BUSINESS_APPLICATION",
         "parentId": 2,
         "environmentId": 3,
     }
@@ -465,14 +496,12 @@ def test_application_put_ok(client):
     # Arrange
     EnvironmentFactory(id=1)
     EnvironmentFactory(id=3)
-    ApplicationTypeFactory(id=1)
-    ApplicationTypeFactory(id=2)
     ApplicationFactory(id=222, name="parent")
     ApplicationFactory(id=333, name="parent-333")
     ApplicationFactory(
         id=111,
         name="child",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         parent_id=222,
         environment_id=3,
     )
@@ -483,7 +512,7 @@ def test_application_put_ok(client):
         json={
             "id": 111,
             "name": "MyApp",
-            "applicationTypeId": 2,
+            "applicationType": "BUSINESS_APPLICATION",
             "environmentId": 1,
             "parentId": 333,
         },
@@ -516,7 +545,7 @@ def test_application_put_handles_id_mismatch(client):
         json={
             "id": 222,
             "name": "MyApp",
-            "applicationTypeId": 2,
+            "applicationType": "BUSINESS_APPLICATION",
             "environmentId": 1,
         },
     )
@@ -541,7 +570,7 @@ def test_application_put_handles_not_found(client):
         json={
             "id": 111,
             "name": "MyApp",
-            "applicationTypeId": 2,
+            "applicationType": "BUSINESS_APPLICATION",
             "environmentId": 1,
         },
     )
@@ -560,14 +589,16 @@ def test_application_put_handles_missing_environment(client):
     """
     # Arrange
     EnvironmentFactory(id=3)
-    ApplicationTypeFactory(id=2)
     ApplicationFactory(
-        id=222, application_type_id=2, environment_id=None, name="parent"
+        id=222,
+        application_type=ApplicationType.APPLICATION_SERVICE,
+        environment_id=None,
+        name="parent",
     )
     ApplicationFactory(
         id=111,
         name="child",
-        application_type_id=2,
+        application_type=ApplicationType.APPLICATION_SERVICE,
         environment_id=3,
     )
 
@@ -577,7 +608,7 @@ def test_application_put_handles_missing_environment(client):
         json={
             "id": 111,
             "name": "MyApp",
-            "applicationTypeId": 2,
+            "applicationType": "APPLICATION_SERVICE",
             "parentId": 222,
         },
     )
@@ -597,12 +628,11 @@ def test_application_put_handles_missing_application_type(client):
     """
     # Arrange
     EnvironmentFactory(id=3)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=222, name="parent")
     ApplicationFactory(
         id=111,
         name="child",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=3,
     )
 
@@ -629,11 +659,10 @@ def test_application_put_handles_missing_parent(client):
     """
     # Arrange
     EnvironmentFactory(id=3)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(
         id=111,
         name="child",
-        application_type_id=1,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=3,
     )
 
@@ -643,7 +672,7 @@ def test_application_put_handles_missing_parent(client):
         json={
             "id": 111,
             "name": "MyApp",
-            "applicationTypeId": 1,
+            "applicationType": "BUSINESS_APPLICATION",
             "environmentId": 3,
         },
     )

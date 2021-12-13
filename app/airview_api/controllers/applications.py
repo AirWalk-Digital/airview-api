@@ -10,6 +10,7 @@ from airview_api.services import (
 from flask.views import MethodView
 from flask_smorest import abort
 import flask
+from flask import request
 
 from airview_api.schemas import (
     ApplicationSchema,
@@ -64,7 +65,9 @@ class Applications(MethodView):
     @blp.role(Roles.CONTENT_READER)
     def get(self):
         """Get all applications"""
-        return application_service.get_all()
+
+        type = request.args.get("applicationType")
+        return application_service.get_all(type)
 
     @blp.arguments(ApplicationSchema)
     @blp.response(200, ApplicationSchema)

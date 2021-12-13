@@ -45,7 +45,6 @@ def test_create_adds_when_new(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
         id=101,
@@ -85,7 +84,6 @@ def test_create_updates_when_existing_different_state(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
         id=101,
@@ -135,7 +133,6 @@ def test_create_updates_when_existing_same_state(client):
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
-    ApplicationTypeFactory(id=1)
     ApplicationFactory(id=1)
     TechnicalControlFactory(
         id=101,

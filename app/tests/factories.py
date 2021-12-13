@@ -42,15 +42,6 @@ class ApplicationReferenceFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
 
 
-class ApplicationTypeFactory(factory.alchemy.SQLAlchemyModelFactory):
-    class Meta:
-        model = ApplicationType
-        sqlalchemy_session = db.session
-
-    id = factory.Sequence(lambda n: n)
-    name = factory.Sequence(lambda n: f"AppType {n}")
-
-
 class ApplicationFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = Application
@@ -58,7 +49,7 @@ class ApplicationFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"App {n}")
-    application_type_id = 1
+    application_type = ApplicationType.BUSINESS_APPLICATION
 
 
 class EnvironmentFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -92,7 +83,6 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 def reset_factories():
     TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
-    ApplicationTypeFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     ApplicationTechnicalControlFactory.reset_sequence()

@@ -7,7 +7,6 @@ from tests.common import client
 
 def setup():
     ApplicationFactory.reset_sequence()
-    ApplicationTypeFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
 
 
@@ -35,20 +34,53 @@ def test_get_environments_by_app_service_ok(client):
     Then: A unique list of environments for application services is returned with status 200
     """
     # Arrange
-    ApplicationTypeFactory(id=1)
-    ApplicationFactory(id=1, name="App 1", application_type_id=1)
-    ApplicationFactory(id=2, name="App 2", application_type_id=1)
+    ApplicationFactory(
+        id=1, name="App 1", application_type=ApplicationType.BUSINESS_APPLICATION
+    )
+    ApplicationFactory(
+        id=2, name="App 2", application_type=ApplicationType.BUSINESS_APPLICATION
+    )
     EnvironmentFactory(id=11, name="Development", abbreviation="DEV")
     EnvironmentFactory(id=12, name="Production", abbreviation="PRD")
     EnvironmentFactory(id=13, name="User Acceptance", abbreviation="UAT")
 
-    ApplicationFactory(id=21, parent_id=1, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=22, parent_id=1, environment_id=12, application_type_id=1)
-    ApplicationFactory(id=23, parent_id=1, environment_id=13, application_type_id=1)
+    ApplicationFactory(
+        id=21,
+        parent_id=1,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=22,
+        parent_id=1,
+        environment_id=12,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=23,
+        parent_id=1,
+        environment_id=13,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
 
-    ApplicationFactory(id=24, parent_id=2, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=25, parent_id=2, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=26, parent_id=2, environment_id=13, application_type_id=1)
+    ApplicationFactory(
+        id=24,
+        parent_id=2,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=25,
+        parent_id=2,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=26,
+        parent_id=2,
+        environment_id=13,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
 
     # Act
     resp = client.get("/applications/2/environments")
@@ -73,20 +105,53 @@ def test_get_environments_by_app_service_handles_none_environment(client):
     Then: A unique list of environments for application services is returned with status 200
     """
     # Arrange
-    ApplicationTypeFactory(id=1)
     EnvironmentFactory(id=11, name="Development", abbreviation="DEV")
     EnvironmentFactory(id=12, name="Production", abbreviation="PRD")
     EnvironmentFactory(id=13, name="User Acceptance", abbreviation="UAT")
-    ApplicationFactory(id=1, name="App 1", application_type_id=1, environment_id=12)
-    ApplicationFactory(id=2, name="App 2", application_type_id=1)
+    ApplicationFactory(
+        id=1,
+        name="App 1",
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+        environment_id=12,
+    )
+    ApplicationFactory(
+        id=2, name="App 2", application_type=ApplicationType.BUSINESS_APPLICATION
+    )
 
-    ApplicationFactory(id=21, parent_id=1, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=22, parent_id=1, environment_id=12, application_type_id=1)
-    ApplicationFactory(id=23, parent_id=1, environment_id=13, application_type_id=1)
+    ApplicationFactory(
+        id=21,
+        parent_id=1,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=22,
+        parent_id=1,
+        environment_id=12,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=23,
+        parent_id=1,
+        environment_id=13,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
 
-    ApplicationFactory(id=24, parent_id=2, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=25, parent_id=2, environment_id=11, application_type_id=1)
-    ApplicationFactory(id=26, parent_id=2, application_type_id=1)
+    ApplicationFactory(
+        id=24,
+        parent_id=2,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=25,
+        parent_id=2,
+        environment_id=11,
+        application_type=ApplicationType.BUSINESS_APPLICATION,
+    )
+    ApplicationFactory(
+        id=26, parent_id=2, application_type=ApplicationType.BUSINESS_APPLICATION
+    )
 
     # Act
     resp = client.get("/applications/2/environments")
