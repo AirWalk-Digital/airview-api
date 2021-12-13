@@ -17,6 +17,16 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.close()
 
 
+if os.environ.get("CREATE_DB", "") == "True":
+    instance = app.create_app()
+    ctx = instance.app_context()
+    ctx.push()
+
+    db.create_all(app=instance)
+    db.session.commit()
+    ctx.pop()
+
+
 instance = app.create_app()
 
 
