@@ -227,13 +227,13 @@ Get an instance of handler using the configuration provided
 ## client.airviewclient.models module
 
 
-### class client.airviewclient.models.Application(name, reference, environment=None, type=1, id=None, parent_id=None)
+### class client.airviewclient.models.Application(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 Bases: `object`
 
 Dataclass representing application definition
 
 
-#### \__init__(name, reference, environment=None, type=1, id=None, parent_id=None)
+#### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 
 #### environment(: Optional[client.airviewclient.models.Environment] = None)
 Defintion of environment which the application sits in
@@ -255,9 +255,21 @@ Internal id of parent application for nested apps
 Unique reference of application within the system. e.g. aws account id, azure subscription id
 
 
-#### type(: int = 1)
-ID for type of application.
+#### type(: client.airviewclient.models.ApplicationType = 1)
+Type of application.
 
+
+### class client.airviewclient.models.ApplicationType(value)
+Bases: `enum.Enum`
+
+An enumeration.
+
+
+#### APPLICATION_SERVICE( = 3)
+
+#### BUSINESS_APPLICATION( = 1)
+
+#### TECHNICAL_SERVICE( = 2)
 
 ### class client.airviewclient.models.BackendConfig(base_url, token, system_name, system_stage, referencing_type)
 Bases: `object`

@@ -25,8 +25,8 @@
     "schemas": {
       "Application": {
         "properties": {
-          "applicationTypeId": {
-            "type": "integer"
+          "applicationType": {
+            "type": "string"
           },
           "environmentId": {
             "nullable": true,
@@ -51,7 +51,7 @@
           }
         },
         "required": [
-          "applicationTypeId",
+          "applicationType",
           "name"
         ],
         "type": "object"
@@ -389,17 +389,6 @@
         ],
         "type": "object"
       },
-      "IdAndName": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "MonitoredResource": {
         "properties": {
           "monitoringState": {
@@ -534,7 +523,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -542,7 +531,7 @@
           },
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -611,106 +600,6 @@
         ],
         "x-api-rbac-role": "ContentWriter"
       }
-    },
-    "/application-types/": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/IdAndName"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "\"Get a list of all application types",
-        "tags": [
-          "application-types"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IdAndName"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IdAndName"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Create a new application type\nReturns the newly created application",
-        "tags": [
-          "application-types"
-        ],
-        "x-api-rbac-role": "ContentWriter"
-      }
-    },
-    "/application-types/{application_type_id}/applications/": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Application"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get a list of applications for the given application type",
-        "tags": [
-          "application-types"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_type_id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ]
     },
     "/applications/": {
       "get": {
@@ -1199,18 +1088,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "applicationTechnicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1292,14 +1181,6 @@
         "parameters": [
           {
             "in": "query",
-            "name": "contextSize",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "q",
             "required": true,
             "schema": {
@@ -1309,6 +1190,14 @@
           {
             "in": "query",
             "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contextSize",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1458,18 +1347,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1576,10 +1465,6 @@
     {
       "description": "Application based resources",
       "name": "applications"
-    },
-    {
-      "description": "App type related resources",
-      "name": "application-types"
     },
     {
       "description": "Technical Control related resources",
