@@ -117,7 +117,7 @@ class Backend:
         """
         data = {
             "name": application.name,
-            "applicationTypeId": application.type,
+            "applicationType": application.type.name,
             "parentId": application.parent_id,
             "environmentId": environment_id,
             "references": [
@@ -143,7 +143,7 @@ class Backend:
             "id": application.id,
             "name": application.name,
             "environmentId": environment_id,
-            "applicationTypeId": application.type,
+            "applicationType": application.type.name,
             "parentId": application.parent_id,
         }
         resp = self._session.put(

@@ -38,7 +38,7 @@ def test_monitored_resource_creates_missing_system(handler):
     """
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, application_type_id=1, environment_id=1)
+    ApplicationFactory(id=2, environment_id=1)
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
@@ -69,7 +69,7 @@ def test_monitored_resource_persisted_for_linked(handler):
     """
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, application_type_id=1, environment_id=1)
+    ApplicationFactory(id=2, environment_id=1)
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
@@ -96,7 +96,7 @@ def test_triggered_resource_creates_new_control(handler):
     """
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, application_type_id=1, environment_id=1)
+    ApplicationFactory(id=2, environment_id=1)
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
@@ -140,7 +140,7 @@ def test_triggered_resource_creates_new_app(handler):
 
     app = Application.query.first()
     assert app.name == "app one"
-    assert app.application_type_id == 1
+    assert app.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert app.environment_id == None
 
     refs = app.references.all()

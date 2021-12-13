@@ -6,6 +6,7 @@ from tests.factories import *
 import requests_mock
 from requests_flask_adapter import Session
 import pytest
+from airview_api import models as api_models
 
 from client.airviewclient import models
 
@@ -81,7 +82,7 @@ def test_account_cache_creates_missing_application_existing_environment(handler)
     assert len(apps) == 1
     data = apps[0]
     assert data.name == "Test App"
-    assert data.application_type_id == 1
+    assert data.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert data.environment_id == 99
 
     refs = data.references.all()
@@ -95,7 +96,7 @@ def test_account_cache_creates_missing_application_existing_environment(handler)
     assert resp.environment.name == "Env One"
     assert resp.environment.abbreviation == "ONE"
     assert resp.environment.id == 99
-    assert resp.type == 1
+    assert resp.type == models.ApplicationType.BUSINESS_APPLICATION
     assert resp.id == 1
     assert resp.parent_id == None
 
@@ -108,7 +109,7 @@ def test_account_cache_creates_missing_application_with_parent(handler):
     """
     # Arrange
     EnvironmentFactory(id=99, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=88, name="name123", application_type_id=1, environment_id=99)
+    ApplicationFactory(id=88, name="name123", environment_id=99)
     application.parent_id = 88
 
     # Act
@@ -119,7 +120,7 @@ def test_account_cache_creates_missing_application_with_parent(handler):
     assert len(apps) == 2
     data = apps[1]
     assert data.name == "Test App"
-    assert data.application_type_id == 1
+    assert data.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert data.environment_id == 99
 
     refs = data.references.all()
@@ -133,7 +134,7 @@ def test_account_cache_creates_missing_application_with_parent(handler):
     assert resp.environment.name == "Env One"
     assert resp.environment.abbreviation == "ONE"
     assert resp.environment.id == 99
-    assert resp.type == 1
+    assert resp.type == models.ApplicationType.BUSINESS_APPLICATION
     assert resp.id == 89
     assert resp.parent_id == 88
 
@@ -169,7 +170,7 @@ def test_account_cache_creates_missing_application_missing_environment(handler):
     assert len(apps) == 1
     data = apps[0]
     assert data.name == "Test App"
-    assert data.application_type_id == 1
+    assert data.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert data.environment_id == 1
 
     refs = data.references.all()
@@ -183,7 +184,7 @@ def test_account_cache_creates_missing_application_missing_environment(handler):
     assert resp.environment.name == "Env One"
     assert resp.environment.abbreviation == "ONE"
     assert resp.environment.id == 1
-    assert resp.type == 1
+    assert resp.type == models.ApplicationType.BUSINESS_APPLICATION
     assert resp.id == 1
     assert resp.parent_id == None
 
@@ -196,8 +197,12 @@ def test_account_cache_updates_existing_application(handler):
     """
     # Arrange
     EnvironmentFactory(id=99, name="Other", abbreviation="XXX")
-    ApplicationTypeFactory(id=2)
-    ApplicationFactory(id=88, name="name123", application_type_id=2, environment_id=99)
+    ApplicationFactory(
+        id=88,
+        name="name123",
+        application_type=api_models.ApplicationType.APPLICATION_SERVICE,
+        environment_id=99,
+    )
     ApplicationReferenceFactory(
         application_id=88, type="aws_account_id", reference="ref-1"
     )
@@ -209,7 +214,7 @@ def test_account_cache_updates_existing_application(handler):
     assert len(apps) == 1
     data = Application.query.get(88)
     assert data.name == "Test App"
-    assert data.application_type_id == 1
+    assert data.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert data.environment_id == 100
 
     refs = data.references.all()
@@ -223,7 +228,7 @@ def test_account_cache_updates_existing_application(handler):
     assert resp.environment.name == "Env One"
     assert resp.environment.abbreviation == "ONE"
     assert resp.environment.id == 100
-    assert resp.type == 1
+    assert resp.type == models.ApplicationType.BUSINESS_APPLICATION
     assert resp.id == 88
     assert resp.parent_id == None
 
@@ -237,11 +242,8 @@ def test_account_cache_updates_existing_application_handle_missing_parent(handle
     # Arrange
     # Arrange
     EnvironmentFactory(id=99, name="Other", abbreviation="XXX")
-    ApplicationTypeFactory(id=2)
-    ApplicationFactory(id=77, application_type_id=1)
-    ApplicationFactory(
-        id=88, name="name123", application_type_id=2, environment_id=99, parent_id=77
-    )
+    ApplicationFactory(id=77)
+    ApplicationFactory(id=88, name="name123", environment_id=99, parent_id=77)
     ApplicationReferenceFactory(
         application_id=88, type="aws_account_id", reference="ref-1"
     )
@@ -253,7 +255,7 @@ def test_account_cache_updates_existing_application_handle_missing_parent(handle
     assert len(apps) == 2
     data = Application.query.get(88)
     assert data.name == "Test App"
-    assert data.application_type_id == 1
+    assert data.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
     assert data.environment_id == 100
     assert data.parent_id == 77
 
@@ -268,7 +270,7 @@ def test_account_cache_updates_existing_application_handle_missing_parent(handle
     assert resp.environment.name == "Env One"
     assert resp.environment.abbreviation == "ONE"
     assert resp.environment.id == 100
-    assert resp.type == 1
+    assert resp.type == models.ApplicationType.BUSINESS_APPLICATION
     assert resp.id == 88
     assert resp.parent_id == 77
 

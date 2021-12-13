@@ -14,11 +14,12 @@ from collections import defaultdict
 import re
 
 
-def get_all(application_type: None):
+def get_all(application_type: str = None):
 
-    results = db.session.query(Application)
     if application_type is not None:
-        results = results.filter(application_type == application_type)
+        return Application.query.filter_by(application_type=application_type)
+
+    return Application.query.all()  #
 
 
 def get_by_id(application_id: int):

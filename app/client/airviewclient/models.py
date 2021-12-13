@@ -53,6 +53,15 @@ class SystemStage(Enum):
         return self.name
 
 
+class ApplicationType(Enum):
+    BUSINESS_APPLICATION = 1
+    TECHNICAL_SERVICE = 2
+    APPLICATION_SERVICE = 3
+
+    def __str__(self):
+        return self.name
+
+
 @dataclass
 class BackendConfig:
     """Configuration data for connecting to a backend"""
@@ -89,10 +98,10 @@ class Application:
     name: str
     #: Unique reference of application within the system. e.g. aws account id, azure subscription id
     reference: str
+    #: Type of application.
+    type: ApplicationType = ApplicationType.BUSINESS_APPLICATION
     #: Defintion of environment which the application sits in
     environment: Optional[Environment] = None
-    #: ID for type of application.
-    type: int = 1
     #: Internal identifier of application
     id: Optional[int] = None
     #: Internal id of parent application for nested apps

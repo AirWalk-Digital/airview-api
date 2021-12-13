@@ -327,12 +327,12 @@ def test_applications_get_all(client):
     data = resp.get_json()
     assert len(data) == 5
 
-    assert data[3]["id"] == 5
-    assert data[3]["name"] == "yyy"
-    assert data[3]["applicationType"] == "BUSINESS_APPLICATION"
+    assert data[2]["id"] == 3
+    assert data[2]["name"] == "bbb"
+    assert data[2]["applicationType"] == "BUSINESS_APPLICATION"
 
-    assert data[0]["name"] == "aaa"
-    assert data[4]["name"] == "zzz"
+    assert data[0]["name"] == "zzz"
+    assert data[4]["name"] == "yyy"
 
 
 def test_applications_get_by_application_type(client):
@@ -346,11 +346,11 @@ def test_applications_get_by_application_type(client):
     ApplicationFactory(
         id=1,
         name="App 1",
-        application_type=ApplicationType.BUSINESS_APPLICATION,
+        application_type=ApplicationType.APPLICATION_SERVICE,
         environment_id=11,
     )
     ApplicationFactory(
-        id=2, name="App 2", application_type=ApplicationType.BUSINESS_APPLICATION
+        id=2, name="App 2", application_type=ApplicationType.TECHNICAL_SERVICE
     )
     ApplicationFactory(
         id=3,
@@ -362,7 +362,7 @@ def test_applications_get_by_application_type(client):
         id=4, name="App 4", application_type=ApplicationType.BUSINESS_APPLICATION
     )
     ApplicationFactory(
-        id=5, name="App 5", application_type=ApplicationType.BUSINESS_APPLICATION
+        id=5, name="App 5", application_type=ApplicationType.APPLICATION_SERVICE
     )
 
     # Act
