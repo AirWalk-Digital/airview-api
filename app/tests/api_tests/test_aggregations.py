@@ -13,6 +13,7 @@ from airview_api.models import (
     TechnicalControlType,
     SystemStage,
 )
+import unittest
 
 
 def setup():
@@ -680,4 +681,5 @@ def test_get_quality_models_for_app(client):
             "name": "COST_OPTIMISATION",
         },
     ]
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)

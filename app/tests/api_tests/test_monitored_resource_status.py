@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pprint import pprint
 from tests.factories import *
 from tests.common import client
@@ -96,13 +96,13 @@ def test_create_updates_when_existing_different_state(client):
     ApplicationTechnicalControlFactory(
         id=201, application_id=1, technical_control_id=101
     )
-    MonitoredResourceFactory(
+    item = MonitoredResourceFactory(
         id=301,
         reference="ref-1",
         monitoring_state=MonitoredResourceState.FLAGGED,
         application_technical_control_id=201,
-        last_modified=datetime(1, 1, 1),
-        last_seen=datetime(2, 1, 1),
+        last_modified=datetime(2001, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
     )
 
     input_data = {"monitoringState": "SUPPRESSED"}
@@ -121,8 +121,8 @@ def test_create_updates_when_existing_different_state(client):
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
     assert persisted.state == MonitoredResourceState.SUPPRESSED
-    assert persisted.last_modified > datetime(1, 1, 1)
-    assert persisted.last_seen > datetime(2, 1, 1)
+    assert persisted.last_modified > datetime(2001, 1, 1, tzinfo=timezone.utc)
+    assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
 
 
 def test_create_updates_when_existing_same_state(client):
@@ -150,8 +150,8 @@ def test_create_updates_when_existing_same_state(client):
         reference="ref-1",
         monitoring_state=MonitoredResourceState.FLAGGED,
         application_technical_control_id=201,
-        last_modified=datetime(1, 1, 1),
-        last_seen=datetime(2, 1, 1),
+        last_modified=datetime(2001, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
     )
 
     input_data = {"monitoringState": "FLAGGED"}
@@ -170,5 +170,5 @@ def test_create_updates_when_existing_same_state(client):
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
     assert persisted.state == MonitoredResourceState.FLAGGED
-    assert persisted.last_modified == datetime(1, 1, 1)
-    assert persisted.last_seen > datetime(2, 1, 1)
+    assert persisted.last_modified == datetime(2001, 1, 1, tzinfo=timezone.utc)
+    assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
