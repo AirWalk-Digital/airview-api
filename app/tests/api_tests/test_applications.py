@@ -119,17 +119,18 @@ def test_application_post_handles_existing_app(client):
     Then: The application is persisted with _1 appended to the id
     """
     # Arrange
-    ApplicationFactory(id=1)
-    ApplicationFactory(id=2)
+    app_one = ApplicationFactory()
+    app_two = ApplicationFactory()
     ApplicationReferenceFactory(
-        application_id=1, type="_internal_reference", reference="app_1"
+        application=app_one, type="_internal_reference", reference="app_1"
     )
     ApplicationReferenceFactory(
-        application_id=2, type="_internal_reference", reference="app_1_0"
+        application=app_two, type="_internal_reference", reference="app_1_0"
     )
 
     EnvironmentFactory(id=1)
     SystemFactory(id=2, stage=SystemStage.BUILD)
+    items = db.session.query(Application).all()
 
     # Act
     resp = client.post(
@@ -373,7 +374,6 @@ def test_applications_get_by_application_type(client):
     data = resp.get_json()
     assert len(data) == 2
 
-    assert data[0]["id"] == 3
     assert data[0]["name"] == "App 3"
     assert data[0]["applicationType"] == "BUSINESS_APPLICATION"
 
@@ -386,7 +386,9 @@ def test_applications_post_child_application_ok(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationFactory(id=3, application_type=ApplicationType.BUSINESS_APPLICATION)
+    app = ApplicationFactory(
+        id=3, application_type=ApplicationType.BUSINESS_APPLICATION
+    )
 
     resp = client.post(
         "/applications/",
@@ -400,9 +402,8 @@ def test_applications_post_child_application_ok(client):
     # Assert return
     data = resp.get_json()
     assert resp.status_code == 200
-    assert data["id"] == 4
     assert data["name"] == "App Service 1"
-    assert data["parentId"] == 3
+    assert data["parentId"] == app.id
 
     # Assert persistance
     items = db.session.query(Application).filter_by(parent_id=3).all()
