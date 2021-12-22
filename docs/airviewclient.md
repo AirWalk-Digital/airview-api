@@ -459,16 +459,24 @@ An enumeration.
 
 #### MONITOR( = 2)
 
-### class client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None)
+### class client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None, ttl=None, is_blocking=None, can_delete_resources=None)
 Bases: `object`
 
 Dataclass representing technical control definition
 
 
-#### \__init__(name, reference, quality_model, type, id=None)
+#### \__init__(name, reference, quality_model, type, id=None, ttl=None, is_blocking=None, can_delete_resources=None)
+
+#### can_delete_resources(: Optional[bool] = None)
+Can resources be unlinked from the control
+
 
 #### id(: Optional[int] = None)
 Internal id of the techincal control
+
+
+#### is_blocking(: Optional[bool] = None)
+Should a failure cause a process to exit
 
 
 #### name(: str)
@@ -481,6 +489,10 @@ Quality model of the techincal control
 
 #### reference(: str)
 Unique reference for the control within the connecting system
+
+
+#### ttl(: Optional[int] = None)
+Period after which the control should be assumed non compliant
 
 
 #### type(: client.airviewclient.models.TechnicalControlType)
