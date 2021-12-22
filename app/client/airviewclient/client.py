@@ -195,7 +195,9 @@ class Backend:
             raise BackendFailureException(f"Status code: {resp.status_code}")
         return resp.json()["id"]
 
-    def save_monitored_resource(self, app_tech_control_id, reference, state) -> None:
+    def save_monitored_resource(
+        self, app_tech_control_id, reference, state, type
+    ) -> None:
         """Persist the current status of a montiored resource"""
 
         url = self.get_url(
@@ -205,6 +207,7 @@ class Backend:
             url=url,
             json={
                 "monitoringState": state,
+                "type": type,
             },
             headers=self._headers,
         )
@@ -379,6 +382,7 @@ class Handler:
             app_tech_control_id=link_id,
             reference=compliance_event.resource_reference,
             state=compliance_event.status.name,
+            type=compliance_event.type.name,
         )
 
     def set_exclusion_resource_state(

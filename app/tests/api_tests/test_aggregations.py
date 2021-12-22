@@ -88,6 +88,7 @@ def _prepare_aggregation_mock_data():
         monitoring_state=MonitoredResourceState.FLAGGED,
         last_seen=datetime(2003, 1, 1, tzinfo=timezone.utc),
         last_modified=datetime(2003, 1, 1, tzinfo=timezone.utc),
+        type=MonitoredResourceType.DATABASE,
     )
     # ctl2 - Different control
     MonitoredResourceFactory(
@@ -502,7 +503,6 @@ def test_get_control_overview_resources_with_children(client):
 
     # Assert
     data = resp.get_json()
-    print(data)
     expected = [
         {
             "environment": "bbb",
@@ -511,6 +511,7 @@ def test_get_control_overview_resources_with_children(client):
             "pending": False,
             "reference": "res-1",
             "state": "SUPPRESSED",
+            "type": "VIRTUAL_MACHINE",
         },
         {
             "environment": "bbb",
@@ -519,6 +520,7 @@ def test_get_control_overview_resources_with_children(client):
             "pending": False,
             "reference": "res-2",
             "state": "SUPPRESSED",  # Suppressed via exclusion
+            "type": "DATABASE",
         },
         {
             "environment": "aaa",
@@ -527,6 +529,7 @@ def test_get_control_overview_resources_with_children(client):
             "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
+            "type": "VIRTUAL_MACHINE",
         },
     ]
 
@@ -558,6 +561,7 @@ def test_get_control_overview_resources_no_children(client):
             "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
+            "type": "VIRTUAL_MACHINE",
         }
     ]
     case = unittest.TestCase()
@@ -592,6 +596,7 @@ def test_get_control_overview_resources_pending(client):
             "pending": False,
             "reference": "res-1",
             "state": "SUPPRESSED",
+            "type": "VIRTUAL_MACHINE",
         },
         {
             "environment": "bbb",
@@ -600,6 +605,7 @@ def test_get_control_overview_resources_pending(client):
             "pending": False,
             "reference": "res-2",
             "state": "SUPPRESSED",  # Suppressed via exclusion
+            "type": "DATABASE",
         },
         {
             "environment": "aaa",
@@ -608,6 +614,7 @@ def test_get_control_overview_resources_pending(client):
             "pending": True,
             "reference": "res-4",
             "state": "FLAGGED",
+            "type": "VIRTUAL_MACHINE",
         },
     ]
 
@@ -637,6 +644,7 @@ def test_get_control_overview_resources_null_environment(client):
     expected = [
         {
             "id": 102,
+            "type": "VIRTUAL_MACHINE",
             "environment": None,
             "lastSeen": "2002-01-01T00:00:00+00:00",
             "pending": False,
@@ -646,6 +654,7 @@ def test_get_control_overview_resources_null_environment(client):
         {
             "id": 103,
             "environment": None,
+            "type": "DATABASE",
             "lastSeen": "2003-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-2",
@@ -654,6 +663,7 @@ def test_get_control_overview_resources_null_environment(client):
         {
             "environment": "aaa",
             "id": 105,
+            "type": "VIRTUAL_MACHINE",
             "lastSeen": "2005-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-4",
@@ -681,7 +691,6 @@ def test_get_quality_models_for_app(client):
 
     # Assert
     data = resp.get_json()
-    print(data)
     expected = [
         {
             "name": "RELIABILITY",

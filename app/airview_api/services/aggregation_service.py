@@ -17,7 +17,7 @@ with recursive apps as (
   select application.id top_level_id, id from application where id=:application_id
   union all
   select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
-)  
+)
 select distinct
   tc.quality_model
 from
@@ -26,8 +26,8 @@ from
     on atc.application_id = a.id
   join technical_control tc
     on tc.id = atc.technical_control_id
-  
-  
+
+
     """
     result = db.session.execute(sql, {"application_id": application_id})
     mapped = []
@@ -44,9 +44,9 @@ with recursive apps as (
   select application.id top_level_id, id from application where id=:application_id
   union all
   select apps.top_level_id, application.id from application join apps on apps.id = application.parent_id
-)  
+)
 select
-  tc.id, 
+  tc.id,
   tc.name,
   tc.control_type control_type,
   tc.severity,
@@ -74,8 +74,8 @@ group by
   tc.severity,
   s.name,
   s.stage
-  
-  
+
+
     """
     result = db.session.execute(
         sql, {"application_id": application_id, "quality_model": quality_model}
@@ -90,7 +90,7 @@ with recursive apps as (
   select application.id top_level_id, id, environment_id from application where id=:application_id
   union all
   select apps.top_level_id, application.id, application.environment_id from application join apps on apps.id = application.parent_id
-)  
+)
 select
     mr.id
 from
@@ -101,7 +101,7 @@ from
     on mr.application_technical_control_id=atc.id
 where
   atc.technical_control_id=:technical_control_id
-  
+
     """
     result = db.session.execute(
         sql,
@@ -122,6 +122,7 @@ where
             MonitoredResource.exclusion_state,
             MonitoredResource.exclusion_id,
             MonitoredResource.monitoring_state,
+            MonitoredResource.type,
         )
         .join(ApplicationTechnicalControl)
         .join(Application)
@@ -143,6 +144,7 @@ where
             "pending": x[6] is not None
             and x[5] is not None
             and x[5] == ExclusionState.PENDING,
+            "type": x[8].name,
         }
         for x in data.all()
     ]
@@ -182,7 +184,7 @@ select
   sum(case when tc.severity = 'HIGH' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) high,
   sum(case when tc.severity = 'MEDIUM' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) medium,
   sum(case when tc.severity = 'LOW' and tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then 1 else 0 end) low,
-  count(distinct(atc2.technical_control_id)) exempt_controls, 
+  count(distinct(atc2.technical_control_id)) exempt_controls,
   count(distinct case when tr.monitoring_state='FLAGGED' and tr.exclusion_id is null then tc.id else null end) failed_controls,
   count(distinct tc.id) total_controls
 from
@@ -203,7 +205,7 @@ from
     on x.id = tr.exclusion_id
     and tr.exclusion_state = 'ACTIVE'
   left join application_technical_control atc2
-    on atc2.id = x.application_technical_control_id 
+    on atc2.id = x.application_technical_control_id
 group by
   pa.id,
   pa.name,
@@ -235,7 +237,7 @@ select
   tc.name,
   tr.id triggered_resource_id,
   tr.reference triggered_resource_reference,
-  tr.exclusion_state, 
+  tr.exclusion_state,
   tr.last_modified logged_datetime,
   tc.severity,
   e.abbreviation environment,

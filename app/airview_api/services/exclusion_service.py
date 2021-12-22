@@ -11,6 +11,7 @@ from airview_api.models import (
     ApplicationReference,
     Application,
     MonitoredResourceState,
+    MonitoredResourceType,
 )
 from airview_api.database import db
 from sqlalchemy import and_
@@ -89,6 +90,7 @@ def create(data: dict):
                         last_modified=datetime.now(timezone.utc),
                         application_technical_control_id=app_tech_control.id,
                         exclusion_state=ExclusionState.PENDING,
+                        type=MonitoredResourceType.UNKNOWN,
                     )
                 )
 

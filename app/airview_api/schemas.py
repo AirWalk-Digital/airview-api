@@ -41,6 +41,7 @@ class MonitoredResourceSchema(CamelCaseSchema):
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
     monitoring_state = ma.fields.Str(required=True)
     state = ma.fields.Str(required=False)
+    type = ma.fields.Str(required=False)
 
 
 class EnvironmentSchema(CamelCaseSchema):

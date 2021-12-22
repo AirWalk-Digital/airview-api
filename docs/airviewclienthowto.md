@@ -85,7 +85,8 @@ compliance_event = models.ComplianceEvent(
 	application=application,
 	technical_control=technical_control,
 	resource_reference=resource_ref,
-	status=status,
+	status=MonitoredResourceState.FLAGGED,
+	type=MonitoredResourceType.VIRTUAL_MACHINE,
 )
 
 client_handler.handle_compliance_event(transformed)

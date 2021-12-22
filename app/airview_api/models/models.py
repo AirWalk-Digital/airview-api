@@ -74,6 +74,22 @@ class ApplicationType(Enum):
         return self.name
 
 
+class MonitoredResourceType(Enum):
+    UNKNOWN = 1
+    VIRTUAL_MACHINE = 2
+    CONTAINER = 3
+    NETWORK = 4
+    REPOSITORY = 5
+    PIPELINE = 6
+    OBJECT_STORAGE = 7
+    DATABASE = 8
+    FUNCTION = 9
+    STORAGE = 10
+
+    def __str__(self):
+        return self.name
+
+
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
@@ -191,6 +207,7 @@ class MonitoredResource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reference = db.Column(db.String(500), nullable=False)
     monitoring_state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
+    type = db.Column(db.Enum(MonitoredResourceType), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
     last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
     exclusion_id = db.Column(

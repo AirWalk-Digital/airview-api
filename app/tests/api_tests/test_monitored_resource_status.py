@@ -24,7 +24,7 @@ def test_create_rejects_bad_reference(client):
     Then: 422 status, no data persisted
     """
     # Arrange
-    input_data = {"monitoringState": "FLAGGED"}
+    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
@@ -58,7 +58,7 @@ def test_create_adds_when_new(client):
         id=201, application_id=1, technical_control_id=101
     )
 
-    input_data = {"monitoringState": "FLAGGED"}
+    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
@@ -73,6 +73,7 @@ def test_create_adds_when_new(client):
     persisted = MonitoredResource.query.first()
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
+    assert persisted.type == MonitoredResourceType.VIRTUAL_MACHINE
     assert persisted.monitoring_state == MonitoredResourceState.FLAGGED
 
 
@@ -105,7 +106,7 @@ def test_create_updates_when_existing_different_state(client):
         last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
     )
 
-    input_data = {"monitoringState": "SUPPRESSED"}
+    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "SUPPRESSED"}
     # Act
 
     resp = client.put(
@@ -120,6 +121,7 @@ def test_create_updates_when_existing_different_state(client):
     persisted = MonitoredResource.query.first()
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
+    assert persisted.type == MonitoredResourceType.VIRTUAL_MACHINE
     assert persisted.state == MonitoredResourceState.SUPPRESSED
     assert persisted.last_modified > datetime(2001, 1, 1, tzinfo=timezone.utc)
     assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
@@ -154,7 +156,7 @@ def test_create_updates_when_existing_same_state(client):
         last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
     )
 
-    input_data = {"monitoringState": "FLAGGED"}
+    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "FLAGGED"}
     # Act
 
     resp = client.put(
@@ -169,6 +171,7 @@ def test_create_updates_when_existing_same_state(client):
     persisted = MonitoredResource.query.first()
     assert persisted.application_technical_control_id == 201
     assert persisted.reference == "ref-1"
+    assert persisted.type == MonitoredResourceType.VIRTUAL_MACHINE
     assert persisted.state == MonitoredResourceState.FLAGGED
     assert persisted.last_modified == datetime(2001, 1, 1, tzinfo=timezone.utc)
     assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
