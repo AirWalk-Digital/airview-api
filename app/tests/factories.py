@@ -26,6 +26,8 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     control_type = TechnicalControlType.SECURITY
     quality_model = QualityModel.COST_OPTIMISATION
+    is_blocking = False
+    can_delete_resources = True
 
 
 class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):
