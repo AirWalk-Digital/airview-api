@@ -23,6 +23,7 @@ compliance_event = models.ComplianceEvent(
     technical_control=technical_control,
     resource_reference="res-ref-1",
     status=models.MonitoredResourceState.FLAGGED,
+    type=models.MonitoredResourceType.VIRTUAL_MACHINE,
 )
 
 
@@ -50,6 +51,7 @@ def test_monitored_resource_creates_missing_system(handler):
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
     assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
     assert monitored[0].reference == "res-ref-1"
     assert (
         monitored[0].application_technical_control.technical_control.system.name
@@ -84,6 +86,7 @@ def test_monitored_resource_persisted_for_linked(handler):
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
     assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
     assert monitored[0].reference == "res-ref-1"
     assert monitored[0].application_technical_control_id == 5
 
@@ -118,6 +121,7 @@ def test_triggered_resource_creates_new_control(handler):
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
     assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
     assert monitored[0].reference == "res-ref-1"
     assert monitored[0].application_technical_control_id == 6
 

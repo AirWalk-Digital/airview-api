@@ -32,12 +32,13 @@ class MonitoredResource(MethodView):
         MonitoredResourceSchema(only=("application_technical_control_id", "reference")),
         location="query",
     )
-    @blp.arguments(MonitoredResourceSchema(only=["monitoring_state"]))
+    @blp.arguments(MonitoredResourceSchema(only=["monitoring_state", "type"]))
     @blp.role(Roles.COMPLIANCE_WRITER)
     def put(self, args, data):
         """Persists the status of a monitored resource which is uniquely identified by the incoming query params"""
         try:
             data.update(args)
+            print(data)
             monitored_resource_service.persist(**data)
         except AirViewNotFoundException:
             return "Not Found", 404

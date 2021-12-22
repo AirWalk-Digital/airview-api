@@ -11,6 +11,7 @@ from airview_api.models import (
     ApplicationReference,
     QualityModel,
     TechnicalControlType,
+    MonitoredResourceType,
 )
 from airview_api.database import db
 
@@ -71,6 +72,8 @@ class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MonitoredResource
         sqlalchemy_session = db.session
+
+    type = MonitoredResourceType.VIRTUAL_MACHINE
 
 
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):

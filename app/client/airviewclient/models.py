@@ -62,6 +62,21 @@ class ApplicationType(Enum):
         return self.name
 
 
+class MonitoredResourceType(Enum):
+    VIRTUAL_MACHINE = 2
+    CONTAINER = 3
+    NETWORK = 4
+    REPOSITORY = 5
+    PIPELINE = 6
+    OBJECT_STORAGE = 7
+    DATABASE = 8
+    FUNCTION = 9
+    STORAGE = 10
+
+    def __str__(self):
+        return self.name
+
+
 @dataclass
 class BackendConfig:
     """Configuration data for connecting to a backend"""
@@ -136,6 +151,8 @@ class ComplianceEvent:
     technical_control: TechnicalControl
     #: The enum status of the event
     status: MonitoredResourceState
+    #: The enum of the resource type
+    type: MonitoredResourceType
 
 
 @dataclass

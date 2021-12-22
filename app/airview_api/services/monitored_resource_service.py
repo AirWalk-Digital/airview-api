@@ -18,7 +18,7 @@ from airview_api.models import (
 from airview_api.database import db
 
 
-def persist(application_technical_control_id, reference, monitoring_state):
+def persist(application_technical_control_id, reference, monitoring_state, type):
     try:
         item = MonitoredResource.query.filter_by(
             application_technical_control_id=application_technical_control_id,
@@ -31,6 +31,7 @@ def persist(application_technical_control_id, reference, monitoring_state):
                 monitoring_state=monitoring_state,
                 last_modified=datetime.now(timezone.utc),
                 last_seen=datetime.now(timezone.utc),
+                type=type,
             )
             db.session.add(item)
             db.session.commit()
