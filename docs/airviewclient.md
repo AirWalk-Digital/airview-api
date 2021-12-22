@@ -100,7 +100,7 @@ create a new linkage between application and technical control
 
 
 
-#### save_monitored_resource(app_tech_control_id, reference, state)
+#### save_monitored_resource(app_tech_control_id, reference, state, type)
 Persist the current status of a montiored resource
 
 
@@ -303,13 +303,13 @@ Access token to be used when interacting with the backend
 Bases: `Exception`
 
 
-### class client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status)
+### class client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type)
 Bases: `object`
 
 Dataclass representing an incoming compliance event
 
 
-#### \__init__(resource_reference, application, technical_control, status)
+#### \__init__(resource_reference, application, technical_control, status, type)
 
 #### application(: client.airviewclient.models.Application)
 Application within which the resource sits
@@ -325,6 +325,10 @@ The enum status of the event
 
 #### technical_control(: client.airviewclient.models.TechnicalControl)
 Technical control which this compliance event is the subject of
+
+
+#### type(: client.airviewclient.models.MonitoredResourceType)
+The enum of the resource type
 
 
 ### class client.airviewclient.models.Environment(name, abbreviation, id=None)
@@ -400,6 +404,30 @@ An enumeration.
 #### FLAGGED( = 1)
 
 #### SUPPRESSED( = 2)
+
+### class client.airviewclient.models.MonitoredResourceType(value)
+Bases: `enum.Enum`
+
+An enumeration.
+
+
+#### CONTAINER( = 3)
+
+#### DATABASE( = 8)
+
+#### FUNCTION( = 9)
+
+#### NETWORK( = 4)
+
+#### OBJECT_STORAGE( = 7)
+
+#### PIPELINE( = 6)
+
+#### REPOSITORY( = 5)
+
+#### STORAGE( = 10)
+
+#### VIRTUAL_MACHINE( = 2)
 
 ### class client.airviewclient.models.QualityModel(value)
 Bases: `enum.Enum`
