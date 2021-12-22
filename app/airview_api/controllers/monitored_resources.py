@@ -38,7 +38,6 @@ class MonitoredResource(MethodView):
         """Persists the status of a monitored resource which is uniquely identified by the incoming query params"""
         try:
             data.update(args)
-            print(data)
             monitored_resource_service.persist(**data)
         except AirViewNotFoundException:
             return "Not Found", 404
