@@ -167,6 +167,9 @@ class TechnicalControl(db.Model):
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)
+    ttl = db.Column(db.Integer, nullable=True)
+    is_blocking = db.Column(db.Boolean, nullable=False)
+    can_delete_resources = db.Column(db.Boolean, nullable=False)
 
     application_technical_controls = db.relationship(
         "ApplicationTechnicalControl",

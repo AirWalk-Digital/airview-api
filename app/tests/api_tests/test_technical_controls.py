@@ -39,6 +39,9 @@ def test_technical_control_get_single_ok(client):
         control_type=TechnicalControlType.OPERATIONAL,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
+        is_blocking=True,
+        can_delete_resources=False,
+        ttl=10,
     )
     TechnicalControlFactory(
         id=703,
@@ -59,6 +62,10 @@ def test_technical_control_get_single_ok(client):
     assert data["name"] == "two"
     assert data["controlType"] == "OPERATIONAL"
     assert data["systemId"] == 2
+    assert data["reference"] == "2"
+    assert data["isBlocking"] == True
+    assert data["canDeleteResources"] == False
+    assert data["ttl"] == 10
 
 
 def test_technical_control_get_single_not_found(client):
@@ -144,6 +151,9 @@ def test_technical_controls_post_ok_new(client):
         "systemId": 2,
         "severity": "LOW",
         "qualityModel": "SECURITY",
+        "ttl": 20,
+        "isBlocking": True,
+        "canDeleteResources": False,
     }
 
     # Act
@@ -160,6 +170,9 @@ def test_technical_controls_post_ok_new(client):
     assert data["controlType"] == input_data["controlType"]
     assert data["systemId"] == input_data["systemId"]
     assert data["severity"] == input_data["severity"]
+    assert data["ttl"] == input_data["ttl"]
+    assert data["isBlocking"] == input_data["isBlocking"]
+    assert data["canDeleteResources"] == input_data["canDeleteResources"]
 
     persisted = TechnicalControl.query.all()
     assert len(persisted) == 1
@@ -168,13 +181,16 @@ def test_technical_controls_post_ok_new(client):
     assert persisted[0].control_type == TechnicalControlType.TASK
     assert persisted[0].system_id == input_data["systemId"]
     assert persisted[0].severity == TechnicalControlSeverity.LOW
+    assert persisted[0].ttl == 20
+    assert persisted[0].is_blocking == True
+    assert persisted[0].can_delete_resources == False
 
 
-def test_technical_controls_post_ok_sets_defaut_severity(client):
+def test_technical_controls_post_ok_sets_defaults(client):
     """
     Given: An empty technicalContols table
-    When: When a correctly formed technical control definition is posted to the api with missing severtiy
-    Then: The technical control is returned with status 200 and stored in db, severity defaults to HIGh
+    When: When a correctly formed technical control definition is posted to the api with missing optional fields
+    Then: The technical control is returned with status 200 and stored in db, optional fields take on default values
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
@@ -200,7 +216,11 @@ def test_technical_controls_post_ok_sets_defaut_severity(client):
     assert data["controlType"] == input_data["controlType"]
     assert data["systemId"] == 2
     assert data["severity"] == "HIGH"
+    # Assert defaults
     assert data["qualityModel"] == "SECURITY"
+    assert data["isBlocking"] == False
+    assert data["canDeleteResources"] == True
+    assert data.get("ttl") is None
 
     persisted = TechnicalControl.query.all()
     assert len(persisted) == 1

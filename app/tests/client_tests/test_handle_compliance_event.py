@@ -17,6 +17,9 @@ technical_control = models.TechnicalControl(
     reference="tc-ref-1",
     quality_model=models.QualityModel.SECURITY,
     type=models.TechnicalControlType.OPERATIONAL,
+    can_delete_resources=False,
+    is_blocking=True,
+    ttl=20,
 )
 compliance_event = models.ComplianceEvent(
     application=application,
@@ -117,6 +120,50 @@ def test_triggered_resource_creates_new_control(handler):
     len(tc) == 2
     assert tc[1].name == "ctrl a"
     assert tc[1].reference == "tc-ref-1"
+    assert tc[1].is_blocking == True
+    assert tc[1].can_delete_resources == False
+    assert tc[1].ttl == 20
+
+    monitored = MonitoredResource.query.all()
+    assert len(monitored) == 1
+    assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
+    assert monitored[0].reference == "res-ref-1"
+    assert monitored[0].application_technical_control_id == 6
+
+
+def test_triggered_resource_creates_new_control_with_defaults(handler):
+    """
+    Given: An existing linked application, no known control
+    When: When a call is made to set a triggered resource with missing optional fields
+    Then: New control created with defaults and linked, the triggerend resource is sent to the backend
+    """
+    # Arrange
+    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ApplicationFactory(id=2, environment_id=1)
+    ApplicationReferenceFactory(
+        application_id=2, type="aws_account_id", reference="app-ref-1"
+    )
+    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
+    TechnicalControlFactory(
+        id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
+    )
+    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
+
+    # Act
+    compliance_event.technical_control.ttl = None
+    compliance_event.technical_control.can_delete_resources = None
+    compliance_event.technical_control.is_blocking = None
+    handler.handle_compliance_event(compliance_event)
+
+    # Assert
+    tc = TechnicalControl.query.all()
+    len(tc) == 2
+    assert tc[1].name == "ctrl a"
+    assert tc[1].reference == "tc-ref-1"
+    assert tc[1].is_blocking == False
+    assert tc[1].can_delete_resources == True
+    assert tc[1].ttl == None
 
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
