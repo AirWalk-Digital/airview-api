@@ -523,7 +523,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "applicationId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -531,7 +531,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "applicationId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1181,14 +1181,6 @@
         "parameters": [
           {
             "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "q",
             "required": true,
             "schema": {
@@ -1198,6 +1190,14 @@
           {
             "in": "query",
             "name": "contextSize",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
             "required": false,
             "schema": {
               "type": "integer"
