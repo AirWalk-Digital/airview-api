@@ -217,15 +217,19 @@ class Backend:
     def create_technical_control(
         self, technical_control: TechnicalControl
     ) -> TechnicalControl:
+        mapped = {
+            "name": technical_control.name,
+            "reference": technical_control.reference,
+            "controlType": technical_control.type.name,
+            "qualityModel": technical_control.quality_model.name,
+            "systemId": self.system_id,
+            "ttl": technical_control.ttl,
+            "canDeleteResources": technical_control.can_delete_resources,
+            "isBlocking": technical_control.is_blocking,
+        }
         resp = self._session.post(
             url=self.get_url("/technical-controls/"),
-            json={
-                "name": technical_control.name,
-                "reference": technical_control.reference,
-                "controlType": technical_control.type.name,
-                "qualityModel": technical_control.quality_model.name,
-                "systemId": self.system_id,
-            },
+            json={k: v for k, v in mapped.items() if v is not None},
             headers=self._headers,
         )
 

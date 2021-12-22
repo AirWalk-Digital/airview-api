@@ -137,6 +137,12 @@ class TechnicalControl:
     type: TechnicalControlType
     #: Internal id of the techincal control
     id: Optional[int] = None
+    #: Period after which the control should be assumed non compliant
+    ttl: Optional[int] = None
+    #: Should a failure cause a process to exit
+    is_blocking: Optional[bool] = None
+    #: Can resources be unlinked from the control
+    can_delete_resources: Optional[bool] = None
 
 
 @dataclass
