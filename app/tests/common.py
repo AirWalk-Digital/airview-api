@@ -4,8 +4,10 @@ import pytest
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
+import testing.postgresql
+import os
 
-
+Postgresql = testing.postgresql.PostgresqlFactory(cache_initialized_db=True)
 # sqlite disables fk constraints by default, this enables them
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -17,7 +19,13 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 
 @pytest.fixture(scope="function")
 def client():
-    app.DB_URI = "sqlite://"
+    if os.environ.get("USE_SQLITE") == "True":
+        app.DB_URI = "sqlite://"
+
+    else:
+        postgresql = Postgresql()
+        app.DB_URI = postgresql.url()
+
     instance = app.create_app()
     db.create_all(app=instance)
     ctx = instance.app_context()

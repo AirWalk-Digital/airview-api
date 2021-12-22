@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, DataError
 from sqlalchemy.log import Identified
 from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.models import (
@@ -87,7 +87,9 @@ def create(data: dict):
 
         db.session.add(app)
         db.session.commit()
-    except IntegrityError:
+    except (IntegrityError, DataError) as e:
+        print(e)
+
         db.session.rollback()
         raise AirViewValidationException("Integrity Error, check reference fields")
     return app
@@ -103,6 +105,6 @@ def update(data: dict):
     app.environment_id = data.get("environment_id")
     try:
         db.session.commit()
-    except IntegrityError:
+    except (IntegrityError, DataError):
         db.session.rollback()
         raise AirViewValidationException("Integrity Error, check reference fields")

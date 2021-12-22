@@ -13,6 +13,7 @@ from airview_api.models import (
     TechnicalControlType,
     SystemStage,
 )
+import unittest
 
 
 def setup():
@@ -76,8 +77,8 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=33,
         reference="res-1",
         monitoring_state=MonitoredResourceState.SUPPRESSED,
-        last_seen=datetime(2, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(2, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2002, 1, 1, tzinfo=timezone.utc),
     )
     # ctl 1 -Second resource
     MonitoredResourceFactory(
@@ -85,8 +86,8 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=33,
         reference="res-2",
         monitoring_state=MonitoredResourceState.FLAGGED,
-        last_seen=datetime(3, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(3, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2003, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2003, 1, 1, tzinfo=timezone.utc),
     )
     # ctl2 - Different control
     MonitoredResourceFactory(
@@ -94,8 +95,8 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=34,
         reference="res-3",
         monitoring_state=MonitoredResourceState.FLAGGED,
-        last_seen=datetime(4, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(4, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2004, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2004, 1, 1, tzinfo=timezone.utc),
     )
     # Ctl1 via different app
     MonitoredResourceFactory(
@@ -103,8 +104,8 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=35,
         reference="res-4",
         monitoring_state=MonitoredResourceState.FLAGGED,
-        last_seen=datetime(5, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(5, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2005, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2005, 1, 1, tzinfo=timezone.utc),
     )
     # Unrelated data
     MonitoredResourceFactory(
@@ -112,16 +113,16 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=36,
         reference="res-1-x",
         monitoring_state=MonitoredResourceState.FLAGGED,
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2006, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2006, 1, 1, tzinfo=timezone.utc),
     )
     MonitoredResourceFactory(
         id=107,
         application_technical_control_id=37,
         reference="res-1-x",
         monitoring_state=MonitoredResourceState.FLAGGED,
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2006, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2006, 1, 1, tzinfo=timezone.utc),
     )
     # Cancelled Resource -  should be ignored
     MonitoredResourceFactory(
@@ -129,8 +130,8 @@ def _prepare_aggregation_mock_data():
         application_technical_control_id=33,
         reference="res-55",
         monitoring_state=MonitoredResourceState.CANCELLED,
-        last_seen=datetime(4, 1, 1, tzinfo=timezone.utc),
-        last_modified=datetime(4, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2004, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2004, 1, 1, tzinfo=timezone.utc),
     )
     # Items not created until something is invoked, probably because of underlying raw query
     Application.query.all()
@@ -142,8 +143,8 @@ def _prepare_additional_data():  # Add additional exemptions
         application_technical_control_id=37,
         reference="res-1-other-2",
         monitoring_state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2006, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2006, 1, 1, tzinfo=timezone.utc),
     )
 
     MonitoredResourceFactory(
@@ -151,8 +152,8 @@ def _prepare_additional_data():  # Add additional exemptions
         application_technical_control_id=37,
         reference="res-1-other-3",
         monitoring_state=MonitoredResourceState.SUPPRESSED,
-        last_modified=datetime(6, 1, 1, tzinfo=timezone.utc),
-        last_seen=datetime(6, 1, 1, tzinfo=timezone.utc),
+        last_modified=datetime(2006, 1, 1, tzinfo=timezone.utc),
+        last_seen=datetime(2006, 1, 1, tzinfo=timezone.utc),
     )
     ExclusionFactory(
         id=44,
@@ -162,7 +163,7 @@ def _prepare_additional_data():  # Add additional exemptions
         impact=3,
         probability=4,
         is_limited_exclusion=True,
-        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
+        end_date=datetime(2001, 1, 1, tzinfo=timezone.utc),
         notes="nnn",
     )
     mr = MonitoredResource.query.get(103)
@@ -196,7 +197,7 @@ def test_get_control_status_aggregation(client):
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
-            "raisedDateTime": "0003-01-01T00:00:00",
+            "raisedDateTime": "2003-01-01T00:00:00+00:00",
             "tickets": [],
         },
         {
@@ -209,7 +210,7 @@ def test_get_control_status_aggregation(client):
             "environment": "DEV",
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
-            "raisedDateTime": "0005-01-01T00:00:00",
+            "raisedDateTime": "2005-01-01T00:00:00+00:00",
             "tickets": [],
         },
         {
@@ -222,11 +223,12 @@ def test_get_control_status_aggregation(client):
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
-            "raisedDateTime": "0004-01-01T00:00:00",
+            "raisedDateTime": "2004-01-01T00:00:00+00:00",
             "tickets": [],
         },
     ]
-    assert data == expected
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_status_aggregation_removes_active_exclusions(client):
@@ -245,7 +247,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
         impact=3,
         probability=4,
         is_limited_exclusion=True,
-        end_date=datetime(1, 1, 1, tzinfo=timezone.utc),
+        end_date=datetime(2001, 1, 1, tzinfo=timezone.utc),
         notes="nnn",
     )
 
@@ -271,7 +273,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "environment": "DEV",
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
-            "raisedDateTime": "0005-01-01T00:00:00",
+            "raisedDateTime": "2005-01-01T00:00:00+00:00",
             "tickets": [],
         },
         {
@@ -284,11 +286,12 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
-            "raisedDateTime": "0004-01-01T00:00:00",
+            "raisedDateTime": "2004-01-01T00:00:00+00:00",
             "tickets": [],
         },
     ]
-    assert data == expected
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_status_aggregation_empty_result_for_unfound_app(client):
@@ -333,7 +336,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
-            "raisedDateTime": "0003-01-01T00:00:00",
+            "raisedDateTime": "2003-01-01T00:00:00+00:00",
             "tickets": [],
         },
         {
@@ -346,12 +349,13 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "environment": "PRD",
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
-            "raisedDateTime": "0004-01-01T00:00:00",
+            "raisedDateTime": "2004-01-01T00:00:00+00:00",
             "tickets": [],
         },
     ]
     assert resp.status_code == 200
-    assert data == expected
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_application_compliance_overview(client):
@@ -414,7 +418,8 @@ def test_get_application_compliance_overview(client):
         },
     ]
 
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_application_control_overview(client):
@@ -477,7 +482,8 @@ def test_get_application_control_overview_hides_parents(client):
             "systemStage": "BUILD",
         }
     ]
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_overview_resources_with_children(client):
@@ -501,7 +507,7 @@ def test_get_control_overview_resources_with_children(client):
         {
             "environment": "bbb",
             "id": 102,
-            "lastSeen": "0002-01-01T00:00:00",
+            "lastSeen": "2002-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-1",
             "state": "SUPPRESSED",
@@ -509,7 +515,7 @@ def test_get_control_overview_resources_with_children(client):
         {
             "environment": "bbb",
             "id": 103,
-            "lastSeen": "0003-01-01T00:00:00",
+            "lastSeen": "2003-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-2",
             "state": "SUPPRESSED",  # Suppressed via exclusion
@@ -517,14 +523,15 @@ def test_get_control_overview_resources_with_children(client):
         {
             "environment": "aaa",
             "id": 105,
-            "lastSeen": "0005-01-01T00:00:00",
+            "lastSeen": "2005-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
         },
     ]
 
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_overview_resources_no_children(client):
@@ -547,13 +554,14 @@ def test_get_control_overview_resources_no_children(client):
         {
             "environment": "aaa",
             "id": 105,
-            "lastSeen": "0005-01-01T00:00:00",
+            "lastSeen": "2005-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
         }
     ]
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_overview_resources_pending(client):
@@ -580,7 +588,7 @@ def test_get_control_overview_resources_pending(client):
         {
             "environment": "bbb",
             "id": 102,
-            "lastSeen": "0002-01-01T00:00:00",
+            "lastSeen": "2002-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-1",
             "state": "SUPPRESSED",
@@ -588,7 +596,7 @@ def test_get_control_overview_resources_pending(client):
         {
             "environment": "bbb",
             "id": 103,
-            "lastSeen": "0003-01-01T00:00:00",
+            "lastSeen": "2003-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-2",
             "state": "SUPPRESSED",  # Suppressed via exclusion
@@ -596,14 +604,15 @@ def test_get_control_overview_resources_pending(client):
         {
             "environment": "aaa",
             "id": 105,
-            "lastSeen": "0005-01-01T00:00:00",
+            "lastSeen": "2005-01-01T00:00:00+00:00",
             "pending": True,
             "reference": "res-4",
             "state": "FLAGGED",
         },
     ]
 
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_control_overview_resources_null_environment(client):
@@ -629,7 +638,7 @@ def test_get_control_overview_resources_null_environment(client):
         {
             "id": 102,
             "environment": None,
-            "lastSeen": "0002-01-01T00:00:00",
+            "lastSeen": "2002-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-1",
             "state": "SUPPRESSED",
@@ -637,7 +646,7 @@ def test_get_control_overview_resources_null_environment(client):
         {
             "id": 103,
             "environment": None,
-            "lastSeen": "0003-01-01T00:00:00",
+            "lastSeen": "2003-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-2",
             "state": "SUPPRESSED",  # Suppressed via exclusion
@@ -645,14 +654,15 @@ def test_get_control_overview_resources_null_environment(client):
         {
             "environment": "aaa",
             "id": 105,
-            "lastSeen": "0005-01-01T00:00:00",
+            "lastSeen": "2005-01-01T00:00:00+00:00",
             "pending": False,
             "reference": "res-4",
             "state": "FLAGGED",
         },
     ]
 
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
 
 
 def test_get_quality_models_for_app(client):
@@ -680,4 +690,5 @@ def test_get_quality_models_for_app(client):
             "name": "COST_OPTIMISATION",
         },
     ]
-    assert expected == data
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)

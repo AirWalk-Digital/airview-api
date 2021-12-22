@@ -47,7 +47,6 @@ class ApplicationFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = Application
         sqlalchemy_session = db.session
 
-    id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"App {n}")
     application_type = ApplicationType.BUSINESS_APPLICATION
 
