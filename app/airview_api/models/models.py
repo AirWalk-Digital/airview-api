@@ -233,7 +233,7 @@ class MonitoredResource(db.Model):
     @hybrid_property
     def state(self):
         return (
-            self.exclusion_state
+            MonitoredResourceState.SUPPRESSED
             if self.exclusion_state == ExclusionState.ACTIVE
             else self.monitoring_state
         )

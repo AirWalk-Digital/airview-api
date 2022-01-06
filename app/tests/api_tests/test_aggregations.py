@@ -568,6 +568,41 @@ def test_get_control_overview_resources_no_children(client):
     case.assertCountEqual(expected, data)
 
 
+def test_get_control_overview_resources_supressed_by_exclusion(client):
+    """
+    Given: A populated database of triggered resources
+    When: When a request is made to list the resources for an appliction with an exclusion
+    Then: The resource is returned as suppressed
+    """
+    # Arrange
+    _prepare_aggregation_mock_data()
+    # Add additional data
+    _prepare_additional_data()
+
+    mr = MonitoredResource.query.get(105)
+    mr.exclusion_id = 44
+    mr.exclusion_state = ExclusionState.ACTIVE
+
+    # Act
+    resp = client.get("/applications/13/monitored-resources?technicalControlId=22")
+
+    # Assert
+    data = resp.get_json()
+    expected = [
+        {
+            "environment": "aaa",
+            "id": 105,
+            "lastSeen": "2005-01-01T00:00:00+00:00",
+            "pending": False,
+            "reference": "res-4",
+            "state": "SUPPRESSED",
+            "type": "VIRTUAL_MACHINE",
+        }
+    ]
+    case = unittest.TestCase()
+    case.assertCountEqual(expected, data)
+
+
 def test_get_control_overview_resources_pending(client):
     """
     Given: Monitored resource with state pending
