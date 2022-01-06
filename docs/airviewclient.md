@@ -56,8 +56,20 @@ Create a new system
 Look up an application by the provided reference
 
 
+* **Return type**
+
+    Application | None
+
+
+
 #### get_application_control_link(application_id, technical_control_id)
 Get the id of application to control linkage
+
+
+* **Return type**
+
+    int | None
+
 
 
 #### get_environments()
