@@ -38,6 +38,7 @@ class MonitoredResourceState(Enum):
     FIXED_OTHER = 4
     MONITORING = 5
     CANCELLED = 6
+    UNRESPONSIVE = 7
 
     def __str__(self):
         return self.name
@@ -233,7 +234,7 @@ class MonitoredResource(db.Model):
     @hybrid_property
     def state(self):
         return (
-            self.exclusion_state
+            MonitoredResourceState.SUPPRESSED
             if self.exclusion_state == ExclusionState.ACTIVE
             else self.monitoring_state
         )
