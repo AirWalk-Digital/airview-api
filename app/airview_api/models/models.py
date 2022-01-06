@@ -38,6 +38,7 @@ class MonitoredResourceState(Enum):
     FIXED_OTHER = 4
     MONITORING = 5
     CANCELLED = 6
+    UNRESPONSIVE = 7
 
     def __str__(self):
         return self.name
