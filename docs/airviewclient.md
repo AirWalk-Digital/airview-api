@@ -5,7 +5,7 @@
 ## client.airviewclient.client module
 
 
-### class client.airviewclient.client.Backend(backend_config, session)
+### _class_ client.airviewclient.client.Backend(backend_config, session)
 Bases: `object`
 
 Low level wrapper for calls to AirView api.
@@ -132,7 +132,7 @@ Set the state of an exclusion resource
 
 
 
-#### property system_id()
+#### _property_ system_id()
 
 #### update_application(application, environment_id)
 
@@ -142,7 +142,7 @@ Set the state of an exclusion resource
 
 
 
-### class client.airviewclient.client.Handler(backend)
+### _class_ client.airviewclient.client.Handler(backend)
 Bases: `object`
 
 Main helper methods for interacting with AirView
@@ -239,7 +239,7 @@ Get an instance of handler using the configuration provided
 ## client.airviewclient.models module
 
 
-### class client.airviewclient.models.Application(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
+### _class_ client.airviewclient.models.Application(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 Bases: `object`
 
 Dataclass representing application definition
@@ -247,43 +247,43 @@ Dataclass representing application definition
 
 #### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 
-#### environment(: Optional[client.airviewclient.models.Environment] = None)
+#### environment(_: Optional[client.airviewclient.models.Environment_ _ = Non_ )
 Defintion of environment which the application sits in
 
 
-#### id(: Optional[int] = None)
+#### id(_: Optional[int_ _ = Non_ )
 Internal identifier of application
 
 
-#### name(: str)
+#### name(_: st_ )
 Name of application
 
 
-#### parent_id(: Optional[int] = None)
+#### parent_id(_: Optional[int_ _ = Non_ )
 Internal id of parent application for nested apps
 
 
-#### reference(: str)
+#### reference(_: st_ )
 Unique reference of application within the system. e.g. aws account id, azure subscription id
 
 
-#### type(: client.airviewclient.models.ApplicationType = 1)
+#### type(_: client.airviewclient.models.ApplicationTyp_ _ = _ )
 Type of application.
 
 
-### class client.airviewclient.models.ApplicationType(value)
+### _class_ client.airviewclient.models.ApplicationType(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### APPLICATION_SERVICE( = 3)
+#### APPLICATION_SERVICE(_ = _ )
 
-#### BUSINESS_APPLICATION( = 1)
+#### BUSINESS_APPLICATION(_ = _ )
 
-#### TECHNICAL_SERVICE( = 2)
+#### TECHNICAL_SERVICE(_ = _ )
 
-### class client.airviewclient.models.BackendConfig(base_url, token, system_name, system_stage, referencing_type)
+### _class_ client.airviewclient.models.BackendConfig(base_url, token, system_name, system_stage, referencing_type)
 Bases: `object`
 
 Configuration data for connecting to a backend
@@ -291,31 +291,31 @@ Configuration data for connecting to a backend
 
 #### \__init__(base_url, token, system_name, system_stage, referencing_type)
 
-#### base_url(: str)
+#### base_url(_: st_ )
 Base url of the AirView api
 
 
-#### referencing_type(: str)
+#### referencing_type(_: st_ )
 Type of reference which will be used when identifying an application. e.g. aws_account_id
 
 
-#### system_name(: str)
+#### system_name(_: st_ )
 Unique name which identifies this system
 
 
-#### system_stage(: client.airviewclient.models.SystemStage)
+#### system_stage(_: client.airviewclient.models.SystemStag_ )
 Stage at which this instance monitors
 
 
-#### token(: str)
+#### token(_: st_ )
 Access token to be used when interacting with the backend
 
 
-### exception client.airviewclient.models.BackendFailureException()
+### _exception_ client.airviewclient.models.BackendFailureException()
 Bases: `Exception`
 
 
-### class client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type)
+### _class_ client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type)
 Bases: `object`
 
 Dataclass representing an incoming compliance event
@@ -323,27 +323,27 @@ Dataclass representing an incoming compliance event
 
 #### \__init__(resource_reference, application, technical_control, status, type)
 
-#### application(: client.airviewclient.models.Application)
+#### application(_: client.airviewclient.models.Applicatio_ )
 Application within which the resource sits
 
 
-#### resource_reference(: str)
+#### resource_reference(_: st_ )
 Unique reference of the resource within the connecting system
 
 
-#### status(: client.airviewclient.models.MonitoredResourceState)
+#### status(_: client.airviewclient.models.MonitoredResourceStat_ )
 The enum status of the event
 
 
-#### technical_control(: client.airviewclient.models.TechnicalControl)
+#### technical_control(_: client.airviewclient.models.TechnicalContro_ )
 Technical control which this compliance event is the subject of
 
 
-#### type(: client.airviewclient.models.MonitoredResourceType)
+#### type(_: client.airviewclient.models.MonitoredResourceTyp_ )
 The enum of the resource type
 
 
-### class client.airviewclient.models.Environment(name, abbreviation, id=None)
+### _class_ client.airviewclient.models.Environment(name, abbreviation, id=None)
 Bases: `object`
 
 Dataclass representing environment
@@ -351,19 +351,19 @@ Dataclass representing environment
 
 #### \__init__(name, abbreviation, id=None)
 
-#### abbreviation(: str)
+#### abbreviation(_: st_ )
 Abbreviated name of the environment
 
 
-#### id(: Optional[int] = None)
+#### id(_: Optional[int_ _ = Non_ )
 internal id for the environment
 
 
-#### name(: str)
+#### name(_: st_ )
 Name of environment
 
 
-### class client.airviewclient.models.ExclusionResource(id, reference, technical_control_reference, application_reference, state)
+### _class_ client.airviewclient.models.ExclusionResource(id, reference, technical_control_reference, application_reference, state)
 Bases: `object`
 
 Dataclass representing an exclusion resource
@@ -371,155 +371,159 @@ Dataclass representing an exclusion resource
 
 #### \__init__(id, reference, technical_control_reference, application_reference, state)
 
-#### application_reference(: str)
+#### application_reference(_: st_ )
 unique reference for the application
 
 
-#### id(: int)
+#### id(_: in_ )
 Internal id of the exclusion resource
 
 
-#### reference(: str)
+#### reference(_: st_ )
 Reference of the exclusion resource
 
 
-#### state(: client.airviewclient.models.ExclusionResourceState)
+#### state(_: client.airviewclient.models.ExclusionResourceStat_ )
 status of the exclusion resource
 
 
-#### technical_control_reference(: str)
+#### technical_control_reference(_: st_ )
 unique reference for the technical control
 
 
-### class client.airviewclient.models.ExclusionResourceState(value)
+### _class_ client.airviewclient.models.ExclusionResourceState(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### ACTIVE( = 3)
+#### ACTIVE(_ = _ )
 
-#### NONE( = 1)
+#### NONE(_ = _ )
 
-#### PENDING( = 2)
+#### PENDING(_ = _ )
 
-### class client.airviewclient.models.MonitoredResourceState(value)
+### _class_ client.airviewclient.models.MonitoredResourceState(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### FIXED_AUTO( = 3)
+#### FIXED_AUTO(_ = _ )
 
-#### FIXED_OTHER( = 4)
+#### FIXED_OTHER(_ = _ )
 
-#### FLAGGED( = 1)
+#### FLAGGED(_ = _ )
 
-#### SUPPRESSED( = 2)
+#### SUPPRESSED(_ = _ )
 
-### class client.airviewclient.models.MonitoredResourceType(value)
+### _class_ client.airviewclient.models.MonitoredResourceType(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### CONTAINER( = 3)
+#### CONTAINER(_ = _ )
 
-#### DATABASE( = 8)
+#### DATABASE(_ = _ )
 
-#### FUNCTION( = 9)
+#### FUNCTION(_ = _ )
 
-#### NETWORK( = 4)
+#### NETWORK(_ = _ )
 
-#### OBJECT_STORAGE( = 7)
+#### OBJECT_STORAGE(_ = _ )
 
-#### PIPELINE( = 6)
+#### PIPELINE(_ = _ )
 
-#### REPOSITORY( = 5)
+#### REPOSITORY(_ = _ )
 
-#### STORAGE( = 10)
+#### STORAGE(_ = 1_ )
 
-#### VIRTUAL_MACHINE( = 2)
+#### VIRTUAL_MACHINE(_ = _ )
 
-### class client.airviewclient.models.QualityModel(value)
+### _class_ client.airviewclient.models.QualityModel(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### COST_OPTIMISATION( = 5)
+#### COST_OPTIMISATION(_ = _ )
 
-#### OPERATIONAL_EXCELLENCE( = 1)
+#### OPERATIONAL_EXCELLENCE(_ = _ )
 
-#### PERFORMANCE_EFFICIENCY( = 4)
+#### PERFORMANCE_EFFICIENCY(_ = _ )
 
-#### PORTABILITY( = 6)
+#### PORTABILITY(_ = _ )
 
-#### RELIABILITY( = 3)
+#### RELIABILITY(_ = _ )
 
-#### SECURITY( = 2)
+#### SECURITY(_ = _ )
 
-#### USABILITY_AND_COMPATIBILITY( = 7)
+#### USABILITY_AND_COMPATIBILITY(_ = _ )
 
-### class client.airviewclient.models.SystemStage(value)
+### _class_ client.airviewclient.models.SystemStage(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### BUILD( = 1)
+#### BUILD(_ = _ )
 
-#### MONITOR( = 2)
+#### MONITOR(_ = _ )
 
-### class client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None, ttl=None, is_blocking=None, can_delete_resources=None)
+### _class_ client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None, parent_id=None, ttl=None, is_blocking=None, can_delete_resources=None)
 Bases: `object`
 
 Dataclass representing technical control definition
 
 
-#### \__init__(name, reference, quality_model, type, id=None, ttl=None, is_blocking=None, can_delete_resources=None)
+#### \__init__(name, reference, quality_model, type, id=None, parent_id=None, ttl=None, is_blocking=None, can_delete_resources=None)
 
-#### can_delete_resources(: Optional[bool] = None)
+#### can_delete_resources(_: Optional[bool_ _ = Non_ )
 Can resources be unlinked from the control
 
 
-#### id(: Optional[int] = None)
+#### id(_: Optional[int_ _ = Non_ )
 Internal id of the techincal control
 
 
-#### is_blocking(: Optional[bool] = None)
+#### is_blocking(_: Optional[bool_ _ = Non_ )
 Should a failure cause a process to exit
 
 
-#### name(: str)
+#### name(_: st_ )
 The name of the technical control
 
 
-#### quality_model(: client.airviewclient.models.QualityModel)
+#### parent_id(_: Optional[int_ _ = Non_ )
+Id of parent control
+
+
+#### quality_model(_: client.airviewclient.models.QualityMode_ )
 Quality model of the techincal control
 
 
-#### reference(: str)
+#### reference(_: st_ )
 Unique reference for the control within the connecting system
 
 
-#### ttl(: Optional[int] = None)
+#### ttl(_: Optional[int_ _ = Non_ )
 Period after which the control should be assumed non compliant
 
 
-#### type(: client.airviewclient.models.TechnicalControlType)
+#### type(_: client.airviewclient.models.TechnicalControlTyp_ )
 Type of control
 
 
-### class client.airviewclient.models.TechnicalControlType(value)
+### _class_ client.airviewclient.models.TechnicalControlType(value)
 Bases: `enum.Enum`
 
 An enumeration.
 
 
-#### OPERATIONAL( = 2)
+#### OPERATIONAL(_ = _ )
 
-#### SECURITY( = 1)
+#### SECURITY(_ = _ )
 
-#### TASK( = 3)
+#### TASK(_ = _ )
 ## Module contents
