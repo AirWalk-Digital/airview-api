@@ -80,6 +80,7 @@ technical_control = models.TechnicalControl(
     reference="local_control_identifier",
     quality_model=models.QualityModel.SECURITY,
     type=models.TechnicalControlType.TASK,
+	parent_id=None, # Optionally link a control to a parent
 )
 compliance_event = models.ComplianceEvent(
 	application=application,
