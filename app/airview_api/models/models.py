@@ -172,6 +172,13 @@ class TechnicalControl(db.Model):
     is_blocking = db.Column(db.Boolean, nullable=False)
     can_delete_resources = db.Column(db.Boolean, nullable=False)
 
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey("technical_control.id"), nullable=True
+    )
+    children = db.relationship(
+        "TechnicalControl", backref=db.backref("parent", remote_side=[id])
+    )
+
     application_technical_controls = db.relationship(
         "ApplicationTechnicalControl",
         back_populates="technical_control",

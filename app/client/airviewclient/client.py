@@ -226,6 +226,7 @@ class Backend:
             "ttl": technical_control.ttl,
             "canDeleteResources": technical_control.can_delete_resources,
             "isBlocking": technical_control.is_blocking,
+            "parentId": technical_control.parent_id,
         }
         resp = self._session.post(
             url=self.get_url("/technical-controls/"),

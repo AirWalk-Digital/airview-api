@@ -99,6 +99,7 @@ class TechnicalControlSchema(CamelCaseSchema):
     ttl = ma.fields.Integer(required=False)
     is_blocking = ma.fields.Boolean(required=False, missing=False)
     can_delete_resources = ma.fields.Boolean(required=False, missing=True)
+    parent_id = ma.fields.Integer(required=False)
 
     quality_model = ma.fields.Str(required=True)
 
