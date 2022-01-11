@@ -11,35 +11,41 @@ import pytest
 
 from client.airviewclient import models
 
-application = models.Application(name="app one", reference="app-ref-1")
-technical_control = models.TechnicalControl(
-    name="ctrl a",
-    reference="tc-ref-1",
-    quality_model=models.QualityModel.SECURITY,
-    type=models.TechnicalControlType.OPERATIONAL,
-    can_delete_resources=False,
-    is_blocking=True,
-    ttl=20,
-)
-compliance_event = models.ComplianceEvent(
-    application=application,
-    technical_control=technical_control,
-    resource_reference="res-ref-1",
-    status=models.MonitoredResourceState.FLAGGED,
-    type=models.MonitoredResourceType.VIRTUAL_MACHINE,
-)
+
+@pytest.fixture()
+def compliance_event():
+    application = models.Application(name="app one", reference="app-ref-1")
+    technical_control = models.TechnicalControl(
+        name="ctrl a",
+        reference="tc-ref-1",
+        quality_model=models.QualityModel.SECURITY,
+        type=models.TechnicalControlType.OPERATIONAL,
+        can_delete_resources=False,
+        is_blocking=True,
+        ttl=20,
+    )
+    evt = models.ComplianceEvent(
+        application=application,
+        technical_control=technical_control,
+        resource_reference="res-ref-1",
+        status=models.MonitoredResourceState.FLAGGED,
+        type=models.MonitoredResourceType.VIRTUAL_MACHINE,
+    )
+
+    yield evt
 
 
 def setup():
     setup_factories()
 
 
-def test_monitored_resource_creates_missing_system(handler):
+def test_monitored_resource_creates_missing_system(handler, compliance_event):
     """
     Given: A missing system
     When: When a call is made to set a monitored resource
     Then: The monitored resource is persisted against a new system
     """
+    print(compliance_event)
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ApplicationFactory(id=2, environment_id=1)
@@ -66,7 +72,7 @@ def test_monitored_resource_creates_missing_system(handler):
     )
 
 
-def test_monitored_resource_persisted_for_linked(handler):
+def test_monitored_resource_persisted_for_linked(handler, compliance_event):
     """
     Given: An existing linked application
     When: When a call is made to set a monitored resource
@@ -94,7 +100,7 @@ def test_monitored_resource_persisted_for_linked(handler):
     assert monitored[0].application_technical_control_id == 5
 
 
-def test_triggered_resource_creates_new_control(handler):
+def test_triggered_resource_creates_new_control(handler, compliance_event):
     """
     Given: An existing linked application, no known control
     When: When a call is made to set a triggered resource
@@ -132,7 +138,50 @@ def test_triggered_resource_creates_new_control(handler):
     assert monitored[0].application_technical_control_id == 6
 
 
-def test_triggered_resource_creates_new_control_with_defaults(handler):
+def test_triggered_resource_creates_new_control_with_parent(handler, compliance_event):
+    """
+    Given: An existing linked application, no known control, control has a parent
+    When: When a call is made to set a triggered resource
+    Then: New control created and linked to parent, the triggerend resource is sent to the backend
+    """
+    # Arrange
+    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ApplicationFactory(id=2, environment_id=1)
+    ApplicationReferenceFactory(
+        application_id=2, type="aws_account_id", reference="app-ref-1"
+    )
+    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
+    TechnicalControlFactory(
+        id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
+    )
+    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
+
+    # Act
+    compliance_event.technical_control.parent_id = 4
+    handler.handle_compliance_event(compliance_event)
+    compliance_event.technical_control.parent_id = None
+
+    # Assert
+    tc = TechnicalControl.query.all()
+    len(tc) == 2
+    assert tc[1].name == "ctrl a"
+    assert tc[1].reference == "tc-ref-1"
+    assert tc[1].is_blocking == True
+    assert tc[1].can_delete_resources == False
+    assert tc[1].ttl == 20
+    assert tc[1].parent_id == 4
+
+    monitored = MonitoredResource.query.all()
+    assert len(monitored) == 1
+    assert monitored[0].state == MonitoredResourceState.FLAGGED
+    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
+    assert monitored[0].reference == "res-ref-1"
+    assert monitored[0].application_technical_control_id == 6
+
+
+def test_triggered_resource_creates_new_control_with_defaults(
+    handler, compliance_event
+):
     """
     Given: An existing linked application, no known control
     When: When a call is made to set a triggered resource with missing optional fields
@@ -173,7 +222,7 @@ def test_triggered_resource_creates_new_control_with_defaults(handler):
     assert monitored[0].application_technical_control_id == 6
 
 
-def test_triggered_resource_creates_new_app(handler):
+def test_triggered_resource_creates_new_app(handler, compliance_event):
     """
     Given: No existing linked application
     When: When a call is made to set a triggered resource
@@ -200,7 +249,9 @@ def test_triggered_resource_creates_new_app(handler):
     assert refs[1].reference == "app-ref-1"
 
 
-def test_account_cache_handle_unexpected_code_for_get_control(handler, adapter):
+def test_account_cache_handle_unexpected_code_for_get_control(
+    handler, compliance_event, adapter
+):
     """
     Given: Status code 500 returned by GET technical control
     When: When a call is made to set a triggered resource
@@ -241,7 +292,7 @@ def test_account_cache_handle_unexpected_code_for_get_control(handler, adapter):
 
 
 def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control(
-    handler, adapter
+    handler, adapter, compliance_event
 ):
     """
     Given: Status code 500 returned by GET application technical control
@@ -296,7 +347,7 @@ def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control
 
 
 def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
-    handler, adapter
+    handler, adapter, compliance_event
 ):
     """
     Given: Status code 500 returned by POST technical-control
@@ -342,7 +393,7 @@ def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
 
 
 def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
-    handler, adapter
+    handler, adapter, compliance_event
 ):
     """
     Given: Status code 500 returned by POST application-technical-control
@@ -403,7 +454,7 @@ def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
 
 
 def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
-    handler, adapter
+    handler, adapter, compliance_event
 ):
     """
     Given: Status code 500 returned by PUT monitored resource

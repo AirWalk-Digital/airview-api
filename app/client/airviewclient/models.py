@@ -137,6 +137,8 @@ class TechnicalControl:
     type: TechnicalControlType
     #: Internal id of the techincal control
     id: Optional[int] = None
+    #: Id of parent control
+    parent_id: Optional[int] = None
     #: Period after which the control should be assumed non compliant
     ttl: Optional[int] = None
     #: Should a failure cause a process to exit

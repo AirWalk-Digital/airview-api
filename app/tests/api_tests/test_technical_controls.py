@@ -42,6 +42,7 @@ def test_technical_control_get_single_ok(client):
         is_blocking=True,
         can_delete_resources=False,
         ttl=10,
+        parent_id=701,
     )
     TechnicalControlFactory(
         id=703,
@@ -66,6 +67,7 @@ def test_technical_control_get_single_ok(client):
     assert data["isBlocking"] == True
     assert data["canDeleteResources"] == False
     assert data["ttl"] == 10
+    assert data["parentId"] == 701
 
 
 def test_technical_control_get_single_not_found(client):
@@ -138,12 +140,21 @@ def test_technical_controls_post_reject_bad_reference(client):
 
 def test_technical_controls_post_ok_new(client):
     """
-    Given: An empty technicalContols table
+    Given: An tech control table with 1 control
     When: When a correctly formed technical control definition is posted to the api
     Then: The technical control is returned with status 200 and stored in db
     """
     # Arrange
     SystemFactory(id=2, stage=SystemStage.BUILD)
+    TechnicalControlFactory(
+        id=701,
+        reference="1",
+        name="one",
+        control_type=TechnicalControlType.SECURITY,
+        system_id=2,
+        severity=TechnicalControlSeverity.HIGH,
+    )
+
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
@@ -154,6 +165,7 @@ def test_technical_controls_post_ok_new(client):
         "ttl": 20,
         "isBlocking": True,
         "canDeleteResources": False,
+        "parentId": 701,
     }
 
     # Act
@@ -173,17 +185,50 @@ def test_technical_controls_post_ok_new(client):
     assert data["ttl"] == input_data["ttl"]
     assert data["isBlocking"] == input_data["isBlocking"]
     assert data["canDeleteResources"] == input_data["canDeleteResources"]
+    assert data["parentId"] == input_data["parentId"]
 
     persisted = TechnicalControl.query.all()
-    assert len(persisted) == 1
-    assert persisted[0].name == input_data["name"]
-    assert persisted[0].reference == input_data["reference"]
-    assert persisted[0].control_type == TechnicalControlType.TASK
-    assert persisted[0].system_id == input_data["systemId"]
-    assert persisted[0].severity == TechnicalControlSeverity.LOW
-    assert persisted[0].ttl == 20
-    assert persisted[0].is_blocking == True
-    assert persisted[0].can_delete_resources == False
+    assert len(persisted) == 2
+    assert persisted[1].name == input_data["name"]
+    assert persisted[1].reference == input_data["reference"]
+    assert persisted[1].control_type == TechnicalControlType.TASK
+    assert persisted[1].system_id == input_data["systemId"]
+    assert persisted[1].severity == TechnicalControlSeverity.LOW
+    assert persisted[1].ttl == 20
+    assert persisted[1].is_blocking == True
+    assert persisted[1].can_delete_resources == False
+    assert persisted[1].parent_id == 701
+
+
+def test_technical_controls_post_bad_request_for_missing_parent(client):
+    """
+    Given: An empty technicalContols table
+    When: When a correctly formed technical control definition is posted to the api with a non existent parent
+    Then: 400 is returned
+    """
+    # Arrange
+    SystemFactory(id=2, stage=SystemStage.BUILD)
+    input_data = {
+        "name": "Ctrl1",
+        "reference": "ctl_id_one",
+        "controlType": "TASK",
+        "systemId": 2,
+        "qualityModel": "SECURITY",
+        "parentId": 123,
+    }
+
+    # Act
+    resp = client.post(
+        "/technical-controls/",
+        json=input_data,
+    )
+
+    # Assert
+    data = resp.get_json()
+    assert resp.status_code == 400
+
+    persisted = TechnicalControl.query.all()
+    assert len(persisted) == 0
 
 
 def test_technical_controls_post_ok_sets_defaults(client):
