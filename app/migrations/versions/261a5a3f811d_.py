@@ -22,10 +22,17 @@ def upgrade():
     # There seems to be a bug in Alembic, the following is required for ALTER ops with Enum types:
     monitored_resource_type_enum = postgresql.ENUM('UNKNOWN', 'VIRTUAL_MACHINE', 'CONTAINER', 'NETWORK', 'REPOSITORY', 'PIPELINE', 'OBJECT_STORAGE', 'DATABASE', 'FUNCTION', 'STORAGE', name='monitoredresourcetype', create_type=False)
     monitored_resource_type_enum.create(op.get_bind(), checkfirst=True)
-    op.add_column('monitored_resource', sa.Column('type', monitored_resource_type_enum, nullable=False))
+    # This below is necessary if the table contains data
+    op.add_column('monitored_resource', sa.Column('type', monitored_resource_type_enum, nullable=True))
+    op.execute("UPDATE monitored_resource SET type = 'UNKNOWN'::monitoredresourcetype WHERE type IS NULL;")
+    op.alter_column('monitored_resource', 'type', nullable=False)
     op.add_column('technical_control', sa.Column('ttl', sa.Integer(), nullable=True))
-    op.add_column('technical_control', sa.Column('is_blocking', sa.Boolean(), nullable=False))
-    op.add_column('technical_control', sa.Column('can_delete_resources', sa.Boolean(), nullable=False))
+    op.add_column('technical_control', sa.Column('is_blocking', sa.Boolean(), nullable=True))
+    op.execute("UPDATE technical_control SET is_blocking = false WHERE is_blocking IS NULL;")
+    op.alter_column('technical_control', 'is_blocking', nullable=False)
+    op.add_column('technical_control', sa.Column('can_delete_resources', sa.Boolean(), nullable=True))
+    op.execute("UPDATE technical_control SET can_delete_resources = false WHERE can_delete_resources IS NULL;")
+    op.alter_column('technical_control', 'can_delete_resources', nullable=False)
     op.add_column('technical_control', sa.Column('parent_id', sa.Integer(), nullable=True))
     op.create_foreign_key(None, 'technical_control', 'technical_control', ['parent_id'], ['id'])
     # ### end Alembic commands ###
