@@ -61,6 +61,7 @@ class TechnicalControlType(Enum):
     SECURITY = 1
     OPERATIONAL = 2
     TASK = 3
+    VULNERABILITY = 4
 
     def __str__(self):
         return self.name
