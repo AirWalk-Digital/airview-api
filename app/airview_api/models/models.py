@@ -239,6 +239,13 @@ class MonitoredResource(db.Model):
         "ApplicationTechnicalControl", back_populates="monitored_resources"
     )
 
+    tickets = db.relationship(
+        "MonitoredResourceTicket",
+        back_populates="monitored_resource",
+        lazy=True,
+        cascade="delete",
+    )
+
     @hybrid_property
     def state(self):
         return (
@@ -262,6 +269,18 @@ class MonitoredResource(db.Model):
             name="uq_monitored_resource",
         ),
     )
+
+
+class MonitoredResourceTicket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    monitored_resource_id = db.Column(
+        db.Integer,
+        db.ForeignKey("monitored_resource.id"),
+        nullable=False,
+    )
+    reference = db.Column(db.String(50), nullable=True)
+    request_timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
+    monitored_resource = db.relationship("MonitoredResource", back_populates="tickets")
 
 
 class ApplicationTechnicalControl(db.Model):
