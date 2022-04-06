@@ -244,7 +244,8 @@ select
   a.name application_name,
   tr.application_technical_control_id,
   s.name system_name,
-  s.stage system_stage
+  s.stage system_stage,
+  tc.quality_model
 from
   monitored_resource tr
   join application_technical_control as atc
@@ -280,6 +281,7 @@ order by
         x["application_name"],
         x["system_name"],
         x["system_stage"],
+        x["quality_model"],
     )
     d = list()
     for key, group in itertools.groupby(data, key_func):
@@ -302,13 +304,14 @@ order by
         mr = MonitoredResource.query.get(m["triggered_resource_id"])
         x = {
             "id": key[0],
-            "controlAction": "security",
+            "qualityModel": "security",
             "severity": key[2].lower(),
             "name": key[1],
             "environment": key[3],
             "application": key[4],
             "systemName": key[5],
             "systemStage": key[6],
+            "qualityModel": key[7],
             "resources": res,
             "raisedDateTime": mr.last_modified,
             "tickets": [],

@@ -190,7 +190,6 @@ def test_get_control_status_aggregation(client):
     expected = [
         {
             "id": 33,
-            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -199,11 +198,11 @@ def test_get_control_status_aggregation(client):
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
             "raisedDateTime": "2003-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 35,
-            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -212,11 +211,11 @@ def test_get_control_status_aggregation(client):
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
             "raisedDateTime": "2005-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlAction": "security",
             "severity": "low",
             "systemName": "one",
             "systemStage": "BUILD",
@@ -225,6 +224,7 @@ def test_get_control_status_aggregation(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]
@@ -266,7 +266,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
     expected = [
         {
             "id": 35,
-            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -275,11 +274,11 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
             "raisedDateTime": "2005-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlAction": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -288,6 +287,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]
@@ -329,7 +329,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
     expected = [
         {
             "id": 33,
-            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -338,11 +337,11 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
             "raisedDateTime": "2003-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlAction": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -351,6 +350,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]

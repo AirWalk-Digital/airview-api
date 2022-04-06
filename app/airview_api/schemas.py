@@ -66,7 +66,7 @@ class ControlStatusSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     applicationId = ma.fields.Integer()
     applicationTechnicalControlId = ma.fields.Integer()
-    controlAction = ma.fields.Str()
+    qualityModel = ma.fields.Str()
     systemName = ma.fields.Str()
     systemStage = ma.fields.Str()
     severity = ma.fields.Str()
