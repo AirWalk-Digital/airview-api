@@ -13,3 +13,4 @@ responses==0.13.2
 requests-mock==1.9.3
 requests-flask-adapter==0.1.0
 testing.postgresql==1.3.0
+Werkzeug==2.0.2
