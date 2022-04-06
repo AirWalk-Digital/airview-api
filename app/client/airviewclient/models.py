@@ -24,7 +24,7 @@ class MonitoredResourceState(Enum):
 
 
 class QualityModel(Enum):
-    OPERATIONAL_EXCELLENCE = 1
+    LOG_EXCELLENCE = 1
     SECURITY = 2
     RELIABILITY = 3
     PERFORMANCE_EFFICIENCY = 4
@@ -38,7 +38,7 @@ class QualityModel(Enum):
 
 class TechnicalControlType(Enum):
     SECURITY = 1
-    OPERATIONAL = 2
+    LOG = 2
     TASK = 3
     VULNERABILITY = 4
 

@@ -48,7 +48,7 @@ with recursive apps as (
 select
   tc.id,
   tc.name,
-  tc.control_type control_type,
+  tc.control_action control_action,
   tc.severity,
   s.name system_name,
   s.stage system_stage,
@@ -70,7 +70,7 @@ where
 group by
   tc.id,
   tc.name,
-  tc.control_type,
+  tc.control_action,
   tc.severity,
   s.name,
   s.stage
@@ -302,7 +302,7 @@ order by
         mr = MonitoredResource.query.get(m["triggered_resource_id"])
         x = {
             "id": key[0],
-            "controlType": "security",
+            "controlAction": "security",
             "severity": key[2].lower(),
             "name": key[1],
             "environment": key[3],

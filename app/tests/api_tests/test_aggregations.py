@@ -32,7 +32,7 @@ def _prepare_aggregation_mock_data():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
         quality_model=QualityModel.RELIABILITY,
@@ -41,7 +41,7 @@ def _prepare_aggregation_mock_data():
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type=TechnicalControlAction.TASK,
+        control_action=TechnicalControlAction.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -50,7 +50,7 @@ def _prepare_aggregation_mock_data():
         id=24,
         name="ctl3",
         reference="control_c",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -190,7 +190,7 @@ def test_get_control_status_aggregation(client):
     expected = [
         {
             "id": 33,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -203,7 +203,7 @@ def test_get_control_status_aggregation(client):
         },
         {
             "id": 35,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -216,7 +216,7 @@ def test_get_control_status_aggregation(client):
         },
         {
             "id": 34,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "low",
             "systemName": "one",
             "systemStage": "BUILD",
@@ -266,7 +266,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
     expected = [
         {
             "id": 35,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -279,7 +279,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
         },
         {
             "id": 34,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -329,7 +329,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
     expected = [
         {
             "id": 33,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -342,7 +342,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
         },
         {
             "id": 34,
-            "controlType": "security",
+            "controlAction": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -442,7 +442,7 @@ def test_get_application_control_overview(client):
     expected = [
         {
             "applied": 3,
-            "controlType": "LOG",
+            "controlAction": "LOG",
             "exempt": 1,
             "id": 22,
             "severity": "HIGH",
@@ -474,7 +474,7 @@ def test_get_application_control_overview_hides_parents(client):
     expected = [
         {
             "applied": 1,
-            "controlType": "LOG",
+            "controlAction": "LOG",
             "exempt": 0,
             "id": 22,
             "name": "ctl1",

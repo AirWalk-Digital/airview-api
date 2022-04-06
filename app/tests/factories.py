@@ -24,7 +24,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"TC {n}")
 
-    control_type = TechnicalControlAction.LOG
+    control_action = TechnicalControlAction.LOG
     quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
     can_delete_resources = True

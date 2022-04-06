@@ -28,7 +28,7 @@ def setup():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -36,7 +36,7 @@ def setup():
         id=230,
         name="ctl2",
         reference="control_5",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )

@@ -174,7 +174,7 @@ class Backend:
                 name=control["name"],
                 reference=control["reference"],
                 quality_model=QualityModel[control["qualityModel"]],
-                type=TechnicalControlType[control["controlType"]],
+                type=TechnicalControlType[control["controlAction"]],
             )
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
@@ -220,7 +220,7 @@ class Backend:
         mapped = {
             "name": technical_control.name,
             "reference": technical_control.reference,
-            "controlType": technical_control.type.name,
+            "controlAction": technical_control.type.name,
             "qualityModel": technical_control.quality_model.name,
             "systemId": self.system_id,
             "ttl": technical_control.ttl,
@@ -241,7 +241,7 @@ class Backend:
                 name=control["name"],
                 reference=control["reference"],
                 quality_model=QualityModel[control["qualityModel"]],
-                type=TechnicalControlType[control["controlType"]],
+                type=TechnicalControlType[control["controlAction"]],
             )
 
         raise BackendFailureException(f"Status code: {resp.status_code}")

@@ -31,7 +31,7 @@ def test_application_technical_control_get_single_ok(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -70,7 +70,7 @@ def test_application_technical_control_not_found(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -103,7 +103,7 @@ def test_application_technical_control_post_ok(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -136,7 +136,7 @@ def test_application_technical_control_post_conflict_when_exist(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlAction.LOG,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
