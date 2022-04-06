@@ -10,7 +10,7 @@ from airview_api.models import (
     Exclusion,
     ApplicationReference,
     QualityModel,
-    TechnicalControlType,
+    TechnicalControlAction,
     MonitoredResourceType,
 )
 from airview_api.database import db
@@ -24,7 +24,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"TC {n}")
 
-    control_type = TechnicalControlType.SECURITY
+    control_type = TechnicalControlAction.LOG
     quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
     can_delete_resources = True

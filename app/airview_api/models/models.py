@@ -57,9 +57,9 @@ class QualityModel(Enum):
         return self.name
 
 
-class TechnicalControlType(Enum):
-    SECURITY = 1
-    OPERATIONAL = 2
+class TechnicalControlAction(Enum):
+    LOG = 1
+    INCIDENT = 2
     TASK = 3
     VULNERABILITY = 4
 
@@ -165,7 +165,7 @@ class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    control_type = db.Column(db.Enum(TechnicalControlType), nullable=False)
+    control_action = db.Column(db.Enum(TechnicalControlAction), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)

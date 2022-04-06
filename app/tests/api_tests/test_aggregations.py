@@ -10,7 +10,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     ExclusionState,
     MonitoredResourceState,
-    TechnicalControlType,
+    TechnicalControlAction,
     SystemStage,
 )
 import unittest
@@ -32,7 +32,7 @@ def _prepare_aggregation_mock_data():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
         quality_model=QualityModel.RELIABILITY,
@@ -41,7 +41,7 @@ def _prepare_aggregation_mock_data():
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type=TechnicalControlType.TASK,
+        control_type=TechnicalControlAction.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -50,7 +50,7 @@ def _prepare_aggregation_mock_data():
         id=24,
         name="ctl3",
         reference="control_c",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -442,7 +442,7 @@ def test_get_application_control_overview(client):
     expected = [
         {
             "applied": 3,
-            "controlType": "SECURITY",
+            "controlType": "LOG",
             "exempt": 1,
             "id": 22,
             "severity": "HIGH",
@@ -474,7 +474,7 @@ def test_get_application_control_overview_hides_parents(client):
     expected = [
         {
             "applied": 1,
-            "controlType": "SECURITY",
+            "controlType": "LOG",
             "exempt": 0,
             "id": 22,
             "name": "ctl1",

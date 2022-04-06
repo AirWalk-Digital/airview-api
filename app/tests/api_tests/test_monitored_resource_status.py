@@ -7,7 +7,7 @@ from airview_api.models import (
     ApplicationTechnicalControl,
     MonitoredResource,
     TechnicalControlSeverity,
-    TechnicalControlType,
+    TechnicalControlAction,
     MonitoredResourceState,
     SystemStage,
 )
@@ -50,7 +50,7 @@ def test_create_adds_when_new(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -90,7 +90,7 @@ def test_create_updates_when_existing_different_state(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -140,7 +140,7 @@ def test_create_updates_when_existing_same_state(client):
         id=101,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_type=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )

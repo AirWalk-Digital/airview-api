@@ -1,20 +1,6 @@
-from pprint import pprint
-
-from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from werkzeug.utils import ArgumentValidationError
-from airview_api.services import AirViewValidationException, AirViewNotFoundException
-from airview_api.models import (
-    TechnicalControl,
-    System,
-    ApplicationTechnicalControl,
-    MonitoredResource,
-    MonitoredResourceState,
-    TechnicalControlType,
-    ControlStatusDetail,
-    NamedUrl,
-    TechnicalControlSeverity,
-)
+from airview_api.services import AirViewValidationException
+from airview_api.models import ApplicationTechnicalControl
 from airview_api.database import db
 
 
