@@ -229,6 +229,7 @@ class MonitoredResource(db.Model):
     )
     exclusion = db.relationship("Exclusion", back_populates="resources")
     exclusion_state = db.Column(db.Enum(ExclusionState), nullable=True)
+    additional_data = db.Column(db.String(8000), nullable=False, default="")
 
     application_technical_control_id = db.Column(
         db.Integer,

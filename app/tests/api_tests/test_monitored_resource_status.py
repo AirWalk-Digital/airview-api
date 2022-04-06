@@ -58,7 +58,10 @@ def test_create_adds_when_new(client):
         id=201, application_id=1, technical_control_id=101
     )
 
-    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "FLAGGED"}
+    input_data = {
+        "type": "VIRTUAL_MACHINE",
+        "monitoringState": "FLAGGED",
+    }
     # Act
 
     resp = client.put(
@@ -75,6 +78,7 @@ def test_create_adds_when_new(client):
     assert persisted.reference == "ref-1"
     assert persisted.type == MonitoredResourceType.VIRTUAL_MACHINE
     assert persisted.monitoring_state == MonitoredResourceState.FLAGGED
+    assert persisted.additional_data == ""
 
 
 def test_create_updates_when_existing_different_state(client):
@@ -104,9 +108,14 @@ def test_create_updates_when_existing_different_state(client):
         application_technical_control_id=201,
         last_modified=datetime(2001, 1, 1, tzinfo=timezone.utc),
         last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
+        additional_data="Old",
     )
 
-    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "SUPPRESSED"}
+    input_data = {
+        "type": "VIRTUAL_MACHINE",
+        "monitoringState": "SUPPRESSED",
+        "additionalData": "Additional",
+    }
     # Act
 
     resp = client.put(
@@ -125,6 +134,7 @@ def test_create_updates_when_existing_different_state(client):
     assert persisted.state == MonitoredResourceState.SUPPRESSED
     assert persisted.last_modified > datetime(2001, 1, 1, tzinfo=timezone.utc)
     assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
+    assert persisted.additional_data == "Additional"
 
 
 def test_create_updates_when_existing_same_state(client):
@@ -154,9 +164,14 @@ def test_create_updates_when_existing_same_state(client):
         application_technical_control_id=201,
         last_modified=datetime(2001, 1, 1, tzinfo=timezone.utc),
         last_seen=datetime(2002, 1, 1, tzinfo=timezone.utc),
+        additional_data="Old",
     )
 
-    input_data = {"type": "VIRTUAL_MACHINE", "monitoringState": "FLAGGED"}
+    input_data = {
+        "type": "VIRTUAL_MACHINE",
+        "monitoringState": "FLAGGED",
+        "additionalData": "Additional",
+    }
     # Act
 
     resp = client.put(
@@ -175,3 +190,4 @@ def test_create_updates_when_existing_same_state(client):
     assert persisted.state == MonitoredResourceState.FLAGGED
     assert persisted.last_modified == datetime(2001, 1, 1, tzinfo=timezone.utc)
     assert persisted.last_seen > datetime(2002, 1, 1, tzinfo=timezone.utc)
+    assert persisted.additional_data == "Additional"

@@ -42,6 +42,7 @@ class MonitoredResourceSchema(CamelCaseSchema):
     monitoring_state = ma.fields.Str(required=True)
     state = ma.fields.Str(required=False)
     type = ma.fields.Str(required=False)
+    additional_data = ma.fields.Str(required=False)
 
 
 class EnvironmentSchema(CamelCaseSchema):

@@ -30,6 +30,7 @@ def compliance_event():
         resource_reference="res-ref-1",
         status=models.MonitoredResourceState.FLAGGED,
         type=models.MonitoredResourceType.VIRTUAL_MACHINE,
+        additional_data="Additional",
     )
 
     yield evt

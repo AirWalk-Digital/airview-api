@@ -162,6 +162,8 @@ class ComplianceEvent:
     status: MonitoredResourceState
     #: The enum of the resource type
     type: MonitoredResourceType
+    #: Any additional textual data to associate with the event
+    additional_data: str
 
 
 @dataclass

@@ -8,7 +8,13 @@ from airview_api.models import (
 from airview_api.database import db
 
 
-def persist(application_technical_control_id, reference, monitoring_state, type):
+def persist(
+    application_technical_control_id,
+    reference,
+    monitoring_state,
+    type,
+    additional_data=None,
+):
     try:
         item = MonitoredResource.query.filter_by(
             application_technical_control_id=application_technical_control_id,
@@ -22,6 +28,7 @@ def persist(application_technical_control_id, reference, monitoring_state, type)
                 last_modified=datetime.now(timezone.utc),
                 last_seen=datetime.now(timezone.utc),
                 type=type,
+                additional_data=additional_data,
             )
             db.session.add(item)
             db.session.commit()
@@ -31,6 +38,7 @@ def persist(application_technical_control_id, reference, monitoring_state, type)
             item.last_modified = datetime.now(timezone.utc)
         item.last_seen = datetime.utcnow()
         item.monitoring_state = monitoring_state
+        item.additional_data = additional_data
 
         db.session.commit()
     except IntegrityError:
