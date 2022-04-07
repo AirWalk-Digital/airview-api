@@ -19,7 +19,7 @@ def compliance_event():
         name="ctrl a",
         reference="tc-ref-1",
         quality_model=models.QualityModel.SECURITY,
-        type=models.TechnicalControlType.OPERATIONAL,
+        type=models.TechnicalControlType.LOG,
         can_delete_resources=False,
         is_blocking=True,
         ttl=20,
@@ -30,6 +30,7 @@ def compliance_event():
         resource_reference="res-ref-1",
         status=models.MonitoredResourceState.FLAGGED,
         type=models.MonitoredResourceType.VIRTUAL_MACHINE,
+        additional_data="Additional",
     )
 
     yield evt
@@ -332,7 +333,7 @@ def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control
                 "name": "tc1",
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
-                "controlType": "OPERATIONAL",
+                "controlAction": "LOG",
             }
         ],
     )
@@ -432,7 +433,7 @@ def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
                 "name": "tc1",
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
-                "controlType": "OPERATIONAL",
+                "controlAction": "LOG",
             }
         ],
     )
@@ -493,7 +494,7 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
                 "name": "tc1",
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
-                "controlType": "OPERATIONAL",
+                "controlAction": "LOG",
             }
         ],
     )

@@ -2,13 +2,12 @@ from datetime import datetime
 import pytest
 from pprint import pprint
 from airview_api.models import (
-    Application,
     TechnicalControlSeverity,
     Exclusion,
     ExclusionState,
     MonitoredResourceState,
-    TechnicalControlType,
     SystemStage,
+    TechnicalControlAction,
 )
 from tests.common import client
 from tests.factories import *
@@ -29,7 +28,7 @@ def setup():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -37,7 +36,7 @@ def setup():
         id=230,
         name="ctl2",
         reference="control_5",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )

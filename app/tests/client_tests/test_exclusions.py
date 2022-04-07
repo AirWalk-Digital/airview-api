@@ -5,7 +5,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     ExclusionState,
     MonitoredResourceState,
-    TechnicalControlType,
+    TechnicalControlAction,
     SystemStage,
 )
 from datetime import datetime
@@ -31,7 +31,7 @@ def setup():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=111,
         severity=TechnicalControlSeverity.HIGH,
     )

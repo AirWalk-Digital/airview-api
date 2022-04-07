@@ -45,7 +45,7 @@ class MonitoredResourceState(Enum):
 
 
 class QualityModel(Enum):
-    OPERATIONAL_EXCELLENCE = 1
+    LOG_EXCELLENCE = 1
     SECURITY = 2
     RELIABILITY = 3
     PERFORMANCE_EFFICIENCY = 4
@@ -57,10 +57,11 @@ class QualityModel(Enum):
         return self.name
 
 
-class TechnicalControlType(Enum):
-    SECURITY = 1
-    OPERATIONAL = 2
+class TechnicalControlAction(Enum):
+    LOG = 1
+    INCIDENT = 2
     TASK = 3
+    VULNERABILITY = 4
 
     def __str__(self):
         return self.name
@@ -164,7 +165,7 @@ class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    control_type = db.Column(db.Enum(TechnicalControlType), nullable=False)
+    control_action = db.Column(db.Enum(TechnicalControlAction), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)
@@ -228,6 +229,7 @@ class MonitoredResource(db.Model):
     )
     exclusion = db.relationship("Exclusion", back_populates="resources")
     exclusion_state = db.Column(db.Enum(ExclusionState), nullable=True)
+    additional_data = db.Column(db.String(8000), nullable=False, default="")
 
     application_technical_control_id = db.Column(
         db.Integer,
@@ -236,6 +238,13 @@ class MonitoredResource(db.Model):
     )
     application_technical_control = db.relationship(
         "ApplicationTechnicalControl", back_populates="monitored_resources"
+    )
+
+    tickets = db.relationship(
+        "MonitoredResourceTicket",
+        back_populates="monitored_resource",
+        lazy=True,
+        cascade="delete",
     )
 
     @hybrid_property
@@ -261,6 +270,18 @@ class MonitoredResource(db.Model):
             name="uq_monitored_resource",
         ),
     )
+
+
+class MonitoredResourceTicket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    monitored_resource_id = db.Column(
+        db.Integer,
+        db.ForeignKey("monitored_resource.id"),
+        nullable=False,
+    )
+    reference = db.Column(db.String(50), nullable=True)
+    request_timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
+    monitored_resource = db.relationship("MonitoredResource", back_populates="tickets")
 
 
 class ApplicationTechnicalControl(db.Model):

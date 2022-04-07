@@ -7,7 +7,7 @@ from airview_api.models import (
     ApplicationTechnicalControl,
     MonitoredResource,
     TechnicalControlSeverity,
-    TechnicalControlType,
+    TechnicalControlAction,
     SystemStage,
 )
 
@@ -28,7 +28,7 @@ def test_technical_control_get_single_ok(client):
         id=701,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -36,7 +36,7 @@ def test_technical_control_get_single_ok(client):
         id=702,
         reference="2",
         name="two",
-        control_type=TechnicalControlType.OPERATIONAL,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
         is_blocking=True,
@@ -48,7 +48,7 @@ def test_technical_control_get_single_ok(client):
         id=703,
         reference="3",
         name="three",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -61,7 +61,7 @@ def test_technical_control_get_single_ok(client):
     assert resp.status_code == 200
     assert data["id"] == 702
     assert data["name"] == "two"
-    assert data["controlType"] == "OPERATIONAL"
+    assert data["controlAction"] == "LOG"
     assert data["systemId"] == 2
     assert data["reference"] == "2"
     assert data["isBlocking"] == True
@@ -82,7 +82,7 @@ def test_technical_control_get_single_not_found(client):
         id=701,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -90,7 +90,7 @@ def test_technical_control_get_single_not_found(client):
         id=702,
         reference="2",
         name="two",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -98,7 +98,7 @@ def test_technical_control_get_single_not_found(client):
         id=703,
         reference="3",
         name="three",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -121,7 +121,7 @@ def test_technical_controls_post_reject_bad_reference(client):
     input_data = {
         "name": "Ctrl1",
         "reference": "bad$reference",
-        "controlType": "TASK",
+        "controlAction": "TASK",
         "systemId": 2,
         "severity": "LOW",
     }
@@ -150,7 +150,7 @@ def test_technical_controls_post_ok_new(client):
         id=701,
         reference="1",
         name="one",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=2,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -158,7 +158,7 @@ def test_technical_controls_post_ok_new(client):
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
-        "controlType": "TASK",
+        "controlAction": "TASK",
         "systemId": 2,
         "severity": "LOW",
         "qualityModel": "SECURITY",
@@ -179,7 +179,7 @@ def test_technical_controls_post_ok_new(client):
     assert resp.status_code == 200
     assert data["name"] == input_data["name"]
     assert data["reference"] == input_data["reference"]
-    assert data["controlType"] == input_data["controlType"]
+    assert data["controlAction"] == input_data["controlAction"]
     assert data["systemId"] == input_data["systemId"]
     assert data["severity"] == input_data["severity"]
     assert data["ttl"] == input_data["ttl"]
@@ -191,7 +191,7 @@ def test_technical_controls_post_ok_new(client):
     assert len(persisted) == 2
     assert persisted[1].name == input_data["name"]
     assert persisted[1].reference == input_data["reference"]
-    assert persisted[1].control_type == TechnicalControlType.TASK
+    assert persisted[1].control_action == TechnicalControlAction.TASK
     assert persisted[1].system_id == input_data["systemId"]
     assert persisted[1].severity == TechnicalControlSeverity.LOW
     assert persisted[1].ttl == 20
@@ -211,7 +211,7 @@ def test_technical_controls_post_bad_request_for_missing_parent(client):
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
-        "controlType": "TASK",
+        "controlAction": "TASK",
         "systemId": 2,
         "qualityModel": "SECURITY",
         "parentId": 123,
@@ -242,7 +242,7 @@ def test_technical_controls_post_ok_sets_defaults(client):
     input_data = {
         "name": "Ctrl1",
         "reference": "ctl_id_one",
-        "controlType": "TASK",
+        "controlAction": "TASK",
         "systemId": 2,
         "qualityModel": "SECURITY",
     }
@@ -258,7 +258,7 @@ def test_technical_controls_post_ok_sets_defaults(client):
     assert resp.status_code == 200
     assert data["name"] == input_data["name"]
     assert data["reference"] == input_data["reference"]
-    assert data["controlType"] == input_data["controlType"]
+    assert data["controlAction"] == input_data["controlAction"]
     assert data["systemId"] == 2
     assert data["severity"] == "HIGH"
     # Assert defaults
@@ -271,7 +271,7 @@ def test_technical_controls_post_ok_sets_defaults(client):
     assert len(persisted) == 1
     assert persisted[0].name == input_data["name"]
     assert persisted[0].reference == input_data["reference"]
-    assert persisted[0].control_type == TechnicalControlType.TASK
+    assert persisted[0].control_action == TechnicalControlAction.TASK
     assert persisted[0].system_id == input_data["systemId"]
     assert persisted[0].severity == TechnicalControlSeverity.HIGH
 
@@ -289,7 +289,7 @@ def test_technical_controls_post_bad_request_for_existing(client):
     input_data = {
         "name": "Ctrl1",
         "reference": "123",
-        "controlType": "TASK",
+        "controlAction": "TASK",
         "systemId": 1,
         "severity": "HIGH",
         "qualityModel": "SECURITY",
@@ -320,7 +320,7 @@ def test_technical_controls_get_with_filter(client):
         id=1,
         name="ctrl1",
         reference="ctrl_abc",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=11,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -328,7 +328,7 @@ def test_technical_controls_get_with_filter(client):
         id=2,
         name="ctrl1",
         reference="ctrl_abc",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=12,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -336,7 +336,7 @@ def test_technical_controls_get_with_filter(client):
         id=3,
         name="ctrl1",
         reference="xxx-ctrl_abc",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=11,
         severity=TechnicalControlSeverity.HIGH,
     )
@@ -351,4 +351,4 @@ def test_technical_controls_get_with_filter(client):
     assert data[0]["id"] == 1
     assert data[0]["name"] == "ctrl1"
     assert data[0]["reference"] == "ctrl_abc"
-    assert data[0]["controlType"] == "SECURITY"
+    assert data[0]["controlAction"] == "LOG"

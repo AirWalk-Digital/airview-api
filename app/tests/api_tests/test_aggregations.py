@@ -10,7 +10,7 @@ from airview_api.models import (
     TechnicalControlSeverity,
     ExclusionState,
     MonitoredResourceState,
-    TechnicalControlType,
+    TechnicalControlAction,
     SystemStage,
 )
 import unittest
@@ -32,7 +32,7 @@ def _prepare_aggregation_mock_data():
         id=22,
         name="ctl1",
         reference="control_a",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.HIGH,
         quality_model=QualityModel.RELIABILITY,
@@ -41,7 +41,7 @@ def _prepare_aggregation_mock_data():
         id=23,
         name="ctl2",
         reference="control_b",
-        control_type=TechnicalControlType.TASK,
+        control_action=TechnicalControlAction.TASK,
         system_id=1,
         severity=TechnicalControlSeverity.LOW,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -50,7 +50,7 @@ def _prepare_aggregation_mock_data():
         id=24,
         name="ctl3",
         reference="control_c",
-        control_type=TechnicalControlType.SECURITY,
+        control_action=TechnicalControlAction.LOG,
         system_id=1,
         severity=TechnicalControlSeverity.MEDIUM,
         quality_model=QualityModel.COST_OPTIMISATION,
@@ -190,7 +190,6 @@ def test_get_control_status_aggregation(client):
     expected = [
         {
             "id": 33,
-            "controlType": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -199,11 +198,11 @@ def test_get_control_status_aggregation(client):
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
             "raisedDateTime": "2003-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 35,
-            "controlType": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -212,11 +211,11 @@ def test_get_control_status_aggregation(client):
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
             "raisedDateTime": "2005-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlType": "security",
             "severity": "low",
             "systemName": "one",
             "systemStage": "BUILD",
@@ -225,6 +224,7 @@ def test_get_control_status_aggregation(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]
@@ -266,7 +266,6 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
     expected = [
         {
             "id": 35,
-            "controlType": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -275,11 +274,11 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "application": "svc 13",
             "resources": [{"id": 105, "name": "res-4", "state": "NONE"}],
             "raisedDateTime": "2005-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlType": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -288,6 +287,7 @@ def test_get_control_status_aggregation_removes_active_exclusions(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]
@@ -329,7 +329,6 @@ def test_get_control_status_aggregation_handles_no_children(client):
     expected = [
         {
             "id": 33,
-            "controlType": "security",
             "severity": "high",
             "name": "ctl1",
             "systemName": "one",
@@ -338,11 +337,11 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "application": "svc 12",
             "resources": [{"id": 103, "name": "res-2", "state": "NONE"}],
             "raisedDateTime": "2003-01-01T00:00:00+00:00",
+            "qualityModel": "RELIABILITY",
             "tickets": [],
         },
         {
             "id": 34,
-            "controlType": "security",
             "severity": "low",
             "name": "ctl2",
             "systemName": "one",
@@ -351,6 +350,7 @@ def test_get_control_status_aggregation_handles_no_children(client):
             "application": "svc 12",
             "resources": [{"id": 104, "name": "res-3", "state": "NONE"}],
             "raisedDateTime": "2004-01-01T00:00:00+00:00",
+            "qualityModel": "COST_OPTIMISATION",
             "tickets": [],
         },
     ]
@@ -442,7 +442,7 @@ def test_get_application_control_overview(client):
     expected = [
         {
             "applied": 3,
-            "controlType": "SECURITY",
+            "controlAction": "LOG",
             "exempt": 1,
             "id": 22,
             "severity": "HIGH",
@@ -474,7 +474,7 @@ def test_get_application_control_overview_hides_parents(client):
     expected = [
         {
             "applied": 1,
-            "controlType": "SECURITY",
+            "controlAction": "LOG",
             "exempt": 0,
             "id": 22,
             "name": "ctl1",
