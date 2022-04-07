@@ -315,13 +315,17 @@ Access token to be used when interacting with the backend
 Bases: `Exception`
 
 
-### _class_ client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type)
+### _class_ client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type, additional_data='')
 Bases: `object`
 
 Dataclass representing an incoming compliance event
 
 
-#### \__init__(resource_reference, application, technical_control, status, type)
+#### \__init__(resource_reference, application, technical_control, status, type, additional_data='')
+
+#### additional_data(_: st_ _ = '_ )
+Any additional textual data to associate with the event
+
 
 #### application(_: client.airviewclient.models.Applicatio_ )
 Application within which the resource sits
@@ -449,7 +453,7 @@ An enumeration.
 
 #### COST_OPTIMISATION(_ = _ )
 
-#### OPERATIONAL_EXCELLENCE(_ = _ )
+#### LOG_EXCELLENCE(_ = _ )
 
 #### PERFORMANCE_EFFICIENCY(_ = _ )
 
@@ -521,9 +525,11 @@ Bases: `enum.Enum`
 An enumeration.
 
 
-#### OPERATIONAL(_ = _ )
+#### LOG(_ = _ )
 
 #### SECURITY(_ = _ )
 
 #### TASK(_ = _ )
+
+#### VULNERABILITY(_ = _ )
 ## Module contents

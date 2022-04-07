@@ -107,7 +107,7 @@
           "applied": {
             "type": "integer"
           },
-          "controlType": {
+          "controlAction": {
             "type": "string"
           },
           "exempt": {
@@ -139,7 +139,7 @@
       },
       "ControlOverviewResource": {
         "properties": {
-          "controlType": {
+          "controlAction": {
             "type": "string"
           },
           "environment": {
@@ -178,9 +178,6 @@
           "applicationTechnicalControlId": {
             "type": "integer"
           },
-          "controlType": {
-            "type": "string"
-          },
           "environment": {
             "type": "string"
           },
@@ -188,6 +185,9 @@
             "type": "integer"
           },
           "name": {
+            "type": "string"
+          },
+          "qualityModel": {
             "type": "string"
           },
           "raisedDateTime": {
@@ -391,6 +391,9 @@
       },
       "MonitoredResource": {
         "properties": {
+          "additionalData": {
+            "type": "string"
+          },
           "monitoringState": {
             "type": "string"
           },
@@ -459,7 +462,7 @@
             "default": true,
             "type": "boolean"
           },
-          "controlType": {
+          "controlAction": {
             "type": "string"
           },
           "id": {
@@ -492,7 +495,7 @@
           }
         },
         "required": [
-          "controlType",
+          "controlAction",
           "name",
           "qualityModel",
           "reference",
@@ -1105,18 +1108,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "applicationTechnicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1206,7 +1209,7 @@
           },
           {
             "in": "query",
-            "name": "limit",
+            "name": "contextSize",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1214,7 +1217,7 @@
           },
           {
             "in": "query",
-            "name": "contextSize",
+            "name": "limit",
             "required": false,
             "schema": {
               "type": "integer"
@@ -1364,18 +1367,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "systemId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "systemId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
