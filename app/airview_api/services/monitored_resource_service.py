@@ -13,7 +13,7 @@ def persist(
     reference,
     monitoring_state,
     type,
-    additional_data=None,
+    additional_data="",
 ):
     try:
         item = MonitoredResource.query.filter_by(
