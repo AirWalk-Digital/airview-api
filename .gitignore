@@ -148,3 +148,6 @@ terraform.tfstate.backup
 /ccf/azauth.py
 
 app/client/sphinx-docs/
+
+*.direnv
+*.envrc
