@@ -11,6 +11,7 @@ setup(
         "psycopg2-binary==2.8.6",
         "sqlalchemy<1.4",
         "flask-smorest==0.31.0",
-        "elasticsearch==7.13.0"
+        "elasticsearch==7.13.0",
+        "Werkzeug==2.0.2"
     ],
 )
