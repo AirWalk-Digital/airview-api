@@ -1,4 +1,4 @@
 azure-functions
-PyJWT==1.7.1
+PyJWT==2.4.0
 requests==2.22.0
 ../../../app
