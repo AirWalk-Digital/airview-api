@@ -247,7 +247,7 @@ Dataclass representing application definition
 
 #### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 
-#### environment(_: Optional[client.airviewclient.models.Environment_ _ = Non_ )
+#### environment(_: Optional[Environment_ _ = Non_ )
 Defintion of environment which the application sits in
 
 
@@ -267,12 +267,12 @@ Internal id of parent application for nested apps
 Unique reference of application within the system. e.g. aws account id, azure subscription id
 
 
-#### type(_: client.airviewclient.models.ApplicationTyp_ _ = _ )
+#### type(_: ApplicationTyp_ _ = _ )
 Type of application.
 
 
 ### _class_ client.airviewclient.models.ApplicationType(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -303,7 +303,7 @@ Type of reference which will be used when identifying an application. e.g. aws_a
 Unique name which identifies this system
 
 
-#### system_stage(_: client.airviewclient.models.SystemStag_ )
+#### system_stage(_: SystemStag_ )
 Stage at which this instance monitors
 
 
@@ -327,7 +327,7 @@ Dataclass representing an incoming compliance event
 Any additional textual data to associate with the event
 
 
-#### application(_: client.airviewclient.models.Applicatio_ )
+#### application(_: Applicatio_ )
 Application within which the resource sits
 
 
@@ -335,15 +335,15 @@ Application within which the resource sits
 Unique reference of the resource within the connecting system
 
 
-#### status(_: client.airviewclient.models.MonitoredResourceStat_ )
+#### status(_: MonitoredResourceStat_ )
 The enum status of the event
 
 
-#### technical_control(_: client.airviewclient.models.TechnicalContro_ )
+#### technical_control(_: TechnicalContro_ )
 Technical control which this compliance event is the subject of
 
 
-#### type(_: client.airviewclient.models.MonitoredResourceTyp_ )
+#### type(_: MonitoredResourceTyp_ )
 The enum of the resource type
 
 
@@ -387,7 +387,7 @@ Internal id of the exclusion resource
 Reference of the exclusion resource
 
 
-#### state(_: client.airviewclient.models.ExclusionResourceStat_ )
+#### state(_: ExclusionResourceStat_ )
 status of the exclusion resource
 
 
@@ -396,7 +396,7 @@ unique reference for the technical control
 
 
 ### _class_ client.airviewclient.models.ExclusionResourceState(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -408,7 +408,7 @@ An enumeration.
 #### PENDING(_ = _ )
 
 ### _class_ client.airviewclient.models.MonitoredResourceState(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -422,7 +422,7 @@ An enumeration.
 #### SUPPRESSED(_ = _ )
 
 ### _class_ client.airviewclient.models.MonitoredResourceType(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -446,7 +446,7 @@ An enumeration.
 #### VIRTUAL_MACHINE(_ = _ )
 
 ### _class_ client.airviewclient.models.QualityModel(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -466,7 +466,7 @@ An enumeration.
 #### USABILITY_AND_COMPATIBILITY(_ = _ )
 
 ### _class_ client.airviewclient.models.SystemStage(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
@@ -503,7 +503,7 @@ The name of the technical control
 Id of parent control
 
 
-#### quality_model(_: client.airviewclient.models.QualityMode_ )
+#### quality_model(_: QualityMode_ )
 Quality model of the techincal control
 
 
@@ -515,12 +515,12 @@ Unique reference for the control within the connecting system
 Period after which the control should be assumed non compliant
 
 
-#### type(_: client.airviewclient.models.TechnicalControlTyp_ )
+#### type(_: TechnicalControlTyp_ )
 Type of control
 
 
 ### _class_ client.airviewclient.models.TechnicalControlType(value)
-Bases: `enum.Enum`
+Bases: `Enum`
 
 An enumeration.
 
