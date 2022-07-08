@@ -258,7 +258,7 @@ def test_exclusions_bad_request_for_missing_app_tech_control(client):
 
     # Assert
     assert resp.status_code == 400
-    assert len(db.session.query(Exclusion).all()) == 0
+    assert db.session.query(Exclusion).count() == 0
 
 
 def test_exclusions_post_bad_request_for_duplicate_resources(client):
@@ -309,8 +309,8 @@ def test_exclusions_post_bad_request_for_duplicate_resources(client):
     # Assert
     assert resp.status_code == 400
 
-    assert len(db.session.query(Exclusion).all()) == 1
-    assert len(db.session.query(MonitoredResource).all()) == 1
+    assert db.session.query(Exclusion).count() == 1
+    assert db.session.query(MonitoredResource).count() == 1
 
 
 def test_exclusions_post_ok_for_different_resources_resources(client):
@@ -361,8 +361,8 @@ def test_exclusions_post_ok_for_different_resources_resources(client):
     # Assert
     assert resp.status_code == 201
 
-    assert len(db.session.query(Exclusion).all()) == 2
-    assert len(db.session.query(MonitoredResource).all()) == 3
+    assert db.session.query(Exclusion).count() == 2
+    assert db.session.query(MonitoredResource).count() == 3
 
     exclusion = db.session.query(Exclusion).filter(Exclusion.id != 44).first()
     assert exclusion.application_technical_control_id == 33
