@@ -108,7 +108,7 @@ def test_application_post_ok_response(client):
     assert items[0].name == "App 1"
     assert items[0].environment_id == data["environmentId"]
 
-    assert len(items[0].references.all()) == 3
+    assert items[0].references.count() == 3
     assert items[0].references.filter_by(type="type1").first().reference == "val1"
 
 
@@ -151,7 +151,7 @@ def test_application_post_handles_existing_app(client):
     # Assert persistance
     items = db.session.query(Application).all()
     assert len(items) == 3
-    assert len(items[2].references.all()) == 1
+    assert items[2].references.count() == 1
     assert (
         items[2].references.filter_by(type="_internal_reference").first().reference
         == "app_1_1"
