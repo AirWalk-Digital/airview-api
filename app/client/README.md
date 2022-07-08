@@ -20,7 +20,7 @@ A convenience method is provided to
 ## Install
 
 ```sh
-pip install  git+ssh://git@github.com/AirWalk-Digital/airview-api.git#subdirectory=app/client
+pip install --ignore-pipfile git+ssh://git@github.com/AirWalk-Digital/airview-api.git#subdirectory=app/client
 ```
 
 
