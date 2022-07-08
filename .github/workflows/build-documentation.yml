@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Build documentation
       run: |
-        python -m pip install --ignore-pipfile --upgrade pip;
+        python -m pip install --upgrade pip;
         pip install sphinx sphinx-markdown-builder sphinx-autodoc-typehints;
         cd app/client;
         sphinx-apidoc -o sphinx-docs . sphinx-apidoc --full -A 'AirWalk Reply';
@@ -29,7 +29,7 @@ jobs:
         make markdown;
         mv _build/markdown/client.airviewclient.md ../../../docs/airviewclient.md;
         cd ../../../app
-        pip install --ignore-pipfile-r requirements.txt
+        pip install  requirements.txt
         FLASK_APP=./utils/debug.py flask openapi write ../docs/openapi.json
         cd ..
         jq -S . docs/openapi.json > docs/newopenapi.json  && mv docs/newopenapi.json docs/openapi.json
