@@ -9,7 +9,9 @@ import os
 
 
 @event.listens_for(Engine, "connect")
-def _set_sqlite_pragma(dbapi_connection: SQLite3Connection, connection_record: any) -> None:
+def _set_sqlite_pragma(
+    dbapi_connection: SQLite3Connection, connection_record: any
+) -> None:
     """
     sqlite disables fk constraints by default, this enables them
     :param dbapi_connection:
@@ -30,9 +32,7 @@ def fetch_aws_secrets_db_credentials(secret_arn: str) -> dict:
     sm = boto3.client("secretsmanager")
 
     try:
-        response = sm.get_secret_value(
-            SecretId=secret_arn
-        )
+        response = sm.get_secret_value(SecretId=secret_arn)
     except Exception as e:
         print("ERROR: Failed to fetch secret {}: '{}'".format(secret_arn, e))
         raise
@@ -47,6 +47,10 @@ def fetch_aws_secrets_db_credentials(secret_arn: str) -> dict:
 
 
 def get_db_conn_string() -> str:
+    """
+    Get Formatted Connection String
+    :return: Postgres Connection URL
+    """
     try:
         secret_arn: str = os.environ["DB_CREDS_SECRET_NAME"]
     except KeyError:
@@ -79,10 +83,9 @@ def get_db_conn_string() -> str:
 
 lambda_api_http: FlaskLambdaHttp = FlaskLambdaHttp(__name__)
 handler: FlaskLambdaHttp = create_app(
-    app=lambda_api_http,
-    db_connection_string=get_db_conn_string()
+    app=lambda_api_http, db_connection_string=get_db_conn_string()
 )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     handler.run(debug=False)
