@@ -81,7 +81,6 @@ lambda_api_http: FlaskLambdaHttp = FlaskLambdaHttp(__name__)
 handler: FlaskLambdaHttp = create_app(
     app=lambda_api_http,
     db_connection_string=get_db_conn_string()
-    # url_prefix="/api/compliance"
 )
 
 
