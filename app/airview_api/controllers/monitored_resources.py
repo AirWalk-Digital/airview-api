@@ -15,12 +15,13 @@ from airview_api.schemas import CamelCaseSchema
 from airview_api.services import monitored_resource_service
 from airview_api.schemas import MonitoredResourceSchema
 from airview_api.blueprint import Blueprint, Roles
+from airview_api.helpers import AirviewApiHelpers
 
 
 blp = Blueprint(
     "monitored-resources",
     __name__,
-    url_prefix="/monitored-resources",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/monitored-resources"),
     description="monitored-resources related resources",
 )
 

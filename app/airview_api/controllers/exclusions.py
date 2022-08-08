@@ -8,11 +8,13 @@ from airview_api.services import (
 from airview_api.models import ExclusionState
 from airview_api.schemas import ExclusionSchema
 from airview_api.blueprint import Blueprint, Roles
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "exclusions",
     __name__,
-    url_prefix="/exclusions",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/exclusions"),
     description="Exclusion related resources",
 )
 

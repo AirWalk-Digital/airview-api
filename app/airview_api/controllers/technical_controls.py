@@ -7,11 +7,13 @@ from airview_api.blueprint import Blueprint, Roles
 from airview_api.schemas import (
     TechnicalControlSchema,
 )
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "technical-controls",
     __name__,
-    url_prefix="/technical-controls",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/technical-controls"),
     description="Technical Control related resources",
 )
 

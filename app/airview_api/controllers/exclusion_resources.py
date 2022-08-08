@@ -4,11 +4,13 @@ from airview_api.services import AirViewNotFoundException, exclusion_service
 from airview_api.models import ExclusionState
 from airview_api.schemas import ExclusionResourceSchema
 from airview_api.blueprint import Blueprint, Roles
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "exclusion-resources",
     __name__,
-    url_prefix="/exclusion-resources",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/exclusion-resources"),
     description="Exclusion Resources related resources",
 )
 

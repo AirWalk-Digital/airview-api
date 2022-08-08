@@ -8,10 +8,18 @@ from airview_api import controllers
 DB_URI = os.environ.get("DATABASE_URI")
 
 
-def create_app():
-    app = Flask(__name__)
+def create_app(app=None, db_connection_string=None):
+    """
+    Create Airview API Flask App
+    :param app: Pre-existing "flask-like" app object
+    :param db_connection_string: Database connection string
+    :return: Flask App
+    """
+    if not app:
+        app = Flask(__name__)
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_connection_string if db_connection_string else DB_URI
 
     database.init_app(app)
 

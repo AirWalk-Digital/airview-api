@@ -18,12 +18,13 @@ from airview_api.schemas import (
     SystemSchema,
     TechnicalControlSchema,
 )
+from airview_api.helpers import AirviewApiHelpers
 
 
 blp = Blueprint(
     "systems",
     __name__,
-    url_prefix="/systems",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/systems"),
     description="systems related resources",
 )
 

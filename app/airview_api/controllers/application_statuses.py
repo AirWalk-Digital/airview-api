@@ -3,11 +3,13 @@ from airview_api.blueprint import Blueprint, Roles
 from marshmallow.utils import pprint
 from airview_api.services import AirViewValidationException, aggregation_service
 from airview_api.schemas import ApplicationStatusSchema
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "application-statuses",
     __name__,
-    url_prefix="/application-statuses",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/application-statuses"),
     description="Application Status related resources",
 )
 

@@ -3,11 +3,13 @@ from airview_api.schemas import ControlStatusDetailSchema
 from airview_api.blueprint import Blueprint, Roles
 from flask.views import MethodView
 from flask_smorest import abort
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "control-statuses",
     __name__,
-    url_prefix="/control-statuses",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/control-statuses"),
     description="Control Status related resources",
 )
 

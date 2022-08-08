@@ -10,12 +10,13 @@ from flask_smorest import abort
 from airview_api.blueprint import Blueprint, Roles
 from airview_api.models import ExclusionState
 from airview_api.schemas import ApplicationTechnicalControlSchema
+from airview_api.helpers import AirviewApiHelpers
 
 
 blp = Blueprint(
     "application-technical-controls",
     __name__,
-    url_prefix="/application-technical-controls",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/application-technical-controls"),
     description="application-technical-controls related resources",
 )
 

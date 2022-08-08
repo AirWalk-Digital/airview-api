@@ -187,7 +187,7 @@ Set the status of a exclusion resource
 
 * **Parameters**
 
-    
+
     * **id** (`int`) – The id of the exclusion resource to update
 
 
@@ -217,7 +217,7 @@ Get an instance of handler using the configuration provided
 
 * **Parameters**
 
-    
+
     * **base_url** (`str`) – The base url at which the AirView API is located
 
 
