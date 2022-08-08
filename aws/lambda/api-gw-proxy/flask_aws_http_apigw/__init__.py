@@ -20,7 +20,7 @@ except ImportError:
 try:  # werkzeug <= 2.0.3
     from werkzeug.wrappers import BaseRequest
 except:  # werkzeug > 2.1
-    from werkzeug.wrappers import Request as BaseRequest  # issue fixed by joranbeasley
+    from werkzeug.wrappers import Request as BaseRequest
 
 
 logger = logging.getLogger("airview.aws.wrapper")
