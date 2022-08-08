@@ -7,11 +7,13 @@ from airview_api.schemas import (
     ApplicationReferenceSchema,
     ApplicationSchema,
 )
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "referenced-applications",
     __name__,
-    url_prefix="/referenced-applications",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/referenced-applications"),
     description="Referenced App related resources",
 )
 

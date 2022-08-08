@@ -20,11 +20,13 @@ from airview_api.schemas import (
     ControlOverviewSchema,
     QualityModelSchema,
 )
+from airview_api.helpers import AirviewApiHelpers
+
 
 blp = Blueprint(
     "applications",
     __name__,
-    url_prefix="/applications",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/applications"),
     description="Application based resources",
 )
 

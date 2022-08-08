@@ -59,11 +59,17 @@ def get_db_conn_string() -> str:
         print("ERROR: 'DB_NAME' environment variable not set")
         raise
 
+    try:
+        rds_proxy_endpoint: str = os.environ["DB_PROXY_HOST"]
+    except KeyError:
+        print("ERROR: 'DB_PROXY_HOST' environment variable not set")
+        raise
+
     credentials: dict = fetch_aws_secrets_db_credentials(secret_arn=secret_arn)
     connection_string: str = "postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}".format(
         DB_USERNAME=credentials.get("username"),
         DB_PASSWORD=credentials.get("password"),
-        DB_HOST=credentials.get("host"),
+        DB_HOST=rds_proxy_endpoint,
         DB_PORT=credentials.get("port"),
         DB_NAME=database_name
     )
@@ -75,6 +81,7 @@ lambda_api_http: FlaskLambdaHttp = FlaskLambdaHttp(__name__)
 handler: FlaskLambdaHttp = create_app(
     app=lambda_api_http,
     db_connection_string=get_db_conn_string()
+    # url_prefix="/api/compliance"
 )
 
 

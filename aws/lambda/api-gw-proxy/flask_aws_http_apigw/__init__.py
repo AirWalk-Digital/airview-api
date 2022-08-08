@@ -1,11 +1,13 @@
 import sys
+import logging
+import json
+from flask import Flask
+import os
 
 try:
     from urllib import urlencode
 except ImportError:
     from urllib.parse import urlencode
-
-from flask import Flask
 
 try:
     from cStringIO import StringIO
@@ -21,10 +23,15 @@ except: # werkzeug > 2.1
     from werkzeug.wrappers import Request as BaseRequest  # issue fixed by joranbeasley
 
 
-__version__ = '0.0.4'
+logger = logging.getLogger('airview.aws.wrapper')
+logger.setLevel(logging.getLevelName(os.getenv('LOG_LEVEL', 'INFO')))
 
-
-def make_environ(event):
+def make_environ(event) -> dict:
+    """
+    Map Lambda Event to WSGI Request
+    :param event: Lambda Event
+    :return: Mapped Environment Dict
+    """
     environ = {}
 
     for hdr_name, hdr_value in event['headers'].items():
@@ -36,23 +43,20 @@ def make_environ(event):
         http_hdr_name = 'HTTP_%s' % hdr_name
         environ[http_hdr_name] = hdr_value
 
-    qs = event.get('queryStringParameters', "")
+    query_string = event.get('queryStringParameters', "")
 
-    environ['REQUEST_METHOD'] = event['requestContext']['http']['method']
-    environ['PATH_INFO'] = event['rawPath']
-    environ['QUERY_STRING'] = urlencode(qs) if qs else ''
-    environ['REMOTE_ADDR'] = event['requestContext']['http']['sourceIp']
+    environ['REQUEST_METHOD'] = event['requestContext']['httpMethod']
+    environ['PATH_INFO'] = event['path']
+    environ['QUERY_STRING'] = urlencode(query_string) if query_string else ''
+    environ['REMOTE_ADDR'] = event['requestContext']['identity']['sourceIp']
     environ['HOST'] = '%(HTTP_HOST)s:%(HTTP_X_FORWARDED_PORT)s' % environ
     environ['SCRIPT_NAME'] = ''
-    environ['SERVER_NAME'] = 'localhost:5000'
-
+    environ['SERVER_NAME'] = '%(HTTP_HOST)s:%(HTTP_X_FORWARDED_PORT)s' % environ
     environ['SERVER_PORT'] = environ['HTTP_X_FORWARDED_PORT']
-    environ['SERVER_PROTOCOL'] = 'HTTP/1.1'
-
+    environ['SERVER_PROTOCOL'] = event['requestContext']['protocol']
     environ['CONTENT_LENGTH'] = str(
         len(event['body']) if event['body'] else ''
     )
-
     environ['wsgi.url_scheme'] = environ['HTTP_X_FORWARDED_PROTO']
     environ['wsgi.input'] = StringIO(event['body'] or '')
     environ['wsgi.version'] = (1, 0)
@@ -62,6 +66,7 @@ def make_environ(event):
     environ['wsgi.multiprocess'] = False
 
     BaseRequest(environ)
+    logger.debug("WSGI Environment: %s", json.dumps(environ, default=str))
 
     return environ
 
@@ -72,13 +77,29 @@ class LambdaResponse(object):
         self.response_headers = None
 
     def start_response(self, status, response_headers, exc_info=None):
+        """
+        Handle WSGI Response
+        :param status: HTTP Status Code
+        :param response_headers: Response Headers
+        :param exc_info: Exception Info
+        """
+        logger.debug("Response Started: Status: '%s', Headers: '%s', Exception: '%s'", status, response_headers, exc_info)
         self.status = int(status[:3])
         self.response_headers = dict(response_headers)
 
 
 class FlaskLambdaHttp(Flask):
-    def __call__(self, event, context):
-        if not event.get('requestContext', {}).get('http', None):
+    def __call__(self, event: dict, context: dict) -> dict:
+        """
+        Handle Lambda Event
+        :param event: Lambda Event
+        :param context: Lambda Context
+        :return: Lambda Response JSON Blob
+        """
+        logger.debug("Lambda Event: %s", json.dumps(event))
+
+        if not event.get('requestContext', {}).get('apiId', None):
+            logger.info("Not an API request: Passing request to Flask Superclass")
             return super(FlaskLambdaHttp, self).__call__(event, context)
 
         response = LambdaResponse()

@@ -6,12 +6,13 @@ from airview_api.schemas import EnvironmentSchema
 from flask.views import MethodView
 from flask_smorest import abort
 from airview_api.blueprint import Blueprint, Roles
+from airview_api.helpers import AirviewApiHelpers
 
 
 blp = Blueprint(
     "environments",
     __name__,
-    url_prefix="/environments",
+    url_prefix=AirviewApiHelpers.get_api_url_prefix("/environments"),
     description="Environment related resources",
 )
 
