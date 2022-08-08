@@ -1,2 +1,2 @@
 ../../../app
-boto3
+# boto3  ## Don't really care about version, will just use what's in lambda env
