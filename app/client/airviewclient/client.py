@@ -412,10 +412,25 @@ class Handler:
         return items
 
 
-def get_azure_token(
-    client_id: str, client_secret: str, tenant_id: str, scope: str
+def get_oauth_token(
+        oauth_endpoint: str,
+        client_id: str,
+        client_secret: str,
+        scope: str,
+        additional_headers=None,
 ) -> str:
-    """Helper method to get an Azure AD token for use with the client"""
+    """
+    Helper method to get OAuth Token
+    :param oauth_endpoint: OAuth Token endpoint
+    :param client_id: Client ID
+    :param client_secret: Client Secret
+    :param scope: OAuth Scope(s)
+    :param additional_headers: Addtional HTTP Request Headers
+    :return: HTTP Authorization header value
+    """
+    if additional_headers is None:
+        additional_headers = dict()
+
     auth_data = {
         "client_id": client_id,
         "client_secret": client_secret,
@@ -424,11 +439,66 @@ def get_azure_token(
     }
 
     resp = requests.post(
-        url=f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token?grant_type=client_credential",
+        url=oauth_endpoint,
         data=auth_data,
+        headers=additional_headers
     )
+    try:
+        resp.raise_for_status()
+    except Exception as e:
+        raise BackendFailureException(f"Failed to get oauth token!  HTTP response: {resp.status_code}")
+
     d = resp.json()
     token = f"Bearer {d.get('access_token')}"
+    return token
+
+def get_azure_token(
+    client_id: str, client_secret: str, tenant_id: str, scope: str
+) -> str:
+    """
+    Helper method to get an Azure AD token for use with the client
+    :param client_id: Client ID
+    :param client_secret: Client Secret
+    :param tenant_id: Azure Tenant ID
+    :param scope: OAuth Scope
+    :return:
+    """
+    token = get_oauth_token(
+        f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token?grant_type=client_credential",
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scope
+    )
+
+    return token
+
+
+def get_aws_cognito_token(
+        client_id: str,
+        client_secret: str,
+        cognito_pool_domain_prefix: str,
+        aws_region: str,
+        scope: str = "airview/agent_push"
+) -> str:
+    """
+    Helper method to get an AWS Cognito token for use with the client
+    :param client_id: Cognito Client ID
+    :param client_secret: Cognito Client Secret
+    :param cognito_pool_domain_prefix: Cognito User Pool Domain Name Prefix
+    :param aws_region: AWS Region Name
+    :param scope: OAuth Scope
+    :return: HTTP Authorization header value
+    """
+    token = get_oauth_token(
+        f"https://{cognito_pool_domain_prefix}.auth.{aws_region}.amazoncognito.com/oauth2/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scope,
+        additional_headers={
+            "content-type": "application/x-www-form-urlencoded"
+        }
+    )
+
     return token
 
 
