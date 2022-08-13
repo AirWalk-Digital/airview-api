@@ -187,7 +187,7 @@ Set the status of a exclusion resource
 
 * **Parameters**
 
-
+    
     * **id** (`int`) – The id of the exclusion resource to update
 
 
@@ -201,14 +201,34 @@ Set the status of a exclusion resource
 
 
 
+### client.airviewclient.client.get_aws_cognito_token(client_id, client_secret, cognito_pool_domain_prefix, aws_region, scope='airview/agent_push')
+Helper method to get an AWS Cognito token for use with the client
+:type client_id: `str`
+:param client_id: Cognito Client ID
+:type client_secret: `str`
+:param client_secret: Cognito Client Secret
+:type cognito_pool_domain_prefix: `str`
+:param cognito_pool_domain_prefix: Cognito User Pool Domain Name Prefix
+:type aws_region: `str`
+:param aws_region: AWS Region Name
+:type scope: `str`
+:param scope: OAuth Scope
+:rtype: `str`
+:return: HTTP Authorization header value
+
+
 ### client.airviewclient.client.get_azure_token(client_id, client_secret, tenant_id, scope)
 Helper method to get an Azure AD token for use with the client
-
-
-* **Return type**
-
-    `str`
-
+:type client_id: `str`
+:param client_id: Client ID
+:type client_secret: `str`
+:param client_secret: Client Secret
+:type tenant_id: `str`
+:param tenant_id: Azure Tenant ID
+:type scope: `str`
+:param scope: OAuth Scope
+:rtype: `str`
+:return:
 
 
 ### client.airviewclient.client.get_handler(base_url, system_name, system_stage, referencing_type, token)
@@ -217,7 +237,7 @@ Get an instance of handler using the configuration provided
 
 * **Parameters**
 
-
+    
     * **base_url** (`str`) – The base url at which the AirView API is located
 
 
@@ -235,6 +255,21 @@ Get an instance of handler using the configuration provided
 
     `Handler`
 
+
+
+### client.airviewclient.client.get_oauth_token(oauth_endpoint, client_id, client_secret, scope, additional_headers=None)
+Helper method to get OAuth Token
+:type oauth_endpoint: `str`
+:param oauth_endpoint: OAuth Token endpoint
+:type client_id: `str`
+:param client_id: Client ID
+:type client_secret: `str`
+:param client_secret: Client Secret
+:type scope: `str`
+:param scope: OAuth Scope(s)
+:param additional_headers: Addtional HTTP Request Headers
+:rtype: `str`
+:return: HTTP Authorization header value
 
 ## client.airviewclient.models module
 
