@@ -108,7 +108,16 @@ class FlaskLambdaHttp(Flask):
 
         response = LambdaResponse()
 
-        body = next(self.wsgi_app(make_environ(event), response.start_response))
+        body = None
+        try:
+            body = next(self.wsgi_app(make_environ(event), response.start_response))
+        except StopIteration as e:
+            ## werkzeug throws a StopIteration error when the response body is empty, which is what we are doing in the
+            ## PUT methods on some api services! Need to catch and ignore it here...
+            if e.value is None and response.status == 204:
+                logger.warning("Request StopIteration Exception on empty response body")
+            else:
+                raise
 
         return {
             "statusCode": response.status,
