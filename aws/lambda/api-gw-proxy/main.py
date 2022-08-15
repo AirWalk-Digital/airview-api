@@ -6,6 +6,11 @@ from sqlite3 import Connection as SQLite3Connection
 import boto3
 import json
 import os
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.getLevelName(os.getenv("LOG_LEVEL", "INFO")))
 
 
 @event.listens_for(Engine, "connect")
@@ -34,13 +39,13 @@ def fetch_aws_secrets_db_credentials(secret_arn: str) -> dict:
     try:
         response = sm.get_secret_value(SecretId=secret_arn)
     except Exception as e:
-        print("ERROR: Failed to fetch secret {}: '{}'".format(secret_arn, e))
+        logger.error("Failed to fetch secret %s: '%s'", secret_arn, e)
         raise
 
     try:
         secret_blob = json.loads(response.get("SecretString"))
     except Exception as e:
-        print("ERROR: Failed to parse secret {}: '{}'".format(secret_arn, e))
+        logger.error("Failed to parse secret %s: '%s'", secret_arn, e)
         raise
 
     return secret_blob
@@ -54,19 +59,19 @@ def get_db_conn_string() -> str:
     try:
         secret_arn: str = os.environ["DB_CREDS_SECRET_NAME"]
     except KeyError:
-        print("ERROR: 'DB_CREDS_SECRET_NAME' environment variable not set")
+        logger.error("DB_CREDS_SECRET_NAME' environment variable not set")
         raise
 
     try:
         database_name: str = os.environ["DB_NAME"]
     except KeyError:
-        print("ERROR: 'DB_NAME' environment variable not set")
+        logger.error("'DB_NAME' environment variable not set")
         raise
 
     try:
         rds_proxy_endpoint: str = os.environ["DB_PROXY_HOST"]
     except KeyError:
-        print("ERROR: 'DB_PROXY_HOST' environment variable not set")
+        logger.error("'DB_PROXY_HOST' environment variable not set")
         raise
 
     credentials: dict = fetch_aws_secrets_db_credentials(secret_arn=secret_arn)
