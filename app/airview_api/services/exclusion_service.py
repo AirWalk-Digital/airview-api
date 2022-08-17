@@ -61,7 +61,7 @@ def create(data: dict):
         if app_tech_control is None:
             raise AirViewNotFoundException()
 
-        resources = MonitoredResource.query.filter(
+        resources = MonitoredResource.query.join(ApplicationTechnicalControl).filter(
             and_(
                 ApplicationTechnicalControl.id == app_tech_control.id,
                 MonitoredResource.reference.in_(data["resources"]),
