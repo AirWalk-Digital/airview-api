@@ -173,6 +173,7 @@ def test_exclusions_post_ok_for_new_resources(client):
     assert exclusion.resources[1].exclusion_id == exclusion.id
 
 
+
 def test_exclusions_post_ok_for_existing_resources(client):
     """
     Given: An empty exclusions colllection, linked app controls, existing resources
@@ -543,3 +544,72 @@ def test_exclusion_resources_put_updates_record_with_sparse_response(client):
 
     item = db.session.query(MonitoredResource).get(55)
     assert item.exclusion_state == ExclusionState.ACTIVE
+
+
+def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_controls(client):
+    """
+    Given: An empty exclusions colllection, linked app controls, existing resources with same names
+    When: When the api is called with an exclusion request
+    Then: The correct monitored_resource is linked to the exclusion
+    """
+    # Arrange
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-a",
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        reference="res-b",
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+
+    MonitoredResourceFactory(
+        application_technical_control_id=340,
+        reference="res-a",
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    db.session.query(MonitoredResource).all()
+
+
+    data = {
+        "applicationTechnicalControlId": 340,
+        "summary": "sum a",
+        "mitigation": "mit b",
+        "probability": 1,
+        "impact": 2,
+        "resources": ["res-a"],
+        "isLimitedExclusion": True,
+        "endDate": "2022-01-01T00:00:00.000000Z",
+        "notes": "notes c",
+    }
+
+    # Act
+    resp = client.post("/exclusions/", json=data)
+
+    print(resp.get_json())
+    # Assert
+    assert resp.status_code == 201
+
+
+    exclusion = db.session.query(Exclusion).first()
+    assert exclusion.application_technical_control_id == 340
+    assert exclusion.summary == data["summary"]
+    assert exclusion.mitigation == data["mitigation"]
+    assert exclusion.probability == data["probability"]
+    assert exclusion.impact == data["impact"]
+    assert exclusion.is_limited_exclusion == data["isLimitedExclusion"]
+    assert exclusion.end_date == datetime(2022, 1, 1, 0, 0)
+    assert exclusion.notes == data["notes"]
+
+    assert len(exclusion.resources) == 1
+    assert exclusion.resources[0].application_technical_control_id == 340
+    assert exclusion.resources[0].reference == "res-a"
+    assert exclusion.resources[0].exclusion_state == ExclusionState.PENDING
+    assert exclusion.resources[0].exclusion_id == exclusion.id
