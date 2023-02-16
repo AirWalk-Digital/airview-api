@@ -12,6 +12,6 @@ setup(
         "sqlalchemy<1.4",
         "flask-smorest==0.31.0",
         "elasticsearch==7.13.0",
-        "Werkzeug==2.0.2"
+        "Werkzeug==2.2.3"
     ],
 )
