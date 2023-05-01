@@ -6,7 +6,7 @@ setup(
     description="API for AirView Product",
     packages=find_packages(),
     install_requires=[
-        "Flask==2.0.0",
+        "Flask==2.3.2",
         "Flask-SQLAlchemy==2.4.4",
         "psycopg2-binary==2.8.6",
         "sqlalchemy<1.4",
