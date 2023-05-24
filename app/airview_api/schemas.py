@@ -36,12 +36,17 @@ class ApplicationSchema(CamelCaseSchema):
     )
 
 
+class ResourceSchema(CamelCaseSchema):
+    id = ma.fields.Integer(required=True)
+    reference = ma.fields.Str(required=False)
+    type = ma.fields.Str(required=False)
+
+
 class MonitoredResourceSchema(CamelCaseSchema):
     application_technical_control_id = ma.fields.Integer(required=True)
-    reference = ma.fields.Str(required=True, validate=is_allowed_reference)
+    resource_id = ma.fields.Integer(required=True)
     monitoring_state = ma.fields.Str(required=True)
     state = ma.fields.Str(required=False)
-    type = ma.fields.Str(required=False)
     additional_data = ma.fields.Str(required=False)
 
 
@@ -84,7 +89,7 @@ class ExclusionSchema(CamelCaseSchema):
     mitigation = ma.fields.Str()
     probability = ma.fields.Integer()
     impact = ma.fields.Integer()
-    resources = ma.fields.List(ma.fields.Str())
+    resource_ids = ma.fields.List(ma.fields.Integer())
     is_limited_exclusion = ma.fields.Boolean()
     end_date = ma.fields.DateTime()
     notes = ma.fields.Str()

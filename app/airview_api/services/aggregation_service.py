@@ -1,7 +1,7 @@
 from airview_api.models import (
     MonitoredResource,
     ExclusionState,
-    ApplicationTechnicalControl,
+    # ApplicationTechnicalControl,
     Application,
     Environment,
     QualityModel,
@@ -124,7 +124,7 @@ where
             MonitoredResource.monitoring_state,
             MonitoredResource.type,
         )
-        .join(ApplicationTechnicalControl)
+        # .join(ApplicationTechnicalControl)
         .join(Application)
         .join(Environment, isouter=True)
         .filter(MonitoredResource.id.in_(ids))
@@ -224,7 +224,6 @@ order by
 
 
 def get_control_statuses(application_id: str):
-
     sql = """
 with recursive apps as (
   select application.id from application where id=:application_id

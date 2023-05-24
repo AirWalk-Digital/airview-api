@@ -32,10 +32,17 @@ def test_control_status_detail_returns_correct_detail(client):
     ApplicationTechnicalControlFactory(
         id=33, application_id=12, technical_control_id=22
     )
+    ResourceFactory(
+        id=999,
+        reference="ref-1",
+        type=MonitoredResourceType.DATABASE,
+        last_seen=datetime.utcnow(),
+        last_modified=datetime.utcnow(),
+    )
     MonitoredResourceFactory(
         id=111,
+        resource_id=999,
         application_technical_control_id=33,
-        reference="ref-1",
         monitoring_state=MonitoredResourceState.SUPPRESSED,
         last_seen=datetime.utcnow(),
         last_modified=datetime.utcnow(),

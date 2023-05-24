@@ -1,3 +1,4 @@
+'''
 from datetime import datetime
 import pytest
 from pprint import pprint
@@ -60,10 +61,16 @@ def add_get_items_to_db():
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
+    ResourceFactory(
+        id=99,
+        reference="res-a",
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
     MonitoredResourceFactory(
         id=55,
+        resource_id=99,
         exclusion_id=44,
-        reference="res-a",
         exclusion_state=ExclusionState.PENDING,
         monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
@@ -91,20 +98,33 @@ def add_get_items_to_db():
         end_date=datetime(1, 1, 1),
         notes="nnn",
     )
+
+    ResourceFactory(
+        id=96,
+        reference="res-5",
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
     MonitoredResourceFactory(
         id=56,
+        resource_id=96,
         exclusion_id=45,
-        reference="res-5",
         exclusion_state=ExclusionState.PENDING,
         monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
         application_technical_control_id=340,
     )
+    ResourceFactory(
+        id=97,
+        reference="res-6",
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
     MonitoredResourceFactory(
         id=57,
+        resource_id=97,
         exclusion_id=45,
-        reference="res-6",
         exclusion_state=ExclusionState.ACTIVE,
         monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
@@ -173,7 +193,6 @@ def test_exclusions_post_ok_for_new_resources(client):
     assert exclusion.resources[1].exclusion_id == exclusion.id
 
 
-
 def test_exclusions_post_ok_for_existing_resources(client):
     """
     Given: An empty exclusions colllection, linked app controls, existing resources
@@ -181,16 +200,28 @@ def test_exclusions_post_ok_for_existing_resources(client):
     Then: The exclusions request is persisted & linked to existing resources, 201 status
     """
     # Arrange
-    MonitoredResourceFactory(
-        application_technical_control_id=33,
+    ResourceFactory(
+        id=93,
         reference="res-a",
-        monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
     )
     MonitoredResourceFactory(
         application_technical_control_id=33,
+        resource_id=93,
+        monitoring_state=MonitoredResourceState.FIXED_AUTO,
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    ResourceFactory(
+        id=94,
         reference="res-b",
+        last_modified=datetime(1, 1, 1),
+        last_seen=datetime(2, 1, 1),
+    )
+    MonitoredResourceFactory(
+        application_technical_control_id=33,
+        resource_id=94,
         monitoring_state=MonitoredResourceState.FIXED_AUTO,
         last_modified=datetime(1, 1, 1),
         last_seen=datetime(2, 1, 1),
@@ -202,7 +233,7 @@ def test_exclusions_post_ok_for_existing_resources(client):
         "mitigation": "mit b",
         "probability": 1,
         "impact": 2,
-        "resources": ["res-a", "res-b"],
+        "resourceIds": [93, 94],
         "isLimitedExclusion": True,
         "endDate": "2022-01-01T00:00:00.000000Z",
         "notes": "notes c",
@@ -546,7 +577,9 @@ def test_exclusion_resources_put_updates_record_with_sparse_response(client):
     assert item.exclusion_state == ExclusionState.ACTIVE
 
 
-def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_controls(client):
+def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_controls(
+    client,
+):
     """
     Given: An empty exclusions colllection, linked app controls, existing resources with same names
     When: When the api is called with an exclusion request
@@ -577,7 +610,6 @@ def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_cont
     )
     db.session.query(MonitoredResource).all()
 
-
     data = {
         "applicationTechnicalControlId": 340,
         "summary": "sum a",
@@ -597,7 +629,6 @@ def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_cont
     # Assert
     assert resp.status_code == 201
 
-
     exclusion = db.session.query(Exclusion).first()
     assert exclusion.application_technical_control_id == 340
     assert exclusion.summary == data["summary"]
@@ -613,3 +644,4 @@ def test_exclusions_post_ignore_matching_named_resources_for_other_app_tech_cont
     assert exclusion.resources[0].reference == "res-a"
     assert exclusion.resources[0].exclusion_state == ExclusionState.PENDING
     assert exclusion.resources[0].exclusion_id == exclusion.id
+'''

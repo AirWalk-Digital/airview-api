@@ -59,13 +59,12 @@ def test_create_adds_when_new(client):
     )
 
     input_data = {
-        "type": "VIRTUAL_MACHINE",
         "monitoringState": "FLAGGED",
     }
     # Act
 
     resp = client.put(
-        "/monitored-resources/?applicationTechnicalControlId=201&reference=ref-1",
+        "/monitored-resources/?applicationTechnicalControlId=201&resourceId=99",
         json=input_data,
     )
     assert resp.status_code == 204

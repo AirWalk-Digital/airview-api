@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from airview_api.services import AirViewValidationException
-from airview_api.models import ApplicationTechnicalControl
+
+# from airview_api.models import ApplicationTechnicalControl
 from airview_api.database import db
 
 

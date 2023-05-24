@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.models import (
     Exclusion,
-    ApplicationTechnicalControl,
+    # ApplicationTechnicalControl,
     MonitoredResource,
     ExclusionState,
     TechnicalControl,
@@ -61,19 +61,22 @@ def create(data: dict):
         if app_tech_control is None:
             raise AirViewNotFoundException()
 
-        resources = MonitoredResource.query.join(ApplicationTechnicalControl).filter(
-            and_(
-                ApplicationTechnicalControl.id == app_tech_control.id,
-                MonitoredResource.reference.in_(data["resources"]),
+        resources = (
+            MonitoredResource.query.join(ApplicationTechnicalControl)
+            .filter(
+                and_(
+                    ApplicationTechnicalControl.id == app_tech_control.id,
+                    MonitoredResource.resource_id.in_(data["resource_ids"]),
+                )
             )
-        ).all()
+            .all()
+        )
 
         data["application_technical_control_id"] = app_tech_control.id
-        payload_resources = data["resources"]
-        del data["resources"]
+        payload_resources = data["resource_ids"]
         exclusion = Exclusion(**data)
         for r in payload_resources:
-            existing = next((x for x in resources if x.reference == r), None)
+            existing = next((x for x in resources if x.resource_id == r), None)
             # Update existing resources
             if existing:
                 # It is not allowed to have a resource with multiple exclusions or to overwrite existing ones
@@ -85,12 +88,11 @@ def create(data: dict):
             else:
                 exclusion.resources.append(
                     MonitoredResource(
-                        reference=r,
+                        resource_id=r,
                         monitoring_state=MonitoredResourceState.FIXED_AUTO,
                         last_modified=datetime.now(timezone.utc),
                         application_technical_control_id=app_tech_control.id,
                         exclusion_state=ExclusionState.PENDING,
-                        type=MonitoredResourceType.UNKNOWN,
                     )
                 )
 

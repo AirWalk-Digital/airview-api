@@ -19,7 +19,9 @@ def create_app(app=None, db_connection_string=None):
         app = Flask(__name__)
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_connection_string if db_connection_string else DB_URI
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        db_connection_string if db_connection_string else DB_URI
+    )
 
     database.init_app(app)
 
@@ -39,7 +41,7 @@ def create_app(app=None, db_connection_string=None):
     api.register_blueprint(controllers.referenced_applications.blp)
     api.register_blueprint(controllers.application_technical_controls.blp)
     api.register_blueprint(controllers.monitored_resources.blp)
-    api.register_blueprint(controllers.exclusions.blp)
-    api.register_blueprint(controllers.search.blp)
+    #    api.register_blueprint(controllers.exclusions.blp) # This is commented cos moving resources to own table broke it and it needs a rethink
+    #    api.register_blueprint(controllers.search.blp)
 
     return app

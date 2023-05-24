@@ -10,24 +10,22 @@ from airview_api.database import db
 
 def persist(
     application_technical_control_id,
-    reference,
+    resource_id,
     monitoring_state,
-    type,
     additional_data="",
 ):
     try:
         item = MonitoredResource.query.filter_by(
             application_technical_control_id=application_technical_control_id,
-            reference=reference,
+            resource_id=resource_id,
         ).first()
         if item is None:
             item = MonitoredResource(
                 application_technical_control_id=application_technical_control_id,
-                reference=reference,
+                resource_id=resource_id,
                 monitoring_state=monitoring_state,
                 last_modified=datetime.now(timezone.utc),
                 last_seen=datetime.now(timezone.utc),
-                type=type,
                 additional_data=additional_data,
             )
             db.session.add(item)

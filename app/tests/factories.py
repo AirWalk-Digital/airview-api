@@ -12,6 +12,7 @@ from airview_api.models import (
     QualityModel,
     TechnicalControlAction,
     MonitoredResourceType,
+    Resource
 )
 from airview_api.database import db
 
@@ -70,12 +71,19 @@ class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory)
         sqlalchemy_session = db.session
 
 
+class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Resource
+        sqlalchemy_session = db.session
+
+    type = MonitoredResourceType.VIRTUAL_MACHINE
+
+
 class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MonitoredResource
         sqlalchemy_session = db.session
 
-    type = MonitoredResourceType.VIRTUAL_MACHINE
 
 
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):

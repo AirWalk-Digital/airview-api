@@ -30,11 +30,11 @@ blp = Blueprint(
 class MonitoredResource(MethodView):
     @blp.response(204)
     @blp.arguments(
-        MonitoredResourceSchema(only=("application_technical_control_id", "reference")),
+        MonitoredResourceSchema(only=("application_technical_control_id", "resource_id")),
         location="query",
     )
     @blp.arguments(
-        MonitoredResourceSchema(only=["monitoring_state", "type", "additional_data"])
+        MonitoredResourceSchema(only=["monitoring_state", "additional_data"])
     )
     @blp.role(Roles.COMPLIANCE_WRITER)
     def put(self, args, data):
