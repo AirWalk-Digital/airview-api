@@ -5,14 +5,13 @@ from airview_api.models import (
     Application,
     ApplicationType,
     Environment,
-    ApplicationTechnicalControl,
     MonitoredResource,
     Exclusion,
     ApplicationReference,
     QualityModel,
     TechnicalControlAction,
     MonitoredResourceType,
-    Resource
+    Resource,
 )
 from airview_api.database import db
 
@@ -65,10 +64,10 @@ class EnvironmentFactory(factory.alchemy.SQLAlchemyModelFactory):
     abbreviation = factory.Sequence(lambda n: f"E{n}")
 
 
-class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
-    class Meta:
-        model = ApplicationTechnicalControl
-        sqlalchemy_session = db.session
+# class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+# class Meta:
+# model = ApplicationTechnicalControl
+# sqlalchemy_session = db.session
 
 
 class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -83,7 +82,6 @@ class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MonitoredResource
         sqlalchemy_session = db.session
-
 
 
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):

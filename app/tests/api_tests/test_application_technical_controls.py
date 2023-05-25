@@ -5,7 +5,7 @@ from tests.common import client
 import tests.common
 from airview_api.models import (
     Application,
-    ApplicationTechnicalControl,
+    # ApplicationTechnicalControl,
     MonitoredResource,
     TechnicalControlSeverity,
     TechnicalControlAction,

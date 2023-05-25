@@ -3,7 +3,6 @@ from tests.common import client
 from tests.factories import *
 from airview_api.models import (
     Application,
-    ApplicationTechnicalControl,
     MonitoredResource,
     MonitoredResourceState,
     TechnicalControlSeverity,
