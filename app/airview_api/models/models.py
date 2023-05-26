@@ -75,7 +75,7 @@ class ApplicationType(Enum):
         return self.name
 
 
-class MonitoredResourceType(Enum):
+class ServiceType(Enum):
     UNKNOWN = 1
     VIRTUAL_MACHINE = 2
     CONTAINER = 3
@@ -163,6 +163,16 @@ class Environment(db.Model):
         return f"{self.name}"
 
 
+class Service(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    reference = db.Column(db.String(500), nullable=False)
+    type = db.Column(db.Enum(ServiceType), nullable=False)
+
+    controls = db.relationship("Control", back_populates="service")
+    resources = db.relationship("Resource", back_populates="service")
+
+
 class FrameworkControl(db.Model):
     framework_id = db.Column(
         db.Integer,
@@ -176,26 +186,7 @@ class FrameworkControl(db.Model):
     )
 
 
-# FrameworkControl = db.Table(
-#     "framework_control",
-#     metadata,
-#     db.Column(
-#         "framework_id", db.Integer, db.ForeignKey("framework.id"), primary_key=True
-#     ),
-#     db.Column("control_id", db.Integer, db.ForeignKey("control.id"), primary_key=True),
-# )
-# FrameworkControl = db.Table(
-#     "frameworkcontrol",
-#     db.Column(
-#         "framework_id", db.Integer, db.ForeignKey("framework.id"), primary_key=True
-#     ),
-#     db.Column("control_id", db.Integer, db.ForeignKey("control.id"), primary_key=True),
-# )
-
-
 class Framework(db.Model):
-    # ...
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
 
@@ -209,11 +200,15 @@ class Framework(db.Model):
 
 
 class Control(db.Model):
-    # ...
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)
+    service_id = db.Column(
+        db.Integer,
+        db.ForeignKey("service.id"),
+    )
+
+    service = db.relationship("Service", back_populates="controls")
 
     exclusions = db.relationship("Exclusion", back_populates="control", lazy="dynamic")
 
@@ -221,45 +216,11 @@ class Control(db.Model):
 
     frameworks = db.relationship(
         "Framework",
-        # secondary="frameworkcontrol",  # Update this line
         secondary=FrameworkControl.__table__,
         back_populates="controls",
         primaryjoin=id == FrameworkControl.control_id,  # Update this line
         secondaryjoin=id == FrameworkControl.framework_id,
     )
-
-
-"""
-class Framework(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
-
-    controls = db.relationship(
-        "FrameworkControl",
-        secondary="Control",
-        back_populates="frameworks",
-        primaryjoin=id == FrameworkControl.control_id,
-        secondaryjoin=id == FrameworkControl.framework_id,
-    )
-
-
-class Control(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
-    quality_model = db.Column(db.Enum(QualityModel), nullable=False)
-
-    exclusions = db.relationship("Exclusion", back_populates="control", lazy="dynamic")
-
-    technical_controls = db.relationship("TechnicalControl", back_populates="control")
-
-    frameworks = db.relationship(
-        "FrameworkControl",
-        secondary="Framework",
-        back_populates="controls",
-        primaryjoin=id == FrameworkControl.framework_id,
-        secondaryjoin=id == FrameworkControl.control_id,
-    )
-"""
 
 
 class TechnicalControl(db.Model):
@@ -276,13 +237,6 @@ class TechnicalControl(db.Model):
     control_id = db.Column(db.Integer, db.ForeignKey("control.id"), nullable=True)
 
     control = db.relationship("Control", back_populates="technical_controls")
-
-    # parent_id = db.Column(
-    # db.Integer, db.ForeignKey("technical_control.id"), nullable=True
-    # )
-    # children = db.relationship(
-    # "TechnicalControl", backref=db.backref("parent", remote_side=[id])
-    # )
 
     monitored_resources = db.relationship(
         "MonitoredResource", back_populates="technical_control"
@@ -330,9 +284,15 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    type = db.Column(db.Enum(MonitoredResourceType), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
     last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+    service_id = db.Column(
+        db.Integer,
+        db.ForeignKey("service.id"),
+        nullable=True,
+    )
+    service = db.relationship("Service", back_populates="resources")
+
     application_id = db.Column(
         db.Integer,
         db.ForeignKey("application.id"),
