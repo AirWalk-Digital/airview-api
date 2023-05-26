@@ -232,7 +232,6 @@ class TechnicalControl(db.Model):
     severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     ttl = db.Column(db.Integer, nullable=True)
     is_blocking = db.Column(db.Boolean, nullable=False)
-    can_delete_resources = db.Column(db.Boolean, nullable=False)
 
     control_id = db.Column(db.Integer, db.ForeignKey("control.id"), nullable=True)
 
@@ -371,9 +370,6 @@ class MonitoredResource(db.Model):
 class Exclusion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     summary = db.Column(db.String, nullable=False)
-    mitigation = db.Column(db.String, nullable=False)
-    impact = db.Column(db.Integer, nullable=False)
-    probability = db.Column(db.Integer, nullable=False)
     is_limited_exclusion = db.Column(db.Boolean, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     notes = db.Column(db.String, nullable=True)
