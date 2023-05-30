@@ -172,6 +172,13 @@ class Service(db.Model):
     controls = db.relationship("Control", back_populates="service")
     resources = db.relationship("Resource", back_populates="service")
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            name="uq_service",
+        ),
+    )
+
 
 class FrameworkControlObjectiveLink(db.Model):
     framework_control_objective_id = db.Column(

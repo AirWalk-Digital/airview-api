@@ -10,6 +10,7 @@ from airview_api.models import (
     ApplicationReference,
     QualityModel,
     TechnicalControlAction,
+    Service,
     Resource,
 )
 from airview_api.database import db
@@ -28,6 +29,15 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     is_blocking = False
     can_delete_resources = True
 """
+
+
+class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Service
+        sqlalchemy_session = db.session
+
+    id = factory.Sequence(lambda n: n)
+    name = factory.Sequence(lambda n: f"Service {n}")
 
 
 class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):

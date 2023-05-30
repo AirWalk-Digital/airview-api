@@ -1,6 +1,7 @@
 from airview_api.controllers import (
     applications,
     # technical_controls,
+    services,
     systems,
     # control_statuses,
     environments,

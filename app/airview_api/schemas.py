@@ -192,6 +192,13 @@ class SearchQueryArgsSchema(CamelCaseSchema):
     q = ma.fields.Str(required=True)
 
 
+class ServiceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str()
+    reference = ma.fields.Str()
+    type = ma.fields.Str()
+
+
 class SystemSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
