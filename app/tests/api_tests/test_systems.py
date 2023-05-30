@@ -3,6 +3,10 @@ from tests.common import client
 from tests.factories import *
 
 
+def setup():
+    reset_factories()
+
+
 def test_systems_post_ok(client):
     """
     Given: No systems in the db

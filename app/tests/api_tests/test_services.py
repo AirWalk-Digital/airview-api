@@ -3,6 +3,10 @@ from tests.common import client
 from tests.factories import *
 
 
+def setup():
+    reset_factories()
+
+
 def test_services_post_ok(client):
     """
     Given: No services in the db
@@ -41,7 +45,7 @@ def test_services_post_handle_duplicate_error(client):
     Then: The item is rejected with 409
     """
     # Arrange
-    ServiceFactory(name="Service One", reference="ref_1", type="NETWORK")
+    ServiceFactory(id=1, name="Service One", reference="ref_1", type="NETWORK")
     db.session.commit()
 
     # Act
@@ -64,7 +68,7 @@ def test_services_get_all(client):
     Then: The item is returned with 200 status
     """
     # Arrange
-    ServiceFactory(name="Service One", reference="ref_1", type="NETWORK")
+    ServiceFactory(id=1, name="Service One", reference="ref_1", type="NETWORK")
     db.session.commit()
 
     # Act

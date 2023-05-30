@@ -32,6 +32,7 @@ def create_app(app=None, db_connection_string=None):
 
     api = Api(app)
     api.register_blueprint(controllers.applications.blp)
+    api.register_blueprint(controllers.resources.blp)
     # api.register_blueprint(controllers.technical_controls.blp)
     api.register_blueprint(controllers.systems.blp)
     api.register_blueprint(controllers.services.blp)

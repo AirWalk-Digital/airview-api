@@ -101,6 +101,7 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 def reset_factories():
     # TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
+    ServiceFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     # ApplicationTechnicalControlFactory.reset_sequence()
