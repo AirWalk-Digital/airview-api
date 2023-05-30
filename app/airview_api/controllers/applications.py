@@ -3,7 +3,6 @@ from pprint import pprint
 from airview_api.blueprint import Blueprint, Roles
 from airview_api.services import (
     application_service,
-    aggregation_service,
     AirViewValidationException,
     AirViewNotFoundException,
 )

@@ -197,7 +197,7 @@ class FrameworkControlObjective(db.Model):
     controls = db.relationship(
         "Control",
         secondary=FrameworkControlObjectiveLink.__table__,
-        back_populates="frameworks",
+        back_populates="framework_control_objectives",
         primaryjoin=id
         == FrameworkControlObjectiveLink.framework_control_objective_id,  # Update this line
         secondaryjoin=id == FrameworkControlObjectiveLink.control_id,
@@ -217,7 +217,7 @@ class FrameworkSection(db.Model):
     )
     framework = db.relationship("Framework", back_populates="framework_sections")
     framework_control_objectives = db.relationship(
-        "FrameworkControlObjectives", back_populates="framework_section"
+        "FrameworkControlObjective", back_populates="framework_section"
     )
 
 
@@ -245,9 +245,9 @@ class Control(db.Model):
     technical_controls = db.relationship("TechnicalControl", back_populates="control")
 
     framework_control_objectives = db.relationship(
-        "Framework",
+        "FrameworkControlObjective",
         secondary=FrameworkControlObjectiveLink.__table__,
-        back_populates="fcontrols",
+        back_populates="controls",
         primaryjoin=id == FrameworkControlObjectiveLink.control_id,  # Update this line
         secondaryjoin=id
         == FrameworkControlObjectiveLink.framework_control_objective_id,

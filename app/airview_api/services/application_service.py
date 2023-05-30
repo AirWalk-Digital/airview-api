@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError, DataError
 from sqlalchemy.log import Identified
 from airview_api.services import AirViewValidationException, AirViewNotFoundException
@@ -15,7 +14,6 @@ import re
 
 
 def get_all(application_type: str = None):
-
     if application_type is not None:
         return Application.query.filter_by(application_type=application_type)
 

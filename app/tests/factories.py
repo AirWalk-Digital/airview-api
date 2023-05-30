@@ -10,12 +10,11 @@ from airview_api.models import (
     ApplicationReference,
     QualityModel,
     TechnicalControlAction,
-    MonitoredResourceType,
     Resource,
 )
 from airview_api.database import db
 
-
+"""
 class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = TechnicalControl
@@ -28,6 +27,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
     can_delete_resources = True
+"""
 
 
 class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -75,8 +75,6 @@ class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = Resource
         sqlalchemy_session = db.session
 
-    type = MonitoredResourceType.VIRTUAL_MACHINE
-
 
 class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
@@ -91,11 +89,11 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 
 
 def reset_factories():
-    TechnicalControlFactory.reset_sequence()
+    # TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
-    ApplicationTechnicalControlFactory.reset_sequence()
+    # ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
