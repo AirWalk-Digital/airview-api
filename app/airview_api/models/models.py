@@ -173,10 +173,10 @@ class Service(db.Model):
     resources = db.relationship("Resource", back_populates="service")
 
 
-class FrameworkControl(db.Model):
-    framework_id = db.Column(
+class FrameworkControlObjectiveLink(db.Model):
+    framework_control_objective_id = db.Column(
         db.Integer,
-        db.ForeignKey("framework.id"),
+        db.ForeignKey("framework_control_objective.id"),
         primary_key=True,
     )
     control_id = db.Column(
@@ -186,17 +186,47 @@ class FrameworkControl(db.Model):
     )
 
 
-class Framework(db.Model):
+class FrameworkControlObjective(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
+    framework_section_id = db.Column(
+        db.Integer,
+        db.ForeignKey("framework_section.id"),
+    )
 
     controls = db.relationship(
         "Control",
-        secondary=FrameworkControl.__table__,
+        secondary=FrameworkControlObjectiveLink.__table__,
         back_populates="frameworks",
-        primaryjoin=id == FrameworkControl.framework_id,  # Update this line
-        secondaryjoin=id == FrameworkControl.control_id,
+        primaryjoin=id
+        == FrameworkControlObjectiveLink.framework_control_objective_id,  # Update this line
+        secondaryjoin=id == FrameworkControlObjectiveLink.control_id,
     )
+    framework_section = db.relationship(
+        "FrameworkSection", back_populates="framework_control_objectives"
+    )
+
+
+class FrameworkSection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
+    framework_id = db.Column(
+        db.Integer,
+        db.ForeignKey("framework.id"),
+    )
+    framework = db.relationship("Framework", back_populates="framework_sections")
+    framework_control_objectives = db.relationship(
+        "FrameworkControlObjectives", back_populates="framework_section"
+    )
+
+
+class Framework(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
+
+    framework_sections = db.relationship("FrameworkSection", back_populates="framework")
 
 
 class Control(db.Model):
@@ -214,12 +244,13 @@ class Control(db.Model):
 
     technical_controls = db.relationship("TechnicalControl", back_populates="control")
 
-    frameworks = db.relationship(
+    framework_control_objectives = db.relationship(
         "Framework",
-        secondary=FrameworkControl.__table__,
-        back_populates="controls",
-        primaryjoin=id == FrameworkControl.control_id,  # Update this line
-        secondaryjoin=id == FrameworkControl.framework_id,
+        secondary=FrameworkControlObjectiveLink.__table__,
+        back_populates="fcontrols",
+        primaryjoin=id == FrameworkControlObjectiveLink.control_id,  # Update this line
+        secondaryjoin=id
+        == FrameworkControlObjectiveLink.framework_control_objective_id,
     )
 
 

@@ -11,7 +11,7 @@ from airview_api.models import (
     ApplicationReference,
     Application,
     MonitoredResourceState,
-    MonitoredResourceType,
+    ServiceType,
 )
 from airview_api.database import db
 from sqlalchemy import and_
