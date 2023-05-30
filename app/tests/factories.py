@@ -5,17 +5,16 @@ from airview_api.models import (
     Application,
     ApplicationType,
     Environment,
-    ApplicationTechnicalControl,
     MonitoredResource,
     Exclusion,
     ApplicationReference,
     QualityModel,
     TechnicalControlAction,
-    MonitoredResourceType,
+    Resource,
 )
 from airview_api.database import db
 
-
+"""
 class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = TechnicalControl
@@ -28,6 +27,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
     can_delete_resources = True
+"""
 
 
 class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -64,9 +64,15 @@ class EnvironmentFactory(factory.alchemy.SQLAlchemyModelFactory):
     abbreviation = factory.Sequence(lambda n: f"E{n}")
 
 
-class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+# class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+# class Meta:
+# model = ApplicationTechnicalControl
+# sqlalchemy_session = db.session
+
+
+class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
-        model = ApplicationTechnicalControl
+        model = Resource
         sqlalchemy_session = db.session
 
 
@@ -74,8 +80,6 @@ class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MonitoredResource
         sqlalchemy_session = db.session
-
-    type = MonitoredResourceType.VIRTUAL_MACHINE
 
 
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -85,11 +89,11 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 
 
 def reset_factories():
-    TechnicalControlFactory.reset_sequence()
+    # TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
-    ApplicationTechnicalControlFactory.reset_sequence()
+    # ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
