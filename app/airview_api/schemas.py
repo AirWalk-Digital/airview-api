@@ -101,15 +101,9 @@ class TechnicalControlSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
-    control_action = ma.fields.Str(required=True)
     system_id = ma.fields.Integer(required=True)
-    severity = ma.fields.Str(required=False)
     ttl = ma.fields.Integer(required=False)
     is_blocking = ma.fields.Boolean(required=False, missing=False)
-    can_delete_resources = ma.fields.Boolean(required=False, missing=True)
-    parent_id = ma.fields.Integer(required=False)
-
-    quality_model = ma.fields.Str(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):
