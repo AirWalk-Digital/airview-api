@@ -37,9 +37,11 @@ class ApplicationSchema(CamelCaseSchema):
 
 
 class ResourceSchema(CamelCaseSchema):
-    id = ma.fields.Integer(required=True)
-    reference = ma.fields.Str(required=False)
-    type = ma.fields.Str(required=False)
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    reference = ma.fields.Str(required=True)
+    service_id = ma.fields.Integer(required=True)
+    application_id = ma.fields.Integer(required=True)
 
 
 class MonitoredResourceSchema(CamelCaseSchema):
@@ -190,6 +192,13 @@ class SearchQueryArgsSchema(CamelCaseSchema):
     limit = ma.fields.Integer(required=False)
     context_size = ma.fields.Integer(required=False)
     q = ma.fields.Str(required=True)
+
+
+class ServiceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str()
+    reference = ma.fields.Str()
+    type = ma.fields.Str()
 
 
 class SystemSchema(CamelCaseSchema):

@@ -172,6 +172,13 @@ class Service(db.Model):
     controls = db.relationship("Control", back_populates="service")
     resources = db.relationship("Resource", back_populates="service")
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            name="uq_service",
+        ),
+    )
+
 
 class FrameworkControlObjectiveLink(db.Model):
     framework_control_objective_id = db.Column(
@@ -315,7 +322,7 @@ class Resource(db.Model):
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
     last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+    last_seen = db.Column(db.DateTime(timezone=True), nullable=False)
     service_id = db.Column(
         db.Integer,
         db.ForeignKey("service.id"),
@@ -335,6 +342,14 @@ class Resource(db.Model):
     )
     exclusions = db.relationship(
         "Exclusion", secondary=ExclusionResource.__table__, back_populates="resources"
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            "application_id",
+            name="uq_resource",
+        ),
     )
 
 
