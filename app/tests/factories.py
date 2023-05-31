@@ -9,13 +9,12 @@ from airview_api.models import (
     Exclusion,
     ApplicationReference,
     QualityModel,
-    TechnicalControlAction,
     Service,
     Resource,
 )
 from airview_api.database import db
 
-"""
+
 class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = TechnicalControl
@@ -24,11 +23,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"TC {n}")
 
-    control_action = TechnicalControlAction.LOG
-    quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
-    can_delete_resources = True
-"""
 
 
 class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):
