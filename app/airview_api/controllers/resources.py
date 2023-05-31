@@ -36,3 +36,14 @@ class Resources(MethodView):
             return app
         except AirViewValidationException as e:
             abort(400, message=str(e))
+
+    @blp.response(204, ResourceSchema)
+    @blp.arguments(ResourceSchema)
+    @blp.role(Roles.COMPLIANCE_READER)
+    def put(self, data):
+        """update the resource by its reference and applicationId"""
+        application_id: str = flask.request.args.get("applicationId")
+        resource_reference: str = flask.request.args.get("reference")
+        data = resource_service.upsert(application_id, resource_reference, data)
+
+        return data

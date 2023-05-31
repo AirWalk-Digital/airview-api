@@ -19,3 +19,35 @@ def create(data: dict):
         raise AirViewValidationException("Integrity Error, check reference fields")
 
     return resource
+
+
+def upsert(application_id: str, reference: str, data: dict):
+    if "id" in data:
+        raise AirViewValidationException("Id is not expected when upserting a record")
+    resource = Resource.query.filter_by(
+        application_id=application_id, reference=reference
+    ).first()
+    if resource is None:
+        resource = Resource(**data)
+        resource.last_modified = datetime.utcnow()
+
+    elif (
+        resource.application_id != data["application_id"]
+        or resource.service_id != data["service_id"]
+        or resource.name != data["name"]
+    ):
+        resource.last_modified = datetime.utcnow()
+
+    resource.last_seen = datetime.utcnow()
+    resource.application_id = data["application_id"]
+    resource.service_id = data["service_id"]
+    resource.name = data["name"]
+
+    try:
+        db.session.add(resource)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise AirViewValidationException("Integrity Error, check reference fields")
+
+    return resource
