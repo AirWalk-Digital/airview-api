@@ -177,19 +177,16 @@ class Backend:
             )
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
-    def save_monitored_resource(
-        self, app_tech_control_id, reference, state, type
-    ) -> None:
+    def save_monitored_resource(self, technical_control_id, resource_id, state) -> None:
         """Persist the current status of a montiored resource"""
 
         url = self.get_url(
-            f"/monitored-resources/?applicationTechnicalControlId={app_tech_control_id}&reference={reference}"
+            f"/monitored-resources/?technicalControlId={technical_control_id}&resourceId={resource_id}"
         )
         resp = self._session.put(
             url=url,
             json={
                 "monitoringState": state,
-                "type": type,
             },
             headers=self._headers,
         )
@@ -273,10 +270,15 @@ class Backend:
         """Get the id of a resource by its application id and reference"""
         resp = self._session.get(
             url=self.get_url(
-                f"/resources/?applicationId{application_id}&reference={reference}/"
+                f"/resources/?applicationId={application_id}&reference={reference}",
             ),
             headers=self._headers,
         )
+        print("GET RES")
+        print(application_id)
+        print(reference)
+        print(resp.status_code)
+        print(resp.json())
         if resp.status_code == 200:
             return resp.json()["id"]
         if resp.status_code == 404:
@@ -380,10 +382,9 @@ class Handler:
 
         # save triggered
         self._backend.save_monitored_resource(
-            app_tech_control_id=link_id,
-            reference=compliance_event.resource_reference,
+            technical_control_id=control.id,
+            resource_id=resource_id,
             state=compliance_event.status.name,
-            type=compliance_event.type.name,
         )
 
     def set_exclusion_resource_state(

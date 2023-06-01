@@ -50,24 +50,32 @@ def test_monitored_resource_creates_missing_system(handler, compliance_event):
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
+    SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
+    TechnicalControlFactory(
+        id=999,
+        reference="tc-ref-1",
+        name="one",
+        system_id=111,
+        control_action=TechnicalControlAction.LOG,
+    )
+    ResourceFactory(
+        id=11,
+        name="Res One",
+        reference="res-ref-1",
+        service_id=10,
+        application_id=2,
+    )
     # Act
     handler.handle_compliance_event(compliance_event)
 
     # Assert
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert (
-        monitored[0].application_technical_control.technical_control.system.name
-        == "one"
-    )
-    assert (
-        monitored[0].application_technical_control.technical_control.system.stage.name
-        == "BUILD"
-    )
+    assert monitored[0].monitoring_state.name == "FLAGGED"
+    assert monitored[0].resource_id == 11
+    assert monitored[0].technical_control_id == 999
 
 
 def test_monitored_resource_persisted_for_linked(handler, compliance_event):
