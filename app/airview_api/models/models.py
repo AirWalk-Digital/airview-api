@@ -365,6 +365,8 @@ class MonitoredResource(db.Model):
         "TechnicalControl", back_populates="monitored_resources"
     )
 
+
+""" This needs looking at again post 'hackathon'
     @hybrid_property
     def state(self):
         return (
@@ -380,14 +382,15 @@ class MonitoredResource(db.Model):
             cls.exclusion_state,
             cls.monitoring_state,
         )
+"""
 
-    # __table_args__ = (
-    # db.UniqueConstraint(
-    # "application_technical_control_id",
-    # "resource_id",
-    # name="uq_monitored_resource",
-    # ),
-    # )
+# __table_args__ = (
+# db.UniqueConstraint(
+# "application_technical_control_id",
+# "resource_id",
+# name="uq_monitored_resource",
+# ),
+# )
 
 
 # class MonitoredResourceTicket(db.Model):

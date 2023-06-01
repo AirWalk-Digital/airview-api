@@ -11,5 +11,5 @@ from airview_api.controllers import (
     # exclusions,
     referenced_applications,
     # application_technical_controls,
-    # monitored_resources,
+    monitored_resources,
 )

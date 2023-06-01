@@ -45,10 +45,9 @@ class ResourceSchema(CamelCaseSchema):
 
 
 class MonitoredResourceSchema(CamelCaseSchema):
-    application_technical_control_id = ma.fields.Integer(required=True)
+    technical_control_id = ma.fields.Integer(required=True)
     resource_id = ma.fields.Integer(required=True)
     monitoring_state = ma.fields.Str(required=True)
-    state = ma.fields.Str(required=False)
     additional_data = ma.fields.Str(required=False)
 
 

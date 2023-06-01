@@ -13,6 +13,7 @@ from airview_api.models import (
     Resource,
 )
 from airview_api.database import db
+from datetime import datetime
 
 
 class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -80,6 +81,9 @@ class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = Resource
         sqlalchemy_session = db.session
 
+    last_seen = datetime.utcnow()
+    last_modified = datetime.utcnow()
+
 
 class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
@@ -94,7 +98,7 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 
 
 def reset_factories():
-    # TechnicalControlFactory.reset_sequence()
+    TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
     ServiceFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
@@ -103,3 +107,4 @@ def reset_factories():
     MonitoredResourceFactory.reset_sequence()
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
+    ResourceFactory.reset_sequence()
