@@ -274,3 +274,98 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
     assert items[0].service_id == 10
     assert items[0].last_seen > time_now
     assert items[0].last_modified == time_now
+
+
+def test_resources_get_single(client):
+    """
+    Given: An existing resource in the collection
+    When: When a call is made to get it by its unique keys
+    Then: The resource is mapped correctly, 200 status
+    """
+    # Arrange
+    ApplicationFactory(
+        id=1,
+        name="App One",
+        application_type=ApplicationType.APPLICATION_SERVICE,
+    )
+
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+
+    time_now = datetime.utcnow()
+    ResourceFactory(
+        name="Res One",
+        reference="res_1",
+        service_id=10,
+        application_id=1,
+        last_modified=time_now,
+        last_seen=time_now,
+    )
+    ResourceFactory(
+        name="Res Two",
+        reference="res_2",
+        service_id=10,
+        application_id=1,
+        last_modified=time_now,
+        last_seen=time_now,
+    )
+
+    db.session.commit()
+
+    # Act
+    resp = client.get(
+        "/resources/?applicationId=1&reference=res_2",
+    )
+    # Assert
+    assert resp.status_code == 200
+
+    # Assert Response
+    data = resp.get_json()
+
+    assert data["id"] == 2
+    assert data["name"] == "Res Two"
+    assert data["reference"] == "res_2"
+    assert data["applicationId"] == 1
+    assert data["serviceId"] == 10
+
+
+def test_resources_get_single_not_found(client):
+    """
+    Given: An existing resource in the collection
+    When: When a call is made to get a resource which is not present by its unique keys
+    Then: 404 status
+    """
+    # Arrange
+    ApplicationFactory(
+        id=1,
+        name="App One",
+        application_type=ApplicationType.APPLICATION_SERVICE,
+    )
+
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+
+    time_now = datetime.utcnow()
+    ResourceFactory(
+        name="Res One",
+        reference="res_1",
+        service_id=10,
+        application_id=1,
+        last_modified=time_now,
+        last_seen=time_now,
+    )
+    ResourceFactory(
+        name="Res Two",
+        reference="res_2",
+        service_id=10,
+        application_id=1,
+        last_modified=time_now,
+        last_seen=time_now,
+    )
+
+    db.session.commit()
+
+    # Act
+    resp = client.get(
+        "/resources/?applicationId=1&reference=res_99999",
+    )
+    # Assert
+    assert resp.status_code == 404

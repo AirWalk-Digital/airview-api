@@ -6,6 +6,7 @@ from airview_api.models import (
     MonitoredResource,
     MonitoredResourceState,
     SystemStage,
+    TechnicalControlAction,
 )
 
 
@@ -32,6 +33,7 @@ def test_create_adds_when_new(client):
         reference="1",
         name="one",
         system_id=2,
+        control_action=TechnicalControlAction.LOG,
     )
     ResourceFactory(
         id=11,
