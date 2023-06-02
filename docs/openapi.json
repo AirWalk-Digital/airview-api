@@ -67,223 +67,6 @@
         },
         "type": "object"
       },
-      "ApplicationStatus": {
-        "properties": {
-          "applicationName": {
-            "type": "string"
-          },
-          "environments": {
-            "items": {
-              "$ref": "#/components/schemas/EnvirionmentStatus"
-            },
-            "type": "array"
-          },
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ApplicationTechnicalControl": {
-        "properties": {
-          "applicationId": {
-            "type": "integer"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "technicalControlId": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "applicationId",
-          "technicalControlId"
-        ],
-        "type": "object"
-      },
-      "ControlOverview": {
-        "properties": {
-          "applied": {
-            "type": "integer"
-          },
-          "controlAction": {
-            "type": "string"
-          },
-          "exempt": {
-            "type": "integer"
-          },
-          "frameworks": {
-            "items": {
-              "$ref": "#/components/schemas/NamedUrl"
-            },
-            "type": "array"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "severity": {
-            "type": "string"
-          },
-          "systemName": {
-            "type": "string"
-          },
-          "systemStage": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ControlOverviewResource": {
-        "properties": {
-          "controlAction": {
-            "type": "string"
-          },
-          "environment": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "lastSeen": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "pending": {
-            "type": "boolean"
-          },
-          "reference": {
-            "type": "string"
-          },
-          "state": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ControlStatus": {
-        "properties": {
-          "application": {
-            "type": "string"
-          },
-          "applicationId": {
-            "type": "integer"
-          },
-          "applicationTechnicalControlId": {
-            "type": "integer"
-          },
-          "environment": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "qualityModel": {
-            "type": "string"
-          },
-          "raisedDateTime": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "resources": {
-            "items": {
-              "$ref": "#/components/schemas/ControlStatusResource"
-            },
-            "type": "array"
-          },
-          "severity": {
-            "type": "string"
-          },
-          "systemName": {
-            "type": "string"
-          },
-          "systemStage": {
-            "type": "string"
-          },
-          "tickets": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "ControlStatusDetail": {
-        "properties": {
-          "applicationName": {
-            "type": "string"
-          },
-          "assignee": {
-            "type": "string"
-          },
-          "assignmentGroup": {
-            "type": "string"
-          },
-          "control": {
-            "$ref": "#/components/schemas/NamedUrl"
-          },
-          "frameworks": {
-            "items": {
-              "$ref": "#/components/schemas/NamedUrl"
-            },
-            "type": "array"
-          },
-          "id": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
-      "ControlStatusResource": {
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "state": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "EnvirionmentStatus": {
-        "properties": {
-          "environment": {
-            "type": "string"
-          },
-          "exemptControls": {
-            "type": "integer"
-          },
-          "failedControls": {
-            "type": "integer"
-          },
-          "high": {
-            "type": "integer"
-          },
-          "low": {
-            "type": "integer"
-          },
-          "medium": {
-            "type": "integer"
-          },
-          "totalControls": {
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
       "Environment": {
         "properties": {
           "abbreviation": {
@@ -323,81 +106,12 @@
         },
         "type": "object"
       },
-      "Exclusion": {
-        "properties": {
-          "applicationTechnicalControlId": {
-            "type": "integer"
-          },
-          "endDate": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "impact": {
-            "type": "integer"
-          },
-          "isLimitedExclusion": {
-            "type": "boolean"
-          },
-          "mitigation": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "probability": {
-            "type": "integer"
-          },
-          "resources": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "summary": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "applicationTechnicalControlId"
-        ],
-        "type": "object"
-      },
-      "ExclusionResource": {
-        "properties": {
-          "applicationReferences": {
-            "items": {
-              "$ref": "#/components/schemas/ApplicationReference"
-            },
-            "nullable": true,
-            "type": "array"
-          },
-          "id": {
-            "type": "integer"
-          },
-          "reference": {
-            "type": "string"
-          },
-          "state": {
-            "type": "string"
-          },
-          "technicalControlReference": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "state"
-        ],
-        "type": "object"
-      },
       "MonitoredResource": {
         "properties": {
           "additionalData": {
             "type": "string"
           },
           "monitoringState": {
-            "type": "string"
-          },
-          "type": {
             "type": "string"
           }
         },
@@ -406,40 +120,46 @@
         ],
         "type": "object"
       },
-      "NamedUrl": {
+      "Resource": {
         "properties": {
+          "applicationId": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
           "name": {
             "type": "string"
           },
-          "url": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "QualityModel": {
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "SearchResult": {
-        "properties": {
-          "path": {
+          "reference": {
             "type": "string"
           },
-          "summary": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
+          "serviceId": {
+            "type": "integer"
           }
         },
         "required": [
-          "summary"
+          "applicationId",
+          "name",
+          "reference"
         ],
+        "type": "object"
+      },
+      "Service": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "System": {
@@ -458,10 +178,6 @@
       },
       "TechnicalControl": {
         "properties": {
-          "canDeleteResources": {
-            "default": true,
-            "type": "boolean"
-          },
           "controlAction": {
             "type": "string"
           },
@@ -475,16 +191,7 @@
           "name": {
             "type": "string"
           },
-          "parentId": {
-            "type": "integer"
-          },
-          "qualityModel": {
-            "type": "string"
-          },
           "reference": {
-            "type": "string"
-          },
-          "severity": {
             "type": "string"
           },
           "systemId": {
@@ -497,7 +204,6 @@
         "required": [
           "controlAction",
           "name",
-          "qualityModel",
           "reference",
           "systemId"
         ],
@@ -511,116 +217,6 @@
   },
   "openapi": "3.0.2",
   "paths": {
-    "/application-statuses/": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ApplicationStatus"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get an aggregated overview of statuses for all applications",
-        "tags": [
-          "application-statuses"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      }
-    },
-    "/application-technical-controls/": {
-      "get": {
-        "parameters": [
-          {
-            "in": "query",
-            "name": "applicationId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "technicalControlId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApplicationTechnicalControl"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get an existing linking record between an application and a technical control",
-        "tags": [
-          "application-technical-controls"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ApplicationTechnicalControl"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApplicationTechnicalControl"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Create a new linkage between an application and a technical control\nReturns the newly created definition",
-        "tags": [
-          "application-technical-controls"
-        ],
-        "x-api-rbac-role": "ContentWriter"
-      }
-    },
     "/applications/": {
       "get": {
         "responses": {
@@ -747,81 +343,6 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/applications/{application_id}/control-overviews": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ControlOverview"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "tags": [
-          "applications"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ]
-    },
-    "/applications/{application_id}/control-statuses": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ControlStatus"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get the current control statuses of resources/controls within this application",
-        "tags": [
-          "applications"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ]
-    },
     "/applications/{application_id}/environments": {
       "get": {
         "responses": {
@@ -852,116 +373,6 @@
         {
           "in": "path",
           "name": "application_id",
-          "required": true,
-          "schema": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
-      ]
-    },
-    "/applications/{application_id}/monitored-resources": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ControlOverviewResource"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "tags": [
-          "applications"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ]
-    },
-    "/applications/{application_id}/quality-models": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/QualityModel"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get the quality models in use by this application",
-        "tags": [
-          "applications"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ]
-    },
-    "/control-statuses/{control_status_id}/control-status-detail": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ControlStatusDetail"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get the details of control status record by id",
-        "tags": [
-          "control-statuses"
-        ],
-        "x-api-rbac-role": "ComplianceReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "control_status_id",
           "required": true,
           "schema": {
             "minLength": 1,
@@ -1032,91 +443,20 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/exclusion-resources/{id}/": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "id",
-          "required": true,
-          "schema": {
-            "minimum": 0,
-            "type": "integer"
-          }
-        }
-      ],
-      "put": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExclusionResource"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Update the state of a specific exclusion resource",
-        "tags": [
-          "exclusion-resources"
-        ],
-        "x-api-rbac-role": "ComplianceWriter"
-      }
-    },
-    "/exclusions/": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Exclusion"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Creates a new exclusion for the provided resources",
-        "tags": [
-          "exclusions"
-        ],
-        "x-api-rbac-role": "ContentWriter"
-      }
-    },
     "/monitored-resources/": {
       "put": {
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
+            "name": "resourceId",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           },
           {
             "in": "query",
-            "name": "applicationTechnicalControlId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1196,43 +536,46 @@
         "x-api-rbac-role": "ContentReader"
       }
     },
-    "/search/": {
+    "/resources/": {
       "get": {
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "contextSize",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "q",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/SearchResult"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/Resource"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "update the resource by its reference and applicationId",
+        "tags": [
+          "resources"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Resource"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Resource"
                 }
               }
             },
@@ -1245,11 +588,108 @@
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
-        "summary": "Searches matching terms in a configured search backend.",
+        "summary": "Create a new resource\nReturns the newly created resource",
         "tags": [
-          "search"
+          "resources"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Resource"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Resource"
+                }
+              }
+            },
+            "description": "No Content"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "update the resource by its reference and applicationId",
+        "tags": [
+          "resources"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      }
+    },
+    "/services/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Service"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get a list of all services",
+        "tags": [
+          "services"
         ],
         "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new service\nReturns the newly created service",
+        "tags": [
+          "services"
+        ],
+        "x-api-rbac-role": "ContentWriter"
       }
     },
     "/systems/": {
@@ -1323,44 +763,6 @@
         ],
         "x-api-rbac-role": "ContentWriter"
       }
-    },
-    "/systems/{system_id}/exclusion-resources/": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ExclusionResource"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get a list of all exclusion resources for the given system, optionally filtered by type",
-        "tags": [
-          "systems"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "system_id",
-          "required": true,
-          "schema": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
-      ]
     },
     "/technical-controls/": {
       "get": {
@@ -1487,6 +889,10 @@
       "name": "applications"
     },
     {
+      "description": "resources related resources",
+      "name": "resources"
+    },
+    {
       "description": "Technical Control related resources",
       "name": "technical-controls"
     },
@@ -1495,40 +901,20 @@
       "name": "systems"
     },
     {
+      "description": "services related resources",
+      "name": "services"
+    },
+    {
       "description": "Environment related resources",
       "name": "environments"
-    },
-    {
-      "description": "Control Status related resources",
-      "name": "control-statuses"
-    },
-    {
-      "description": "Application Status related resources",
-      "name": "application-statuses"
-    },
-    {
-      "description": "Exclusion Resources related resources",
-      "name": "exclusion-resources"
     },
     {
       "description": "Referenced App related resources",
       "name": "referenced-applications"
     },
     {
-      "description": "application-technical-controls related resources",
-      "name": "application-technical-controls"
-    },
-    {
       "description": "monitored-resources related resources",
       "name": "monitored-resources"
-    },
-    {
-      "description": "Exclusion related resources",
-      "name": "exclusions"
-    },
-    {
-      "description": "Search endpoint to query existing documents.",
-      "name": "search"
     }
   ]
 }

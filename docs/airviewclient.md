@@ -34,6 +34,16 @@ Create a new environment
 
 
 
+#### create_resource(reference, application_id)
+Create a barebone resource for linking compliance event to
+
+
+* **Return type**
+
+    `Optional`[`int`]
+
+
+
 #### create_system(name, stage)
 Create a new system
 
@@ -62,22 +72,22 @@ Look up an application by the provided reference
 
 
 
-#### get_application_control_link(application_id, technical_control_id)
-Get the id of application to control linkage
-
-
-* **Return type**
-
-    int | None
-
-
-
 #### get_environments()
 Get a list of environments
 
 
 #### get_exclusion_resources(state)
 Get a list of exclusion resources by state
+
+
+#### get_resource_id(reference, application_id)
+Get the id of a resource by its application id and reference
+
+
+* **Return type**
+
+    `Optional`[`int`]
+
 
 
 #### get_system_id_by_name(name)
@@ -102,17 +112,7 @@ Helper method to resolve route to full url
 
 
 
-#### link_application_to_control(application_id, technical_control_id)
-create a new linkage between application and technical control
-
-
-* **Return type**
-
-    `int`
-
-
-
-#### save_monitored_resource(app_tech_control_id, reference, state, type)
+#### save_monitored_resource(technical_control_id, resource_id, state)
 Persist the current status of a montiored resource
 
 
@@ -449,19 +449,11 @@ Bases: `Enum`
 An enumeration.
 
 
-#### CANCELLED(_ = _ )
-
-#### FIXED_AUTO(_ = _ )
-
-#### FIXED_OTHER(_ = _ )
+#### DELETED(_ = _ )
 
 #### FLAGGED(_ = _ )
 
 #### MONITORING(_ = _ )
-
-#### SUPPRESSED(_ = _ )
-
-#### UNRESPONSIVE(_ = _ )
 
 ### _class_ client.airviewclient.models.MonitoredResourceType(value)
 Bases: `Enum`
@@ -519,20 +511,20 @@ An enumeration.
 
 #### MONITOR(_ = _ )
 
-### _class_ client.airviewclient.models.TechnicalControl(name, reference, quality_model, type, id=None, parent_id=None, ttl=None, is_blocking=None, can_delete_resources=None)
+### _class_ client.airviewclient.models.TechnicalControl(name, reference, control_action, id=None, ttl=None, is_blocking=None)
 Bases: `object`
 
 Dataclass representing technical control definition
 
 
-#### \__init__(name, reference, quality_model, type, id=None, parent_id=None, ttl=None, is_blocking=None, can_delete_resources=None)
+#### \__init__(name, reference, control_action, id=None, ttl=None, is_blocking=None)
 
-#### can_delete_resources(_: `Optional`[`bool`_ _ = Non_ )
-Can resources be unlinked from the control
+#### control_action(_: `TechnicalControlAction_ )
+Type of control
 
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
-Internal id of the techincal control
+Id of control
 
 
 #### is_blocking(_: `Optional`[`bool`_ _ = Non_ )
@@ -543,27 +535,15 @@ Should a failure cause a process to exit
 The name of the technical control
 
 
-#### parent_id(_: `Optional`[`int`_ _ = Non_ )
-Id of parent control
-
-
-#### quality_model(_: `QualityModel_ )
-Quality model of the techincal control
-
-
 #### reference(_: `str_ )
 Unique reference for the control within the connecting system
 
 
 #### ttl(_: `Optional`[`int`_ _ = Non_ )
-Period after which the control should be assumed non compliant
+Id of parent control
 
 
-#### type(_: `TechnicalControlType_ )
-Type of control
-
-
-### _class_ client.airviewclient.models.TechnicalControlType(value)
+### _class_ client.airviewclient.models.TechnicalControlAction(value)
 Bases: `Enum`
 
 An enumeration.
