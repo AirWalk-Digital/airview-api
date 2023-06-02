@@ -5,15 +5,16 @@ from airview_api.models import (
     Application,
     ApplicationType,
     Environment,
-    ApplicationTechnicalControl,
     MonitoredResource,
     Exclusion,
     ApplicationReference,
     QualityModel,
+    Service,
+    Resource,
     TechnicalControlAction,
-    MonitoredResourceType,
 )
 from airview_api.database import db
+from datetime import datetime
 
 
 class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -24,10 +25,17 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.Sequence(lambda n: n)
     name = factory.Sequence(lambda n: f"TC {n}")
 
-    control_action = TechnicalControlAction.LOG
-    quality_model = QualityModel.COST_OPTIMISATION
     is_blocking = False
-    can_delete_resources = True
+    control_action = TechnicalControlAction.LOG
+
+
+class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Service
+        sqlalchemy_session = db.session
+
+    id = factory.Sequence(lambda n: n)
+    name = factory.Sequence(lambda n: f"Service {n}")
 
 
 class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -64,18 +72,25 @@ class EnvironmentFactory(factory.alchemy.SQLAlchemyModelFactory):
     abbreviation = factory.Sequence(lambda n: f"E{n}")
 
 
-class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+# class ApplicationTechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+# class Meta:
+# model = ApplicationTechnicalControl
+# sqlalchemy_session = db.session
+
+
+class ResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
-        model = ApplicationTechnicalControl
+        model = Resource
         sqlalchemy_session = db.session
+
+    last_seen = datetime.utcnow()
+    last_modified = datetime.utcnow()
 
 
 class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MonitoredResource
         sqlalchemy_session = db.session
-
-    type = MonitoredResourceType.VIRTUAL_MACHINE
 
 
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -87,9 +102,11 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 def reset_factories():
     TechnicalControlFactory.reset_sequence()
     SystemFactory.reset_sequence()
+    ServiceFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
-    ApplicationTechnicalControlFactory.reset_sequence()
+    # ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
+    ResourceFactory.reset_sequence()

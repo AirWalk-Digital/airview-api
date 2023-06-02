@@ -1,4 +1,3 @@
-from datetime import timezone
 from enum import Enum
 from airview_api.database import db
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -33,12 +32,8 @@ class ExclusionState(Enum):
 
 class MonitoredResourceState(Enum):
     FLAGGED = 1
-    SUPPRESSED = 2
-    FIXED_AUTO = 3
-    FIXED_OTHER = 4
-    MONITORING = 5
-    CANCELLED = 6
-    UNRESPONSIVE = 7
+    MONITORING = 2
+    DELETED = 3
 
     def __str__(self):
         return self.name
@@ -57,16 +52,6 @@ class QualityModel(Enum):
         return self.name
 
 
-class TechnicalControlAction(Enum):
-    LOG = 1
-    INCIDENT = 2
-    TASK = 3
-    VULNERABILITY = 4
-
-    def __str__(self):
-        return self.name
-
-
 class ApplicationType(Enum):
     BUSINESS_APPLICATION = 1
     TECHNICAL_SERVICE = 2
@@ -76,7 +61,7 @@ class ApplicationType(Enum):
         return self.name
 
 
-class MonitoredResourceType(Enum):
+class ServiceType(Enum):
     UNKNOWN = 1
     VIRTUAL_MACHINE = 2
     CONTAINER = 3
@@ -87,6 +72,16 @@ class MonitoredResourceType(Enum):
     DATABASE = 8
     FUNCTION = 9
     STORAGE = 10
+
+    def __str__(self):
+        return self.name
+
+
+class TechnicalControlAction(Enum):
+    LOG = 1
+    INCIDENT = 2
+    TASK = 3
+    VULNERABILITY = 4
 
     def __str__(self):
         return self.name
@@ -104,12 +99,15 @@ class Application(db.Model):
         "Application", backref=db.backref("parent", remote_side=[id])
     )
     environment = db.relationship("Environment", back_populates="applications")
-    application_technical_controls = db.relationship(
-        "ApplicationTechnicalControl",
-        back_populates="application",
-    )
     references = db.relationship(
         "ApplicationReference", back_populates="application", lazy="dynamic"
+    )
+    resources = db.relationship(
+        "Resource", back_populates="application", lazy="dynamic"
+    )
+
+    exclusions = db.relationship(
+        "Exclusion", back_populates="application", lazy="dynamic"
     )
 
     def __repr__(self):
@@ -161,29 +159,122 @@ class Environment(db.Model):
         return f"{self.name}"
 
 
+class Service(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    reference = db.Column(db.String(500), nullable=False)
+    type = db.Column(db.Enum(ServiceType), nullable=False)
+
+    controls = db.relationship("Control", back_populates="service")
+    resources = db.relationship("Resource", back_populates="service")
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            name="uq_service",
+        ),
+    )
+
+
+class FrameworkControlObjectiveLink(db.Model):
+    framework_control_objective_id = db.Column(
+        db.Integer,
+        db.ForeignKey("framework_control_objective.id"),
+        primary_key=True,
+    )
+    control_id = db.Column(
+        db.Integer,
+        db.ForeignKey("control.id"),
+        primary_key=True,
+    )
+
+
+class FrameworkControlObjective(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    link = db.Column(db.String(500), nullable=False)
+    framework_section_id = db.Column(
+        db.Integer,
+        db.ForeignKey("framework_section.id"),
+    )
+
+    controls = db.relationship(
+        "Control",
+        secondary=FrameworkControlObjectiveLink.__table__,
+        back_populates="framework_control_objectives",
+        primaryjoin=id
+        == FrameworkControlObjectiveLink.framework_control_objective_id,  # Update this line
+        secondaryjoin=id == FrameworkControlObjectiveLink.control_id,
+    )
+    framework_section = db.relationship(
+        "FrameworkSection", back_populates="framework_control_objectives"
+    )
+
+
+class FrameworkSection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
+    framework_id = db.Column(
+        db.Integer,
+        db.ForeignKey("framework.id"),
+    )
+    framework = db.relationship("Framework", back_populates="framework_sections")
+    framework_control_objectives = db.relationship(
+        "FrameworkControlObjective", back_populates="framework_section"
+    )
+
+
+class Framework(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(500), nullable=False)
+
+    framework_sections = db.relationship("FrameworkSection", back_populates="framework")
+
+
+class Control(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    quality_model = db.Column(db.Enum(QualityModel), nullable=False)
+    service_id = db.Column(
+        db.Integer,
+        db.ForeignKey("service.id"),
+    )
+
+    service = db.relationship("Service", back_populates="controls")
+
+    exclusions = db.relationship("Exclusion", back_populates="control", lazy="dynamic")
+
+    technical_controls = db.relationship("TechnicalControl", back_populates="control")
+
+    framework_control_objectives = db.relationship(
+        "FrameworkControlObjective",
+        secondary=FrameworkControlObjectiveLink.__table__,
+        back_populates="controls",
+        primaryjoin=id == FrameworkControlObjectiveLink.control_id,  # Update this line
+        secondaryjoin=id
+        == FrameworkControlObjectiveLink.framework_control_objective_id,
+    )
+
+
 class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
     control_action = db.Column(db.Enum(TechnicalControlAction), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
-    severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
-    quality_model = db.Column(db.Enum(QualityModel), nullable=False)
+    # severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     ttl = db.Column(db.Integer, nullable=True)
     is_blocking = db.Column(db.Boolean, nullable=False)
-    can_delete_resources = db.Column(db.Boolean, nullable=False)
 
-    parent_id = db.Column(
-        db.Integer, db.ForeignKey("technical_control.id"), nullable=True
-    )
-    children = db.relationship(
-        "TechnicalControl", backref=db.backref("parent", remote_side=[id])
+    control_id = db.Column(db.Integer, db.ForeignKey("control.id"), nullable=True)
+
+    control = db.relationship("Control", back_populates="technical_controls")
+
+    monitored_resources = db.relationship(
+        "MonitoredResource", back_populates="technical_control"
     )
 
-    application_technical_controls = db.relationship(
-        "ApplicationTechnicalControl",
-        back_populates="technical_control",
-    )
     system = db.relationship("System", back_populates="technical_controls")
 
     __table_args__ = (
@@ -215,38 +306,74 @@ class System(db.Model):
         return f"{self.name}"
 
 
-class MonitoredResource(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    reference = db.Column(db.String(500), nullable=False)
-    monitoring_state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
-    type = db.Column(db.Enum(MonitoredResourceType), nullable=False)
-    last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+class ExclusionResource(db.Model):
+    resource_id = db.Column(db.Integer, db.ForeignKey("resource.id"), primary_key=True)
     exclusion_id = db.Column(
+        db.Integer, db.ForeignKey("exclusion.id"), primary_key=True
+    )
+
+
+class Resource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    reference = db.Column(db.String(500), nullable=False)
+    last_modified = db.Column(db.DateTime, nullable=False)
+    last_seen = db.Column(db.DateTime, nullable=False)
+    service_id = db.Column(
         db.Integer,
-        db.ForeignKey("exclusion.id"),
+        db.ForeignKey("service.id"),
         nullable=True,
     )
-    exclusion = db.relationship("Exclusion", back_populates="resources")
-    exclusion_state = db.Column(db.Enum(ExclusionState), nullable=True)
-    additional_data = db.Column(db.String(8000), nullable=False, default="")
+    service = db.relationship("Service", back_populates="resources")
 
-    application_technical_control_id = db.Column(
+    application_id = db.Column(
         db.Integer,
-        db.ForeignKey("application_technical_control.id"),
+        db.ForeignKey("application.id"),
+        nullable=True,
+    )
+    application = db.relationship("Application", back_populates="resources")
+
+    monitored_resources = db.relationship(
+        "MonitoredResource", back_populates="resource"
+    )
+    exclusions = db.relationship(
+        "Exclusion", secondary=ExclusionResource.__table__, back_populates="resources"
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            "application_id",
+            name="uq_resource",
+        ),
+    )
+
+
+class MonitoredResource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resource_id = db.Column(
+        db.Integer,
+        db.ForeignKey("resource.id"),
         nullable=False,
     )
-    application_technical_control = db.relationship(
-        "ApplicationTechnicalControl", back_populates="monitored_resources"
+
+    resource = db.relationship("Resource", back_populates="monitored_resources")
+    monitoring_state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
+    last_modified = db.Column(db.DateTime, nullable=False)
+    last_seen = db.Column(db.DateTime, nullable=True)
+    additional_data = db.Column(db.String(8000), nullable=False, default="")
+
+    technical_control_id = db.Column(
+        db.Integer,
+        db.ForeignKey("technical_control.id"),
+        nullable=False,
+    )
+    technical_control = db.relationship(
+        "TechnicalControl", back_populates="monitored_resources"
     )
 
-    tickets = db.relationship(
-        "MonitoredResourceTicket",
-        back_populates="monitored_resource",
-        lazy=True,
-        cascade="delete",
-    )
 
+""" This needs looking at again post 'hackathon'
     @hybrid_property
     def state(self):
         return (
@@ -262,90 +389,53 @@ class MonitoredResource(db.Model):
             cls.exclusion_state,
             cls.monitoring_state,
         )
+"""
 
-    __table_args__ = (
-        db.UniqueConstraint(
-            "application_technical_control_id",
-            "reference",
-            name="uq_monitored_resource",
-        ),
-    )
-
-
-class MonitoredResourceTicket(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    monitored_resource_id = db.Column(
-        db.Integer,
-        db.ForeignKey("monitored_resource.id"),
-        nullable=False,
-    )
-    reference = db.Column(db.String(50), nullable=True)
-    request_timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
-    monitored_resource = db.relationship("MonitoredResource", back_populates="tickets")
+# __table_args__ = (
+# db.UniqueConstraint(
+# "application_technical_control_id",
+# "resource_id",
+# name="uq_monitored_resource",
+# ),
+# )
 
 
-class ApplicationTechnicalControl(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    application_id = db.Column(
-        db.Integer, db.ForeignKey("application.id"), nullable=False
-    )
-    technical_control_id = db.Column(
-        db.Integer, db.ForeignKey("technical_control.id"), nullable=False
-    )
-
-    application = db.relationship(
-        "Application", back_populates="application_technical_controls"
-    )
-    technical_control = db.relationship(
-        "TechnicalControl",
-        back_populates="application_technical_controls",
-    )
-
-    monitored_resources = db.relationship(
-        "MonitoredResource",
-        back_populates="application_technical_control",
-        lazy="dynamic",
-        cascade="delete",
-    )
-
-    exclusions = db.relationship(
-        "Exclusion",
-        back_populates="application_technical_control",
-        lazy=True,
-        cascade="delete",
-    )
-
-    __table_args__ = (
-        db.UniqueConstraint(
-            "application_id",
-            "technical_control_id",
-            name="uq_application_technical_control",
-        ),
-    )
-
-    def __repr__(self):
-        return f"{self.application.name} {self.technical_control.name}"
+# class MonitoredResourceTicket(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     monitored_resource_id = db.Column(
+#         db.Integer,
+#         db.ForeignKey("monitored_resource.id"),
+#         nullable=False,
+#     )
+#     reference = db.Column(db.String(50), nullable=True)
+#     request_timestamp = db.Column(db.DateTime(timezone=True), nullable=False)
+#     monitored_resource = db.relationship("MonitoredResource", back_populates="tickets")
 
 
 class Exclusion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    application_technical_control_id = db.Column(
-        db.Integer,
-        db.ForeignKey("application_technical_control.id"),
-        nullable=False,
-    )
     summary = db.Column(db.String, nullable=False)
-    mitigation = db.Column(db.String, nullable=False)
-    impact = db.Column(db.Integer, nullable=False)
-    probability = db.Column(db.Integer, nullable=False)
     is_limited_exclusion = db.Column(db.Boolean, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     notes = db.Column(db.String, nullable=True)
-    application_technical_control = db.relationship(
-        "ApplicationTechnicalControl", back_populates="exclusions"
+    status = db.Column(db.Enum(ExclusionState), nullable=True)
+
+    control_id = db.Column(
+        db.Integer,
+        db.ForeignKey("control.id"),
+        nullable=False,
     )
-    resources = db.relationship("MonitoredResource", back_populates="exclusion")
+    control = db.relationship("Control", back_populates="exclusions")
+    application_id = db.Column(
+        db.Integer,
+        db.ForeignKey("application.id"),
+        nullable=False,
+    )
+    application = db.relationship("Application", back_populates="exclusions")
+
+    resources = db.relationship(
+        "Resource", secondary=ExclusionResource.__table__, back_populates="exclusions"
+    )
 
 
 class NamedUrl:

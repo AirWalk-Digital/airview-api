@@ -1,4 +1,3 @@
-from airview_api.models import MonitoredResourceState
 from tests.client_tests.common import *
 from airview_api import app
 from airview_api.database import db
@@ -18,11 +17,9 @@ def compliance_event():
     technical_control = models.TechnicalControl(
         name="ctrl a",
         reference="tc-ref-1",
-        quality_model=models.QualityModel.SECURITY,
-        type=models.TechnicalControlType.LOG,
-        can_delete_resources=False,
         is_blocking=True,
         ttl=20,
+        control_action=models.TechnicalControlAction.LOG,
     )
     evt = models.ComplianceEvent(
         application=application,
@@ -40,214 +37,144 @@ def setup():
     setup_factories()
 
 
-def test_monitored_resource_creates_missing_system(handler, compliance_event):
+def test_monitored_resource_creates_missing_application(handler, compliance_event):
     """
-    Given: A missing system
+    Given: A compliance event with a non-existing application, existing technica control
     When: When a call is made to set a monitored resource
-    Then: The monitored resource is persisted against a new system
-    """
-    print(compliance_event)
-    # Arrange
-    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
-    )
-
-    # Act
-    handler.handle_compliance_event(compliance_event)
-
-    # Assert
-    monitored = MonitoredResource.query.all()
-    assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert (
-        monitored[0].application_technical_control.technical_control.system.name
-        == "one"
-    )
-    assert (
-        monitored[0].application_technical_control.technical_control.system.stage.name
-        == "BUILD"
-    )
-
-
-def test_monitored_resource_persisted_for_linked(handler, compliance_event):
-    """
-    Given: An existing linked application
-    When: When a call is made to set a monitored resource
-    Then: The monitored resource is persisted
+    Then: The monitored resource is persisted against a new application, new resource
     """
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+
     ApplicationFactory(id=2, environment_id=1)
     ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+        application_id=2, type="aws_account_id", reference="app-ref-other"
     )
-    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
-    TechnicalControlFactory(id=4, system_id=111, reference="tc-ref-1", severity="HIGH")
-    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
-
-    # Act
-    handler.handle_compliance_event(compliance_event)
-
-    # Assert
-    monitored = MonitoredResource.query.all()
-    assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert monitored[0].application_technical_control_id == 5
-
-
-def test_triggered_resource_creates_new_control(handler, compliance_event):
-    """
-    Given: An existing linked application, no known control
-    When: When a call is made to set a triggered resource
-    Then: New control created and linked, the triggerend resource is sent to the backend
-    """
-    # Arrange
-    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+    ResourceFactory(
+        id=11,
+        name="Res Other",
+        reference="res-ref-other",
+        service_id=10,
+        application_id=2,
     )
-    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
+
+    SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
+
     TechnicalControlFactory(
-        id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
+        id=999,
+        reference="tc-ref-1",
+        name="one",
+        system_id=111,
+        control_action=TechnicalControlAction.LOG,
     )
-    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
-
     # Act
     handler.handle_compliance_event(compliance_event)
 
     # Assert
-    tc = TechnicalControl.query.all()
-    len(tc) == 2
-    assert tc[1].name == "ctrl a"
-    assert tc[1].reference == "tc-ref-1"
-    assert tc[1].is_blocking == True
-    assert tc[1].can_delete_resources == False
-    assert tc[1].ttl == 20
-
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert monitored[0].application_technical_control_id == 6
+    assert monitored[0].monitoring_state.name == "FLAGGED"
+    assert monitored[0].resource_id == 12
+    assert monitored[0].technical_control_id == 999
+
+    assert monitored[0].resource.reference == "res-ref-1"
+    assert monitored[0].resource.name == "res-ref-1"
+    assert monitored[0].resource.application_id == 3
 
 
-def test_triggered_resource_creates_new_control_with_parent(handler, compliance_event):
-    """
-    Given: An existing linked application, no known control, control has a parent
-    When: When a call is made to set a triggered resource
-    Then: New control created and linked to parent, the triggerend resource is sent to the backend
-    """
-    # Arrange
-    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
-    )
-    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
-    TechnicalControlFactory(
-        id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
-    )
-    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
-
-    # Act
-    compliance_event.technical_control.parent_id = 4
-    handler.handle_compliance_event(compliance_event)
-    compliance_event.technical_control.parent_id = None
-
-    # Assert
-    tc = TechnicalControl.query.all()
-    len(tc) == 2
-    assert tc[1].name == "ctrl a"
-    assert tc[1].reference == "tc-ref-1"
-    assert tc[1].is_blocking == True
-    assert tc[1].can_delete_resources == False
-    assert tc[1].ttl == 20
-    assert tc[1].parent_id == 4
-
-    monitored = MonitoredResource.query.all()
-    assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert monitored[0].application_technical_control_id == 6
-
-
-def test_triggered_resource_creates_new_control_with_defaults(
+def test_monitored_resource_creates_missing_resource_existing_app(
     handler, compliance_event
 ):
     """
-    Given: An existing linked application, no known control
-    When: When a call is made to set a triggered resource with missing optional fields
-    Then: New control created with defaults and linked, the triggerend resource is sent to the backend
+    Given: A compliance event with a existing application, existing technical control
+    When: When a call is made to set a monitored resource
+    Then: The monitored resource is persisted against a new application, new resource
     """
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+
     ApplicationFactory(id=2, environment_id=1)
     ApplicationReferenceFactory(
         application_id=2, type="aws_account_id", reference="app-ref-1"
     )
-    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
-    TechnicalControlFactory(
-        id=4, system_id=111, reference="tc-ref-other", severity="HIGH"
+    ResourceFactory(
+        id=11,
+        name="Res Other",
+        reference="res-ref-other",
+        service_id=10,
+        application_id=2,
     )
-    ApplicationTechnicalControlFactory(id=5, application_id=2, technical_control_id=4)
 
+    SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
+
+    TechnicalControlFactory(
+        id=999,
+        reference="tc-ref-1",
+        name="one",
+        system_id=111,
+        control_action=TechnicalControlAction.LOG,
+    )
     # Act
-    compliance_event.technical_control.ttl = None
-    compliance_event.technical_control.can_delete_resources = None
-    compliance_event.technical_control.is_blocking = None
     handler.handle_compliance_event(compliance_event)
 
     # Assert
-    tc = TechnicalControl.query.all()
-    len(tc) == 2
-    assert tc[1].name == "ctrl a"
-    assert tc[1].reference == "tc-ref-1"
-    assert tc[1].is_blocking == False
-    assert tc[1].can_delete_resources == True
-    assert tc[1].ttl == None
-
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
-    assert monitored[0].state == MonitoredResourceState.FLAGGED
-    assert monitored[0].type == MonitoredResourceType.VIRTUAL_MACHINE
-    assert monitored[0].reference == "res-ref-1"
-    assert monitored[0].application_technical_control_id == 6
+    assert monitored[0].monitoring_state.name == "FLAGGED"
+    assert monitored[0].resource_id == 12
+    assert monitored[0].technical_control_id == 999
+
+    assert monitored[0].resource.reference == "res-ref-1"
+    assert monitored[0].resource.name == "res-ref-1"
+    assert monitored[0].resource.application_id == 2
 
 
-def test_triggered_resource_creates_new_app(handler, compliance_event):
+def test_monitored_resource_creates_missing_control(handler, compliance_event):
     """
-    Given: No existing linked application
-    When: When a call is made to set a triggered resource
-    Then: A new application is created, linked and triggered
+    Given: A compliance event with a existing resource, missing technical control
+    When: When a call is made to set a monitored resource
+    Then: The monitored resource is persisted against a new technical control
     """
     # Arrange
-    SystemFactory(id=111, name="one", stage=api_models.SystemStage.BUILD)
+    EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
+    ApplicationFactory(id=2, environment_id=1)
+    ApplicationReferenceFactory(
+        application_id=2, type="aws_account_id", reference="app-ref-1"
+    )
+    ResourceFactory(
+        id=11,
+        name="Res Existing",
+        reference="res-ref-1",
+        service_id=10,
+        application_id=2,
+    )
+
+    SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
+
+    TechnicalControlFactory(
+        id=999,
+        reference="tc-ref-other",
+        name="one",
+        system_id=111,
+        control_action=TechnicalControlAction.LOG,
+    )
     # Act
     handler.handle_compliance_event(compliance_event)
 
     # Assert
     monitored = MonitoredResource.query.all()
     assert len(monitored) == 1
+    assert monitored[0].monitoring_state.name == "FLAGGED"
+    assert monitored[0].resource_id == 11
+    assert monitored[0].technical_control_id == 1000
 
-    app = Application.query.first()
-    assert app.name == "app one"
-    assert app.application_type == api_models.ApplicationType.BUSINESS_APPLICATION
-    assert app.environment_id == None
-
-    refs = app.references.all()
-    assert len(refs) == 2
-    assert refs[1].type == "aws_account_id"
-    assert refs[1].reference == "app-ref-1"
+    assert monitored[0].resource.reference == "res-ref-1"
+    assert monitored[0].resource.name == "Res Existing"
+    assert monitored[0].resource.application_id == 2
 
 
 def test_account_cache_handle_unexpected_code_for_get_control(
@@ -292,7 +219,7 @@ def test_account_cache_handle_unexpected_code_for_get_control(
         handler.handle_compliance_event(compliance_event)
 
 
-def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control(
+def test_triggered_resource_handle_unexpected_code_for_get_resource(
     handler, adapter, compliance_event
 ):
     """
@@ -339,7 +266,7 @@ def test_triggered_resource_handle_unexpected_code_for_get_app_technical_control
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/application-technical-controls/?applicationId=111&technicalControlId=222",
+        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
         status_code=500,
     )
     # Act
@@ -393,7 +320,7 @@ def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
         handler.handle_compliance_event(compliance_event)
 
 
-def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
+def test_triggered_resource_handle_unexpected_code_for_create_resource(
     handler, adapter, compliance_event
 ):
     """
@@ -439,13 +366,13 @@ def test_triggered_resource_handle_unexpected_code_for_link_technical_control(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/application-technical-controls/?applicationId=111&technicalControlId=222",
+        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
         status_code=404,
     )
 
     adapter.register_uri(
         "POST",
-        f"{base_url}/application-technical-controls/",
+        f"{base_url}/resources/",
         status_code=500,
     )
 
@@ -500,14 +427,14 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/application-technical-controls/?applicationId=111&technicalControlId=222",
+        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
         status_code=200,
         json={"id": 444},
     )
 
     adapter.register_uri(
         "PUT",
-        f"{base_url}/monitored-resources/?applicationTechnicalControlId=444&reference=res-ref-1",
+        f"{base_url}/monitored-resources/?technicalControlId=222&resourceId=444",
         status_code=500,
     )
 

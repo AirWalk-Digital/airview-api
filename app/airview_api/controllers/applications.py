@@ -3,7 +3,6 @@ from pprint import pprint
 from airview_api.blueprint import Blueprint, Roles
 from airview_api.services import (
     application_service,
-    aggregation_service,
     AirViewValidationException,
     AirViewNotFoundException,
 )
@@ -94,46 +93,3 @@ class Environments(MethodView):
         Returns a list of applications
         """
         return application_service.get_environments(application_id)
-
-
-@blp.route("/<int:application_id>/control-statuses")
-class ControlStatuses(MethodView):
-    @blp.response(200, ControlStatusSchema(many=True))
-    @blp.role(Roles.COMPLIANCE_READER)
-    def get(self, application_id):
-        """Get the current control statuses of resources/controls within this application"""
-        return aggregation_service.get_control_statuses(application_id)
-
-
-@blp.route("/<int:application_id>/control-overviews")
-class ControlOverviews(MethodView):
-    @blp.response(200, ControlOverviewSchema(many=True))
-    @blp.role(Roles.COMPLIANCE_READER)
-    def get(self, application_id):
-        quality_model = flask.request.args.get("qualityModel")
-        """Get the current control overviews by quality model for resources/controls within this application"""
-        data = aggregation_service.get_control_overviews(application_id, quality_model)
-        return data
-
-
-@blp.route("/<int:application_id>/monitored-resources")
-class ControlOverviews(MethodView):
-    @blp.response(200, ControlOverviewResourceSchema(many=True))
-    @blp.role(Roles.COMPLIANCE_READER)
-    def get(self, application_id):
-        technical_control_id = flask.request.args.get("technicalControlId")
-        """Get the current resources for a given technical control within this application"""
-        data = aggregation_service.get_control_overview_resources(
-            application_id, technical_control_id
-        )
-        return data
-
-
-@blp.route("/<int:application_id>/quality-models")
-class ControlOverviews(MethodView):
-    @blp.response(200, QualityModelSchema(many=True))
-    @blp.role(Roles.COMPLIANCE_READER)
-    def get(self, application_id):
-        """Get the quality models in use by this application"""
-        data = aggregation_service.get_quality_models(application_id)
-        return data

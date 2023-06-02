@@ -36,12 +36,18 @@ class ApplicationSchema(CamelCaseSchema):
     )
 
 
+class ResourceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    reference = ma.fields.Str(required=True)
+    service_id = ma.fields.Integer(required=False)
+    application_id = ma.fields.Integer(required=True)
+
+
 class MonitoredResourceSchema(CamelCaseSchema):
-    application_technical_control_id = ma.fields.Integer(required=True)
-    reference = ma.fields.Str(required=True, validate=is_allowed_reference)
+    technical_control_id = ma.fields.Integer(required=True)
+    resource_id = ma.fields.Integer(required=True)
     monitoring_state = ma.fields.Str(required=True)
-    state = ma.fields.Str(required=False)
-    type = ma.fields.Str(required=False)
     additional_data = ma.fields.Str(required=False)
 
 
@@ -84,7 +90,7 @@ class ExclusionSchema(CamelCaseSchema):
     mitigation = ma.fields.Str()
     probability = ma.fields.Integer()
     impact = ma.fields.Integer()
-    resources = ma.fields.List(ma.fields.Str())
+    resource_ids = ma.fields.List(ma.fields.Integer())
     is_limited_exclusion = ma.fields.Boolean()
     end_date = ma.fields.DateTime()
     notes = ma.fields.Str()
@@ -94,15 +100,10 @@ class TechnicalControlSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
-    control_action = ma.fields.Str(required=True)
     system_id = ma.fields.Integer(required=True)
-    severity = ma.fields.Str(required=False)
     ttl = ma.fields.Integer(required=False)
     is_blocking = ma.fields.Boolean(required=False, missing=False)
-    can_delete_resources = ma.fields.Boolean(required=False, missing=True)
-    parent_id = ma.fields.Integer(required=False)
-
-    quality_model = ma.fields.Str(required=True)
+    control_action = ma.fields.Str(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):
@@ -185,6 +186,13 @@ class SearchQueryArgsSchema(CamelCaseSchema):
     limit = ma.fields.Integer(required=False)
     context_size = ma.fields.Integer(required=False)
     q = ma.fields.Str(required=True)
+
+
+class ServiceSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str()
+    reference = ma.fields.Str()
+    type = ma.fields.Str()
 
 
 class SystemSchema(CamelCaseSchema):

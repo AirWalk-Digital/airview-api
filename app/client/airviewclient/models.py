@@ -15,12 +15,8 @@ class ExclusionResourceState(Enum):
 
 class MonitoredResourceState(Enum):
     FLAGGED = 1
-    SUPPRESSED = 2
-    FIXED_AUTO = 3
-    FIXED_OTHER = 4
-    MONITORING = 5
-    CANCELLED = 6
-    UNRESPONSIVE = 7
+    MONITORING = 2
+    DELETED = 3
 
     def __str__(self):
         return self.name
@@ -39,7 +35,7 @@ class QualityModel(Enum):
         return self.name
 
 
-class TechnicalControlType(Enum):
+class TechnicalControlAction(Enum):
     LOG = 1
     INCIDENT = 2
     TASK = 3
@@ -136,20 +132,14 @@ class TechnicalControl:
     name: str
     #: Unique reference for the control within the connecting system
     reference: str
-    #:Quality model of the techincal control
-    quality_model: QualityModel
     #: Type of control
-    type: TechnicalControlType
-    #: Internal id of the techincal control
+    control_action: TechnicalControlAction
+    #: Id of control
     id: Optional[int] = None
     #: Id of parent control
-    parent_id: Optional[int] = None
-    #: Period after which the control should be assumed non compliant
     ttl: Optional[int] = None
     #: Should a failure cause a process to exit
     is_blocking: Optional[bool] = None
-    #: Can resources be unlinked from the control
-    can_delete_resources: Optional[bool] = None
 
 
 @dataclass

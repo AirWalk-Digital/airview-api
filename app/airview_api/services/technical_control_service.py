@@ -8,7 +8,6 @@ from airview_api.models import (
     MonitoredResource,
     ControlStatusDetail,
     NamedUrl,
-    TechnicalControlSeverity,
 )
 from airview_api.database import db
 
@@ -16,7 +15,6 @@ from airview_api.database import db
 def create(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
-    data["severity"] = data.get("severity", TechnicalControlSeverity.HIGH)
     app = TechnicalControl(**data)
     try:
         db.session.add(app)
