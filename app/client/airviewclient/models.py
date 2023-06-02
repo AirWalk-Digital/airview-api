@@ -18,6 +18,9 @@ class MonitoredResourceState(Enum):
     SUPPRESSED = 2
     FIXED_AUTO = 3
     FIXED_OTHER = 4
+    MONITORING = 5
+    CANCELLED = 6
+    UNRESPONSIVE = 7
 
     def __str__(self):
         return self.name
@@ -37,8 +40,8 @@ class QualityModel(Enum):
 
 
 class TechnicalControlType(Enum):
-    SECURITY = 1
-    LOG = 2
+    LOG = 1
+    INCIDENT = 2
     TASK = 3
     VULNERABILITY = 4
 
@@ -64,6 +67,7 @@ class ApplicationType(Enum):
 
 
 class MonitoredResourceType(Enum):
+    UNKNOWN = 1
     VIRTUAL_MACHINE = 2
     CONTAINER = 3
     NETWORK = 4
