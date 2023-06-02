@@ -204,7 +204,6 @@ class Backend:
             "isBlocking": technical_control.is_blocking,
             "controlAction": technical_control.control_action.name,
         }
-        print(mapped)
         resp = self._session.post(
             url=self.get_url("/technical-controls/"),
             json={k: v for k, v in mapped.items() if v is not None},
@@ -274,11 +273,6 @@ class Backend:
             ),
             headers=self._headers,
         )
-        print("GET RES")
-        print(application_id)
-        print(reference)
-        print(resp.status_code)
-        print(resp.json())
         if resp.status_code == 200:
             return resp.json()["id"]
         if resp.status_code == 404:
