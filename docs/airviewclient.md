@@ -267,6 +267,7 @@ Helper method to get OAuth Token
 :param client_secret: Client Secret
 :type scope: `str`
 :param scope: OAuth Scope(s)
+:type additional_headers: 
 :param additional_headers: Addtional HTTP Request Headers
 :rtype: `str`
 :return: HTTP Authorization header value
@@ -282,27 +283,27 @@ Dataclass representing application definition
 
 #### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
 
-#### environment(_: Optional[Environment_ _ = Non_ )
+#### environment(_: `Optional`[`Environment`_ _ = Non_ )
 Defintion of environment which the application sits in
 
 
-#### id(_: Optional[int_ _ = Non_ )
+#### id(_: `Optional`[`int`_ _ = Non_ )
 Internal identifier of application
 
 
-#### name(_: st_ )
+#### name(_: `str_ )
 Name of application
 
 
-#### parent_id(_: Optional[int_ _ = Non_ )
+#### parent_id(_: `Optional`[`int`_ _ = Non_ )
 Internal id of parent application for nested apps
 
 
-#### reference(_: st_ )
+#### reference(_: `str_ )
 Unique reference of application within the system. e.g. aws account id, azure subscription id
 
 
-#### type(_: ApplicationTyp_ _ = _ )
+#### type(_: `ApplicationType_ _ = _ )
 Type of application.
 
 
@@ -326,23 +327,23 @@ Configuration data for connecting to a backend
 
 #### \__init__(base_url, token, system_name, system_stage, referencing_type)
 
-#### base_url(_: st_ )
+#### base_url(_: `str_ )
 Base url of the AirView api
 
 
-#### referencing_type(_: st_ )
+#### referencing_type(_: `str_ )
 Type of reference which will be used when identifying an application. e.g. aws_account_id
 
 
-#### system_name(_: st_ )
+#### system_name(_: `str_ )
 Unique name which identifies this system
 
 
-#### system_stage(_: SystemStag_ )
+#### system_stage(_: `SystemStage_ )
 Stage at which this instance monitors
 
 
-#### token(_: st_ )
+#### token(_: `str_ )
 Access token to be used when interacting with the backend
 
 
@@ -358,27 +359,27 @@ Dataclass representing an incoming compliance event
 
 #### \__init__(resource_reference, application, technical_control, status, type, additional_data='')
 
-#### additional_data(_: st_ _ = '_ )
+#### additional_data(_: `str_ _ = '_ )
 Any additional textual data to associate with the event
 
 
-#### application(_: Applicatio_ )
+#### application(_: `Application_ )
 Application within which the resource sits
 
 
-#### resource_reference(_: st_ )
+#### resource_reference(_: `str_ )
 Unique reference of the resource within the connecting system
 
 
-#### status(_: MonitoredResourceStat_ )
+#### status(_: `MonitoredResourceState_ )
 The enum status of the event
 
 
-#### technical_control(_: TechnicalContro_ )
+#### technical_control(_: `TechnicalControl_ )
 Technical control which this compliance event is the subject of
 
 
-#### type(_: MonitoredResourceTyp_ )
+#### type(_: `MonitoredResourceType_ )
 The enum of the resource type
 
 
@@ -390,15 +391,15 @@ Dataclass representing environment
 
 #### \__init__(name, abbreviation, id=None)
 
-#### abbreviation(_: st_ )
+#### abbreviation(_: `str_ )
 Abbreviated name of the environment
 
 
-#### id(_: Optional[int_ _ = Non_ )
+#### id(_: `Optional`[`int`_ _ = Non_ )
 internal id for the environment
 
 
-#### name(_: st_ )
+#### name(_: `str_ )
 Name of environment
 
 
@@ -410,23 +411,23 @@ Dataclass representing an exclusion resource
 
 #### \__init__(id, reference, technical_control_reference, application_reference, state)
 
-#### application_reference(_: st_ )
+#### application_reference(_: `str_ )
 unique reference for the application
 
 
-#### id(_: in_ )
+#### id(_: `int_ )
 Internal id of the exclusion resource
 
 
-#### reference(_: st_ )
+#### reference(_: `str_ )
 Reference of the exclusion resource
 
 
-#### state(_: ExclusionResourceStat_ )
+#### state(_: `ExclusionResourceState_ )
 status of the exclusion resource
 
 
-#### technical_control_reference(_: st_ )
+#### technical_control_reference(_: `str_ )
 unique reference for the technical control
 
 
@@ -448,13 +449,19 @@ Bases: `Enum`
 An enumeration.
 
 
+#### CANCELLED(_ = _ )
+
 #### FIXED_AUTO(_ = _ )
 
 #### FIXED_OTHER(_ = _ )
 
 #### FLAGGED(_ = _ )
 
+#### MONITORING(_ = _ )
+
 #### SUPPRESSED(_ = _ )
+
+#### UNRESPONSIVE(_ = _ )
 
 ### _class_ client.airviewclient.models.MonitoredResourceType(value)
 Bases: `Enum`
@@ -477,6 +484,8 @@ An enumeration.
 #### REPOSITORY(_ = _ )
 
 #### STORAGE(_ = 1_ )
+
+#### UNKNOWN(_ = _ )
 
 #### VIRTUAL_MACHINE(_ = _ )
 
@@ -518,39 +527,39 @@ Dataclass representing technical control definition
 
 #### \__init__(name, reference, quality_model, type, id=None, parent_id=None, ttl=None, is_blocking=None, can_delete_resources=None)
 
-#### can_delete_resources(_: Optional[bool_ _ = Non_ )
+#### can_delete_resources(_: `Optional`[`bool`_ _ = Non_ )
 Can resources be unlinked from the control
 
 
-#### id(_: Optional[int_ _ = Non_ )
+#### id(_: `Optional`[`int`_ _ = Non_ )
 Internal id of the techincal control
 
 
-#### is_blocking(_: Optional[bool_ _ = Non_ )
+#### is_blocking(_: `Optional`[`bool`_ _ = Non_ )
 Should a failure cause a process to exit
 
 
-#### name(_: st_ )
+#### name(_: `str_ )
 The name of the technical control
 
 
-#### parent_id(_: Optional[int_ _ = Non_ )
+#### parent_id(_: `Optional`[`int`_ _ = Non_ )
 Id of parent control
 
 
-#### quality_model(_: QualityMode_ )
+#### quality_model(_: `QualityModel_ )
 Quality model of the techincal control
 
 
-#### reference(_: st_ )
+#### reference(_: `str_ )
 Unique reference for the control within the connecting system
 
 
-#### ttl(_: Optional[int_ _ = Non_ )
+#### ttl(_: `Optional`[`int`_ _ = Non_ )
 Period after which the control should be assumed non compliant
 
 
-#### type(_: TechnicalControlTyp_ )
+#### type(_: `TechnicalControlType_ )
 Type of control
 
 
@@ -560,9 +569,9 @@ Bases: `Enum`
 An enumeration.
 
 
-#### LOG(_ = _ )
+#### INCIDENT(_ = _ )
 
-#### SECURITY(_ = _ )
+#### LOG(_ = _ )
 
 #### TASK(_ = _ )
 

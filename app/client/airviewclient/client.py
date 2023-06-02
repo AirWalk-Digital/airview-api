@@ -14,7 +14,7 @@ class Backend:
         self.referencing_type = backend_config.referencing_type
         self._session = session
         self._backend_config = backend_config
-        self._headers = {"Authorization": backend_config.token}
+        self._headers = {"Authorization": f"Bearer {backend_config.token}"}
         self._system_id = None
 
     @property

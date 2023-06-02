@@ -63,6 +63,7 @@ class ApplicationType(Enum):
 
 
 class MonitoredResourceType(Enum):
+    UNKNOWN = 1
     VIRTUAL_MACHINE = 2
     CONTAINER = 3
     NETWORK = 4
