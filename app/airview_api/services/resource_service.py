@@ -51,3 +51,12 @@ def upsert(application_id: str, reference: str, data: dict):
         raise AirViewValidationException("Integrity Error, check reference fields")
 
     return resource
+
+
+def get(application_id: str, reference: str):
+    resource = Resource.query.filter_by(
+        application_id=application_id, reference=reference
+    ).first()
+    if resource is None:
+        raise AirViewNotFoundException
+    return resource

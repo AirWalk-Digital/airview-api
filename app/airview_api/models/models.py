@@ -32,12 +32,8 @@ class ExclusionState(Enum):
 
 class MonitoredResourceState(Enum):
     FLAGGED = 1
-    SUPPRESSED = 2
-    FIXED_AUTO = 3
-    FIXED_OTHER = 4
-    MONITORING = 5
-    CANCELLED = 6
-    UNRESPONSIVE = 7
+    MONITORING = 2
+    DELETED = 3
 
     def __str__(self):
         return self.name
@@ -76,6 +72,16 @@ class ServiceType(Enum):
     DATABASE = 8
     FUNCTION = 9
     STORAGE = 10
+
+    def __str__(self):
+        return self.name
+
+
+class TechnicalControlAction(Enum):
+    LOG = 1
+    INCIDENT = 2
+    TASK = 3
+    VULNERABILITY = 4
 
     def __str__(self):
         return self.name
@@ -255,6 +261,7 @@ class TechnicalControl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
+    control_action = db.Column(db.Enum(TechnicalControlAction), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
     # severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     ttl = db.Column(db.Integer, nullable=True)

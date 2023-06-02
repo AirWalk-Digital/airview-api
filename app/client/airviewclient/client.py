@@ -173,41 +173,20 @@ class Backend:
                 id=control["id"],
                 name=control["name"],
                 reference=control["reference"],
-                quality_model=QualityModel[control["qualityModel"]],
-                type=TechnicalControlType[control["controlAction"]],
+                control_action=TechnicalControlAction[control["controlAction"]],
             )
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
-    def get_application_control_link(
-        self, application_id, technical_control_id
-    ) -> int | None:
-        """Get the id of application to control linkage"""
-        url = self.get_url(
-            f"/application-technical-controls/?applicationId={application_id}&technicalControlId={technical_control_id}"
-        )
-        resp = self._session.get(
-            url=url,
-            headers=self._headers,
-        )
-        if resp.status_code == 404:
-            return None
-        if resp.status_code != 200:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
-        return resp.json()["id"]
-
-    def save_monitored_resource(
-        self, app_tech_control_id, reference, state, type
-    ) -> None:
+    def save_monitored_resource(self, technical_control_id, resource_id, state) -> None:
         """Persist the current status of a montiored resource"""
 
         url = self.get_url(
-            f"/monitored-resources/?applicationTechnicalControlId={app_tech_control_id}&reference={reference}"
+            f"/monitored-resources/?technicalControlId={technical_control_id}&resourceId={resource_id}"
         )
         resp = self._session.put(
             url=url,
             json={
                 "monitoringState": state,
-                "type": type,
             },
             headers=self._headers,
         )
@@ -220,13 +199,10 @@ class Backend:
         mapped = {
             "name": technical_control.name,
             "reference": technical_control.reference,
-            "controlAction": technical_control.type.name,
-            "qualityModel": technical_control.quality_model.name,
             "systemId": self.system_id,
             "ttl": technical_control.ttl,
-            "canDeleteResources": technical_control.can_delete_resources,
             "isBlocking": technical_control.is_blocking,
-            "parentId": technical_control.parent_id,
+            "controlAction": technical_control.control_action.name,
         }
         resp = self._session.post(
             url=self.get_url("/technical-controls/"),
@@ -240,25 +216,10 @@ class Backend:
                 id=control["id"],
                 name=control["name"],
                 reference=control["reference"],
-                quality_model=QualityModel[control["qualityModel"]],
-                type=TechnicalControlType[control["controlAction"]],
+                control_action=control["controlAction"],
             )
 
         raise BackendFailureException(f"Status code: {resp.status_code}")
-
-    def link_application_to_control(self, application_id, technical_control_id) -> int:
-        """create a new linkage between application and technical control"""
-        resp = self._session.post(
-            url=self.get_url("/application-technical-controls/"),
-            json={
-                "technicalControlId": technical_control_id,
-                "applicationId": application_id,
-            },
-            headers=self._headers,
-        )
-        if resp.status_code != 200:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
-        return resp.json()["id"]
 
     def _get_application_reference(self, arr):
         for item in arr:
@@ -303,6 +264,35 @@ class Backend:
         )
         if resp.status_code != 204:
             raise BackendFailureException(f"Status code: {resp.status_code}")
+
+    def get_resource_id(self, reference: str, application_id: int) -> Optional[int]:
+        """Get the id of a resource by its application id and reference"""
+        resp = self._session.get(
+            url=self.get_url(
+                f"/resources/?applicationId={application_id}&reference={reference}",
+            ),
+            headers=self._headers,
+        )
+        if resp.status_code == 200:
+            return resp.json()["id"]
+        if resp.status_code == 404:
+            return None
+        raise BackendFailureException(f"Status code: {resp.status_code}")
+
+    def create_resource(self, reference: str, application_id: int) -> Optional[int]:
+        """Create a barebone resource for linking compliance event to"""
+        resp = self._session.post(
+            url=self.get_url(f"/resources/"),
+            headers=self._headers,
+            json={
+                "name": reference,
+                "reference": reference,
+                "applicationId": application_id,
+            },
+        )
+        if resp.status_code == 200:
+            return resp.json()["id"]
+        raise BackendFailureException(f"Status code: {resp.status_code}")
 
 
 class Handler:
@@ -373,21 +363,22 @@ class Handler:
                 compliance_event.technical_control
             )
 
+        # Ensure resource exists
         # ensure control is linked to app
-        link_id = self._backend.get_application_control_link(
-            application_id=application.id, technical_control_id=control.id
+        resource_id = self._backend.get_resource_id(
+            application_id=application.id, reference=compliance_event.resource_reference
         )
-        if link_id is None:
-            link_id = self._backend.link_application_to_control(
-                application_id=application.id, technical_control_id=control.id
+        if resource_id is None:
+            resource_id = self._backend.create_resource(
+                application_id=application.id,
+                reference=compliance_event.resource_reference,
             )
 
         # save triggered
         self._backend.save_monitored_resource(
-            app_tech_control_id=link_id,
-            reference=compliance_event.resource_reference,
+            technical_control_id=control.id,
+            resource_id=resource_id,
             state=compliance_event.status.name,
-            type=compliance_event.type.name,
         )
 
     def set_exclusion_resource_state(
@@ -413,11 +404,11 @@ class Handler:
 
 
 def get_oauth_token(
-        oauth_endpoint: str,
-        client_id: str,
-        client_secret: str,
-        scope: str,
-        additional_headers=None,
+    oauth_endpoint: str,
+    client_id: str,
+    client_secret: str,
+    scope: str,
+    additional_headers=None,
 ) -> str:
     """
     Helper method to get OAuth Token
@@ -438,19 +429,18 @@ def get_oauth_token(
         "scope": scope,
     }
 
-    resp = requests.post(
-        url=oauth_endpoint,
-        data=auth_data,
-        headers=additional_headers
-    )
+    resp = requests.post(url=oauth_endpoint, data=auth_data, headers=additional_headers)
     try:
         resp.raise_for_status()
     except Exception as e:
-        raise BackendFailureException(f"Failed to get oauth token!  HTTP response: {resp.status_code}")
+        raise BackendFailureException(
+            f"Failed to get oauth token!  HTTP response: {resp.status_code}"
+        )
 
     d = resp.json()
     token = f"Bearer {d.get('access_token')}"
     return token
+
 
 def get_azure_token(
     client_id: str, client_secret: str, tenant_id: str, scope: str
@@ -467,18 +457,18 @@ def get_azure_token(
         f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token?grant_type=client_credential",
         client_id=client_id,
         client_secret=client_secret,
-        scope=scope
+        scope=scope,
     )
 
     return token
 
 
 def get_aws_cognito_token(
-        client_id: str,
-        client_secret: str,
-        cognito_pool_domain_prefix: str,
-        aws_region: str,
-        scope: str = "airview/agent_push"
+    client_id: str,
+    client_secret: str,
+    cognito_pool_domain_prefix: str,
+    aws_region: str,
+    scope: str = "airview/agent_push",
 ) -> str:
     """
     Helper method to get an AWS Cognito token for use with the client
@@ -494,9 +484,7 @@ def get_aws_cognito_token(
         client_id=client_id,
         client_secret=client_secret,
         scope=scope,
-        additional_headers={
-            "content-type": "application/x-www-form-urlencoded"
-        }
+        additional_headers={"content-type": "application/x-www-form-urlencoded"},
     )
 
     return token

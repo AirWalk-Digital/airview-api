@@ -40,7 +40,7 @@ class ResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True)
-    service_id = ma.fields.Integer(required=True)
+    service_id = ma.fields.Integer(required=False)
     application_id = ma.fields.Integer(required=True)
 
 
@@ -103,6 +103,7 @@ class TechnicalControlSchema(CamelCaseSchema):
     system_id = ma.fields.Integer(required=True)
     ttl = ma.fields.Integer(required=False)
     is_blocking = ma.fields.Boolean(required=False, missing=False)
+    control_action = ma.fields.Str(required=True)
 
 
 class ApplicationTechnicalControlSchema(CamelCaseSchema):

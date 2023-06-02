@@ -47,3 +47,16 @@ class Resources(MethodView):
         data = resource_service.upsert(application_id, resource_reference, data)
 
         return data
+
+    @blp.response(200, ResourceSchema)
+    @blp.role(Roles.COMPLIANCE_READER)
+    def get(self):
+        """update the resource by its reference and applicationId"""
+        application_id: str = flask.request.args.get("applicationId")
+        resource_reference: str = flask.request.args.get("reference")
+        try:
+            data = resource_service.get(application_id, resource_reference)
+
+            return data
+        except AirViewNotFoundException:
+            abort(404)

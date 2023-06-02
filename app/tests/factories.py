@@ -11,6 +11,7 @@ from airview_api.models import (
     QualityModel,
     Service,
     Resource,
+    TechnicalControlAction,
 )
 from airview_api.database import db
 from datetime import datetime
@@ -25,6 +26,7 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
     name = factory.Sequence(lambda n: f"TC {n}")
 
     is_blocking = False
+    control_action = TechnicalControlAction.LOG
 
 
 class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):
