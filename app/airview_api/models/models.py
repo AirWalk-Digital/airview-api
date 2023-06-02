@@ -317,8 +317,8 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     reference = db.Column(db.String(500), nullable=False)
-    last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=False)
+    last_modified = db.Column(db.DateTime, nullable=False)
+    last_seen = db.Column(db.DateTime, nullable=False)
     service_id = db.Column(
         db.Integer,
         db.ForeignKey("service.id"),
@@ -359,8 +359,8 @@ class MonitoredResource(db.Model):
 
     resource = db.relationship("Resource", back_populates="monitored_resources")
     monitoring_state = db.Column(db.Enum(MonitoredResourceState), nullable=False)
-    last_modified = db.Column(db.DateTime(timezone=True), nullable=False)
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=True)
+    last_modified = db.Column(db.DateTime, nullable=False)
+    last_seen = db.Column(db.DateTime, nullable=True)
     additional_data = db.Column(db.String(8000), nullable=False, default="")
 
     technical_control_id = db.Column(
