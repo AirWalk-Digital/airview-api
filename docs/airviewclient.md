@@ -351,13 +351,13 @@ Access token to be used when interacting with the backend
 Bases: `Exception`
 
 
-### _class_ client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, type, additional_data='')
+### _class_ client.airviewclient.models.ComplianceEvent(resource_reference, application, technical_control, status, additional_data='')
 Bases: `object`
 
 Dataclass representing an incoming compliance event
 
 
-#### \__init__(resource_reference, application, technical_control, status, type, additional_data='')
+#### \__init__(resource_reference, application, technical_control, status, additional_data='')
 
 #### additional_data(_: `str_ _ = '_ )
 Any additional textual data to associate with the event
@@ -377,10 +377,6 @@ The enum status of the event
 
 #### technical_control(_: `TechnicalControl_ )
 Technical control which this compliance event is the subject of
-
-
-#### type(_: `MonitoredResourceType_ )
-The enum of the resource type
 
 
 ### _class_ client.airviewclient.models.Environment(name, abbreviation, id=None)
