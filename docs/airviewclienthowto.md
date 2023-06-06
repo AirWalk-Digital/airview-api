@@ -78,16 +78,13 @@ application = models.Application(name="Test App One", reference="local-app-ident
 technical_control = models.TechnicalControl(
     name="All servers should be patched",
     reference="local_control_identifier",
-    quality_model=models.QualityModel.SECURITY,
-    type=models.TechnicalControlType.TASK,
-	parent_id=None, # Optionally link a control to a parent
+    control_action=TechnicalControlAction.VULNERABILITY,
 )
 compliance_event = models.ComplianceEvent(
 	application=application,
 	technical_control=technical_control,
 	resource_reference=resource_ref,
 	status=MonitoredResourceState.FLAGGED,
-	type=MonitoredResourceType.VIRTUAL_MACHINE,
 )
 
 client_handler.handle_compliance_event(transformed)

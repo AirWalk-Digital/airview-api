@@ -26,7 +26,6 @@ def compliance_event():
         technical_control=technical_control,
         resource_reference="res-ref-1",
         status=models.MonitoredResourceState.FLAGGED,
-        type=models.MonitoredResourceType.VIRTUAL_MACHINE,
         additional_data="Additional",
     )
 
