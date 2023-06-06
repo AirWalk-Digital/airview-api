@@ -203,3 +203,11 @@ class SystemSchema(CamelCaseSchema):
 
 class QualityModelSchema(CamelCaseSchema):
     name = ma.fields.Str()
+
+
+class ComplianceDataSchema(CamelCaseSchema):
+    application_id = ma.fields.Integer()
+    application_name = ma.fields.Str()
+    isCompliant = ma.fields.Boolean()
+    resource_reference = ma.fields.Str()
+    technical_control_reference = ma.fields.Str()
