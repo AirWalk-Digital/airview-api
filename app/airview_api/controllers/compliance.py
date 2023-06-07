@@ -3,6 +3,8 @@ from airview_api.schemas import ComplianceDataSchema
 from airview_api.blueprint import Blueprint, Roles
 from flask.views import MethodView
 from flask import request
+from flask_smorest import abort
+from airview_api.services import AirViewValidationException
 
 from airview_api.services import compliance_service
 
@@ -25,7 +27,12 @@ class ComplianceData(MethodView):
 
         odata_filter = request.args.get("$filter")
         odata_select = request.args.get("$select")
+        if not odata_select:
+            abort(400, message="The $select query parameter must be passed")
 
-        return compliance_service.get_compliace_aggregate(
-            filter=odata_filter, select=odata_select
-        )
+        try:
+            return compliance_service.get_compliace_aggregate(
+                filter=odata_filter, select=odata_select
+            )
+        except AirViewValidationException as e:
+            abort(400, message=str(e))
