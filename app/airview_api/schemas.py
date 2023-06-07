@@ -210,5 +210,5 @@ class ComplianceDataSchema(CamelCaseSchema):
     application_name = ma.fields.Str()
     resource_reference = ma.fields.Str()
     technical_control_reference = ma.fields.Str()
-    isCompliant = ma.fields.Integer()
+    is_compliant = ma.fields.Integer()
     total = ma.fields.Integer()

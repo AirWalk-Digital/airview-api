@@ -38,7 +38,7 @@ def get_compliace_aggregate(filter: str, select: str):
                     )
                 ],
                 else_=0,
-            ).label("isCompliant"),
+            ).label("is_compliant"),
         )
         .select_from(TechnicalControl)
         .join(MonitoredResource)
@@ -54,7 +54,7 @@ def get_compliace_aggregate(filter: str, select: str):
         ast = parser.parse(lexer.tokenize(filter))
         visitor = AstToSqlVisitor()
         where_clause = visitor.visit(ast)
-        # apply the where to the subquery
+        # apply the where to the subquery, creating another subquery
         orm_query = db.select(["*"]).select_from(orm_query).where(db.text(where_clause))
 
     # The mapping is used to re-label the previously lower cased columns back to snake case, python style
@@ -65,8 +65,8 @@ def get_compliace_aggregate(filter: str, select: str):
         db.select(
             [db.column(c).label(mapping[c]) for c in splits]
             + [
-                func.sum(db.column("isCompliant")).label("isCompliant"),
-                func.count(db.column("isCompliant")).label("total"),
+                func.sum(db.column("is_compliant")).label("is_compliant"),
+                func.count(db.column("is_compliant")).label("total"),
             ]
         )
         .select_from(orm_query)
