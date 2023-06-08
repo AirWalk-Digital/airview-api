@@ -53,6 +53,35 @@ class Backend:
             return [Environment(**item) for item in resp.json()]
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
+    def get_services(self) -> list[Service]:
+        """
+        Get a list of services
+        """
+        url = self.get_url("/services/")
+        resp = self._session.get(url=url, headers=self._headers)
+        if resp.status_code == 200:
+            return [Service(**item) for item in resp.json()]
+        raise BackendFailureException(f"Status code: {resp.status_code}")
+
+    def create_service(self, service:Service) -> Environment:
+        """
+        Create a new service
+        """
+
+        resp = self._session.post(
+            url=self.get_url("/services/"),
+            headers=self._headers,
+            json={
+                "name": service.name,
+                "reference": service.reference,
+                "type": service.type.name,
+            },
+        )
+        if resp.status_code == 200:
+            return resp.json()["id"]
+        raise BackendFailureException(f"Status code: {resp.status_code}")
+
+
     def create_system(self, name: str, stage: SystemStage) -> Environment:
         """
         Create a new system
@@ -300,6 +329,33 @@ class Handler:
 
     def __init__(self, backend: Backend):
         self._backend = backend
+
+    def handle_resource(self, resource: Resource) -> Resource:
+        # check app pre-exists
+        application = self._backend.get_application_by_reference(
+            application_reference=resource.application.reference
+        )
+
+        if application is None:
+            # create new app
+            application = self._backend.create_application(
+                application=resource.application, environment_id=None
+            )
+
+        all_services = self._backend.get_services()
+
+        service = next(
+            (
+                e
+                for e in all_services
+                if e.reference == resource.service.reference
+            ),
+            None,
+        )
+        if service is None:
+            service = self._backend.create_service(resource.service)
+
+
 
     def handle_application(self, application: Application) -> Application:
         """
