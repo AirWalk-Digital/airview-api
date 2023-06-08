@@ -63,7 +63,7 @@ class Backend:
             return [Service(**item) for item in resp.json()]
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
-    def create_service(self, service:Service) -> Environment:
+    def create_service(self, service:Service) -> Service:
         """
         Create a new service
         """
@@ -78,7 +78,7 @@ class Backend:
             },
         )
         if resp.status_code == 200:
-            return resp.json()["id"]
+            return Service(**resp.json())
         raise BackendFailureException(f"Status code: {resp.status_code}")
 
 
@@ -321,7 +321,24 @@ class Backend:
         )
         if resp.status_code == 200:
             return resp.json()["id"]
+        
         raise BackendFailureException(f"Status code: {resp.status_code}")
+
+    def save_resource(self, resource: Resource) -> None:
+        """Create a barebone resource for linking compliance event to"""
+        resp = self._session.put(
+            url=self.get_url(f"/resources/"),
+            headers=self._headers,
+            json={
+                "name": resource.name,
+                "reference": resource.reference,
+                "applicationId": resource.application.id,
+                "serviceId": resource.service.id,
+            },
+        )
+        if resp.status_code != 204:
+            raise BackendFailureException(f"Status code: {resp.status_code}")
+
 
 
 class Handler:
@@ -330,7 +347,7 @@ class Handler:
     def __init__(self, backend: Backend):
         self._backend = backend
 
-    def handle_resource(self, resource: Resource) -> Resource:
+    def handle_resource(self, resource: Resource) -> None:
         # check app pre-exists
         application = self._backend.get_application_by_reference(
             application_reference=resource.application.reference
@@ -354,6 +371,12 @@ class Handler:
         )
         if service is None:
             service = self._backend.create_service(resource.service)
+
+        resource.service.id = service.id
+        resource.application.id = application.id
+        self._backend.save_resource(resource)
+
+        
 
 
 
@@ -420,7 +443,6 @@ class Handler:
             )
 
         # Ensure resource exists
-        # ensure control is linked to app
         resource_id = self._backend.get_resource_id(
             application_id=application.id, reference=compliance_event.resource_reference
         )
