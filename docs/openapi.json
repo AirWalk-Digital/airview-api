@@ -67,6 +67,35 @@
         },
         "type": "object"
       },
+      "ComplianceData": {
+        "properties": {
+          "applicationId": {
+            "type": "integer"
+          },
+          "applicationName": {
+            "type": "string"
+          },
+          "controlId": {
+            "type": "integer"
+          },
+          "controlName": {
+            "type": "string"
+          },
+          "isCompliant": {
+            "type": "integer"
+          },
+          "resourceReference": {
+            "type": "string"
+          },
+          "technicalControlReference": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "Environment": {
         "properties": {
           "abbreviation": {
@@ -118,6 +147,32 @@
         "required": [
           "monitoringState"
         ],
+        "type": "object"
+      },
+      "PaginationMetadata": {
+        "properties": {
+          "first_page": {
+            "type": "integer"
+          },
+          "last_page": {
+            "type": "integer"
+          },
+          "next_page": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "previous_page": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          }
+        },
         "type": "object"
       },
       "Resource": {
@@ -380,6 +435,33 @@
           }
         }
       ]
+    },
+    "/compliance/": {
+      "get": {
+        "description": "Returns application matching requested id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ComplianceData"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get an application by id",
+        "tags": [
+          "compliance"
+        ]
+      }
     },
     "/environments/": {
       "get": {
@@ -769,18 +851,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -907,6 +989,10 @@
     {
       "description": "Environment related resources",
       "name": "environments"
+    },
+    {
+      "description": "compliance based resources",
+      "name": "compliance"
     },
     {
       "description": "Referenced App related resources",
