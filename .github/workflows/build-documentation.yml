@@ -30,7 +30,7 @@ jobs:
         mv _build/markdown/client.airviewclient.md ../../../docs/airviewclient.md;
         cd ../../../app
         pip install -r requirements.txt
-        FLASK_APP=./utils/debug.py flask openapi write ../docs/openapi.json
+        FLASK_APP=./utils/debug.py  DATABASE_URI=sqlite:// flask openapi write ../docs/openapi.json
         cd ..
         jq -S . docs/openapi.json > docs/newopenapi.json  && mv docs/newopenapi.json docs/openapi.json
 
