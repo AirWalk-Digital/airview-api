@@ -27,22 +27,21 @@ def client():
         app.DB_URI = postgresql.url()
 
     instance = app.create_app()
-    db.create_all(app=instance)
     ctx = instance.app_context()
     ctx.push()
 
+    db.create_all()
     yield instance.test_client()
 
     ctx.pop()
-
 
 @pytest.fixture(scope="function")
 def instance():
     app.DB_URI = "sqlite://"
     inst = app.create_app()
-    db.create_all(app=inst)
     ctx = inst.app_context()
     ctx.push()
+    db.create_all()
 
     yield inst
 
