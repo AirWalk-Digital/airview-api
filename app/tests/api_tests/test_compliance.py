@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from pprint import pprint
 from tests.factories import *
 from tests.common import client
 from airview_api.models import (
@@ -197,9 +196,8 @@ def test_get_complaince_ok_for_valid_query_with_missing_filter(client, test_inpu
     resp = client.get(
         f"/compliance/?{test_input['query']}",
     )
-    # print(resp.get_json())
-    # assert resp.status_code == 200
+    assert resp.status_code == 200
 
     data = resp.get_json()
-    print(data)
-    # assert data == test_input["expected"]
+    
+    assert data == test_input["expected"]

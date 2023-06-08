@@ -53,13 +53,13 @@ def get_compliace_aggregate(filter: str, select: str):
             Control.name.label("controlname"),
             Control.id.label("controlid"),
             case(
-                [
+                
                     (
                         MonitoredResource.monitoring_state
                         == MonitoredResourceState.MONITORING,
                         1,
                     )
-                ],
+                ,
                 else_=0,
             ).label("is_compliant"),
         )
@@ -69,6 +69,7 @@ def get_compliace_aggregate(filter: str, select: str):
         .join(Application)
         .join(Control, isouter=True)
         .where(MonitoredResource.monitoring_state != MonitoredResourceState.DELETED)
+        .subquery()
     )
 
     if filter:
@@ -82,22 +83,23 @@ def get_compliace_aggregate(filter: str, select: str):
             where_clause = visitor.visit(ast)
             # apply the where to the subquery, creating another subquery
             orm_query = (
-                db.select(["*"]).select_from(orm_query).where(db.text(where_clause))
+                db.select(db.text("*")).select_from(orm_query).where(db.text(where_clause)).subquery()
             )
-        except:
+        except Exception as e:
             raise AirViewValidationException("The filter provided could not be parsed")
 
     # The mapping is used to re-label the previously lower cased columns back to snake case, python style
     mapping = {x.replace("_", ""): x for x in allowed_columns}
 
     # apply the final 'group by' aggregation based on what was requested in the select param
+
     aggreated_query = (
         db.select(
-            [db.column(c).label(mapping[c]) for c in splits]
+            *([db.column(c).label(mapping[c]) for c in splits]
             + [
                 func.sum(db.column("is_compliant")).label("is_compliant"),
                 func.count(db.column("is_compliant")).label("total"),
-            ]
+            ])
         )
         .select_from(orm_query)
         .group_by(db.text(select))
@@ -105,7 +107,7 @@ def get_compliace_aggregate(filter: str, select: str):
 
     try:
         results = db.session.execute(aggreated_query).all()
-    except:
+    except Exception as e:
         # This is less than ideal but since there's so many permetations of the odata filter it's hard to validate
         # For now, this assumes the failure is due to a bad filter. It could be anything. But this guards against 500 errors at least.
         raise AirViewValidationException(
