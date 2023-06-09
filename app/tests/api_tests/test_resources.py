@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from airview_api.models import TechnicalControlSeverity, Resource, ApplicationType
 from tests.common import client
 from tests.factories import *
+import pytest
 
 
 def setup():
@@ -369,3 +370,29 @@ def test_resources_get_single_not_found(client):
     )
     # Assert
     assert resp.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "test_input", ["applicationId=999&reference=res_1", "applicationId=1&reference=res_blah", "reference=res_1", "applicationId=1"]
+)
+def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_input):
+    """
+    Given: No existing resource in the collection
+    When: When a call is made to update a resource but the query params do not match the payload
+    Then: A 400 error is returned
+    """
+    # Arrange
+
+    # Act
+    resp = client.put(
+        "/resources/?applicationId=1&reference=res_1",
+        json={
+            "name": "Res One",
+            "reference": "res_1",
+            "serviceId": 10,
+            "applicationId": 1,
+        },
+    )
+    # Assert
+    assert resp.status_code == 400
+    assert resp.get_json()['message'] == "Keys in data do not match the keys in the query parameters"

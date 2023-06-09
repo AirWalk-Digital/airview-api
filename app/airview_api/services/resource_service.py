@@ -21,11 +21,12 @@ def create(data: dict):
     return resource
 
 
-def upsert(application_id: str, reference: str, data: dict):
+def upsert(data: dict):
+
     if "id" in data:
         raise AirViewValidationException("Id is not expected when upserting a record")
     resource = Resource.query.filter_by(
-        application_id=application_id, reference=reference
+        application_id=data['application_id'], reference=data['reference']
     ).first()
     if resource is None:
         resource = Resource(**data)
