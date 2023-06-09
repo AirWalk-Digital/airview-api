@@ -204,7 +204,7 @@ def test_resources_put_updates_existing(client):
             "name": "Res One Update",
             "reference": "res_1",
             "serviceId": 11,
-            "applicationId": 2,
+            "applicationId": 1,
         },
     )
     # Assert
@@ -217,7 +217,7 @@ def test_resources_put_updates_existing(client):
     assert items[0].id == 1
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
-    assert items[0].application_id == 2
+    assert items[0].application_id == 1
     assert items[0].service_id == 11
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
@@ -385,7 +385,7 @@ def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_
 
     # Act
     resp = client.put(
-        "/resources/?applicationId=1&reference=res_1",
+        f"/resources/?{test_input}",
         json={
             "name": "Res One",
             "reference": "res_1",

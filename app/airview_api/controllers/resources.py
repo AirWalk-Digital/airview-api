@@ -45,9 +45,9 @@ class Resources(MethodView):
         application_id: str = flask.request.args.get("applicationId")
         resource_reference: str = flask.request.args.get("reference")
 
-        if application_id != data['application_id'] or resource_reference!=data['reference']:
+        if application_id != str(data['application_id']) or resource_reference!=data['reference']:
             abort(400, message="Keys in data do not match the keys in the query parameters")
-        data = resource_service.upsert(application_id, resource_reference, data)
+        data = resource_service.upsert(data)
 
         return data
 
