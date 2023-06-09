@@ -51,7 +51,7 @@ class Backend:
         resp = self._session.get(url=url, headers=self._headers)
         if resp.status_code == 200:
             return [Environment(**item) for item in resp.json()]
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def get_services(self) -> list[Service]:
         """
@@ -61,7 +61,7 @@ class Backend:
         resp = self._session.get(url=url, headers=self._headers)
         if resp.status_code == 200:
             return [Service(**item) for item in resp.json()]
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def create_service(self, service:Service) -> Service:
         """
@@ -79,7 +79,7 @@ class Backend:
         )
         if resp.status_code == 200:
             return Service(**resp.json())
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
 
     def create_system(self, name: str, stage: SystemStage) -> Environment:
@@ -97,7 +97,7 @@ class Backend:
         )
         if resp.status_code == 200:
             return resp.json()["id"]
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def create_environment(self, environment: Environment) -> Environment:
         """
@@ -114,7 +114,7 @@ class Backend:
         )
         if resp.status_code == 200:
             return Environment(**resp.json())
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def get_application_by_reference(self, application_reference) -> Application | None:
         """
@@ -136,7 +136,7 @@ class Backend:
             )
         if resp.status_code == 404:
             return None
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def create_application(
         self, application: Application, environment_id: int = None
@@ -165,7 +165,7 @@ class Backend:
             data = resp.json()
             application.id = resp.json()["id"]
             return application
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def update_application(self, application: Application, environment_id: int) -> None:
         data = {
@@ -181,7 +181,7 @@ class Backend:
             json=data,
         )
         if resp.status_code != 204:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
+            raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def get_technical_control(self, reference) -> TechnicalControl:
         """
@@ -204,7 +204,7 @@ class Backend:
                 reference=control["reference"],
                 control_action=TechnicalControlAction[control["controlAction"]],
             )
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def save_monitored_resource(self, technical_control_id, resource_id, state) -> None:
         """Persist the current status of a montiored resource"""
@@ -220,7 +220,7 @@ class Backend:
             headers=self._headers,
         )
         if resp.status_code != 204:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
+            raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def create_technical_control(
         self, technical_control: TechnicalControl
@@ -248,7 +248,7 @@ class Backend:
                 control_action=control["controlAction"],
             )
 
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def _get_application_reference(self, arr):
         for item in arr:
@@ -280,7 +280,7 @@ class Backend:
                 for item in resp.json()
             ]
 
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def set_exclusion_resource_state(
         self, id: int, state: ExclusionResourceState
@@ -292,7 +292,7 @@ class Backend:
             json={"id": id, "state": state.name},
         )
         if resp.status_code != 204:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
+            raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def get_resource_id(self, reference: str, application_id: int) -> Optional[int]:
         """Get the id of a resource by its application id and reference"""
@@ -306,7 +306,7 @@ class Backend:
             return resp.json()["id"]
         if resp.status_code == 404:
             return None
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def create_resource(self, reference: str, application_id: int) -> Optional[int]:
         """Create a barebone resource for linking compliance event to"""
@@ -322,12 +322,12 @@ class Backend:
         if resp.status_code == 200:
             return resp.json()["id"]
         
-        raise BackendFailureException(f"Status code: {resp.status_code}")
+        raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
     def save_resource(self, resource: Resource) -> None:
         """Create a barebone resource for linking compliance event to"""
         resp = self._session.put(
-            url=self.get_url(f"/resources/"),
+            url=self.get_url(f"/resources/?applicationId={resource.application.id}&reference={resource.reference}"),
             headers=self._headers,
             json={
                 "name": resource.name,
@@ -337,7 +337,7 @@ class Backend:
             },
         )
         if resp.status_code != 204:
-            raise BackendFailureException(f"Status code: {resp.status_code}")
+            raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
 
 
