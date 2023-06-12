@@ -1,9 +1,8 @@
 name: Build Documentation
 
 on:
-  push:
-    branches:
-      - "main"
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,7 +13,9 @@ jobs:
         python-version: [3.8]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -41,13 +42,17 @@ jobs:
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
 
+    - name: Pull latest changes 
+      run: |
+        git pull origin ${{ github.head_ref }}
+
     - name: commit
       run: |
         # Stage the file, commit and push
         git add docs
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Automated update of documentation"
-            git push
+            git push origin HEAD:${{ github.head_ref }}
           else
             echo "no changes";
           fi

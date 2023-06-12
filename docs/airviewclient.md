@@ -44,6 +44,16 @@ Create a barebone resource for linking compliance event to
 
 
 
+#### create_service(service)
+Create a new service
+
+
+* **Return type**
+
+    `Service`
+
+
+
 #### create_system(name, stage)
 Create a new system
 
@@ -90,6 +100,10 @@ Get the id of a resource by its application id and reference
 
 
 
+#### get_services()
+Get a list of services
+
+
 #### get_system_id_by_name(name)
 
 #### get_technical_control(reference)
@@ -114,6 +128,16 @@ Helper method to resolve route to full url
 
 #### save_monitored_resource(technical_control_id, resource_id, state)
 Persist the current status of a montiored resource
+
+
+* **Return type**
+
+    `None`
+
+
+
+#### save_resource(resource)
+Create a barebone resource for linking compliance event to
 
 
 * **Return type**
@@ -178,6 +202,24 @@ When passed a compliance event this method will attempt to create any missing de
 * **Return type**
 
     `None`
+
+
+
+#### handle_resource(resource)
+
+* **Return type**
+
+    `None`
+
+
+
+#### handle_technical_control(technical_control)
+When passed a technical control this method will check its existance and if it does not exist a new one will be created. The technical control is returned
+
+
+* **Return type**
+
+    `TechnicalControl`
 
 
 
@@ -451,7 +493,75 @@ An enumeration.
 
 #### MONITORING(_ = _ )
 
-### _class_ client.airviewclient.models.MonitoredResourceType(value)
+### _class_ client.airviewclient.models.QualityModel(value)
+Bases: `Enum`
+
+An enumeration.
+
+
+#### COST_OPTIMISATION(_ = _ )
+
+#### LOG_EXCELLENCE(_ = _ )
+
+#### PERFORMANCE_EFFICIENCY(_ = _ )
+
+#### PORTABILITY(_ = _ )
+
+#### RELIABILITY(_ = _ )
+
+#### SECURITY(_ = _ )
+
+#### USABILITY_AND_COMPATIBILITY(_ = _ )
+
+### _class_ client.airviewclient.models.Resource(reference, name, application, service)
+Bases: `object`
+
+Dataclass representing an resource
+
+
+#### \__init__(reference, name, application, service)
+
+#### application(_: `Application_ )
+Application within which the resource sits
+
+
+#### name(_: `str_ )
+A friendly name for the resource
+
+
+#### reference(_: `str_ )
+Unique reference of the resource within the connecting system
+
+
+#### service(_: `Service_ )
+The service which this resource belongs to (ec2, s3, dynamodb, etc)
+
+
+### _class_ client.airviewclient.models.Service(reference, name, type, id=None)
+Bases: `object`
+
+Dataclass representing a service
+
+
+#### \__init__(reference, name, type, id=None)
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Internal identifier of service
+
+
+#### name(_: `str_ )
+A friendly name for the service
+
+
+#### reference(_: `str_ )
+Unique reference of the service within the connecting system
+
+
+#### type(_: `ServiceType_ )
+The type of service this is
+
+
+### _class_ client.airviewclient.models.ServiceType(value)
 Bases: `Enum`
 
 An enumeration.
@@ -476,26 +586,6 @@ An enumeration.
 #### UNKNOWN(_ = _ )
 
 #### VIRTUAL_MACHINE(_ = _ )
-
-### _class_ client.airviewclient.models.QualityModel(value)
-Bases: `Enum`
-
-An enumeration.
-
-
-#### COST_OPTIMISATION(_ = _ )
-
-#### LOG_EXCELLENCE(_ = _ )
-
-#### PERFORMANCE_EFFICIENCY(_ = _ )
-
-#### PORTABILITY(_ = _ )
-
-#### RELIABILITY(_ = _ )
-
-#### SECURITY(_ = _ )
-
-#### USABILITY_AND_COMPATIBILITY(_ = _ )
 
 ### _class_ client.airviewclient.models.SystemStage(value)
 Bases: `Enum`
