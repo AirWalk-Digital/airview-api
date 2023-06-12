@@ -40,6 +40,10 @@ jobs:
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
 
+    - name: Pull latest changes
+      run: |
+        git pull origin ${{ github.head_ref }}
+
     - name: commit
       run: |
         # Stage the file, commit and push
