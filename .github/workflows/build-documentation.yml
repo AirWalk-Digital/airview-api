@@ -46,7 +46,7 @@ jobs:
         git add docs
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Automated update of documentation"
-            git push
+            git push origin HEAD:${{ github.head_ref }}
           else
             echo "no changes";
           fi
