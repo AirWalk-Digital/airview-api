@@ -203,6 +203,7 @@ class Backend:
                 name=control["name"],
                 reference=control["reference"],
                 control_action=TechnicalControlAction[control["controlAction"]],
+                is_blocking=control["isBlocking"],
             )
         raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
 
@@ -245,7 +246,8 @@ class Backend:
                 id=control["id"],
                 name=control["name"],
                 reference=control["reference"],
-                control_action=control["controlAction"],
+                control_action=TechnicalControlAction[control["controlAction"]],
+                is_blocking=control["isBlocking"],
             )
 
         raise BackendFailureException(f"Status code: {resp.status_code} Message: {resp.text}")
@@ -417,6 +419,22 @@ class Handler:
         application.environment.id = environment.id
         application.environment.name = environment.name
         return application
+
+    def handle_technical_control(self, technical_control: TechnicalControl) -> TechnicalControl:
+
+        """When passed a technical control this method will check its existance and if it does not exist a new one will be created. The technical control is returned"""
+        # check control pre exists
+        backend_techincal_control = self._backend.get_technical_control(
+            reference=technical_control.reference
+        )
+
+        if backend_techincal_control == None:
+            # create control
+            backend_techincal_control= self._backend.create_technical_control(
+                technical_control
+            )
+        return backend_techincal_control
+
 
     def handle_compliance_event(self, compliance_event: ComplianceEvent) -> None:
         """When passed a compliance event this method will attempt to create any missing defintions for Application and Technical Controls and persist the presented event"""

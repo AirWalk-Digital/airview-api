@@ -66,6 +66,7 @@ def test_monitored_resource_creates_missing_application(handler, compliance_even
         name="one",
         system_id=111,
         control_action=TechnicalControlAction.LOG,
+        is_blocking=True,
     )
     # Act
     handler.handle_compliance_event(compliance_event)
@@ -114,6 +115,7 @@ def test_monitored_resource_creates_missing_resource_existing_app(
         name="one",
         system_id=111,
         control_action=TechnicalControlAction.LOG,
+        is_blocking=True,
     )
     # Act
     handler.handle_compliance_event(compliance_event)
@@ -160,6 +162,7 @@ def test_monitored_resource_creates_missing_control(handler, compliance_event):
         name="one",
         system_id=111,
         control_action=TechnicalControlAction.LOG,
+        is_blocking=True,
     )
     # Act
     handler.handle_compliance_event(compliance_event)
@@ -260,6 +263,7 @@ def test_triggered_resource_handle_unexpected_code_for_get_resource(
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
                 "controlAction": "LOG",
+                "isBlocking": True,
             }
         ],
     )
@@ -360,6 +364,7 @@ def test_triggered_resource_handle_unexpected_code_for_create_resource(
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
                 "controlAction": "LOG",
+                "isBlocking": True,
             }
         ],
     )
@@ -421,6 +426,7 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
                 "reference": "ref1",
                 "qualityModel": "SECURITY",
                 "controlAction": "LOG",
+                "isBlocking": True,
             }
         ],
     )
