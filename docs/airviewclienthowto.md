@@ -63,6 +63,17 @@ client_handler.handle_application(transformed)
 
 ```
 
+
+# Persisting a Resource
+
+```
+resource = models.Resource(name='res_one', reference='res-ref-1', application=application, service=service)
+client_handler.handle_resource(resource)
+
+```
+
+
+
 # Persisting a compliance event
 A compliance event can be sent to AirView via the method. [handle_compliance_event](./airviewclient.md#handle_compliance_eventcompliance_event)
 

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from airview_api.models import TechnicalControlSeverity, Resource, ApplicationType
 from tests.common import client
 from tests.factories import *
+import pytest
 
 
 def setup():
@@ -203,7 +204,7 @@ def test_resources_put_updates_existing(client):
             "name": "Res One Update",
             "reference": "res_1",
             "serviceId": 11,
-            "applicationId": 2,
+            "applicationId": 1,
         },
     )
     # Assert
@@ -216,7 +217,7 @@ def test_resources_put_updates_existing(client):
     assert items[0].id == 1
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
-    assert items[0].application_id == 2
+    assert items[0].application_id == 1
     assert items[0].service_id == 11
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
@@ -369,3 +370,29 @@ def test_resources_get_single_not_found(client):
     )
     # Assert
     assert resp.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "test_input", ["applicationId=999&reference=res_1", "applicationId=1&reference=res_blah", "reference=res_1", "applicationId=1"]
+)
+def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_input):
+    """
+    Given: No existing resource in the collection
+    When: When a call is made to update a resource but the query params do not match the payload
+    Then: A 400 error is returned
+    """
+    # Arrange
+
+    # Act
+    resp = client.put(
+        f"/resources/?{test_input}",
+        json={
+            "name": "Res One",
+            "reference": "res_1",
+            "serviceId": 10,
+            "applicationId": 1,
+        },
+    )
+    # Assert
+    assert resp.status_code == 400
+    assert resp.get_json()['message'] == "Keys in data do not match the keys in the query parameters"

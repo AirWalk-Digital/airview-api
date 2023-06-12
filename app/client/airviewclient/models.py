@@ -62,7 +62,7 @@ class ApplicationType(Enum):
         return self.name
 
 
-class MonitoredResourceType(Enum):
+class ServiceType(Enum):
     UNKNOWN = 1
     VIRTUAL_MACHINE = 2
     CONTAINER = 3
@@ -172,6 +172,34 @@ class ExclusionResource:
     application_reference: str
     #: status of the exclusion resource
     state: ExclusionResourceState
+
+
+@dataclass
+class Service:
+    """Dataclass representing a service"""
+
+    #: Unique reference of the service within the connecting system
+    reference: str
+    #: A friendly name for the service
+    name: str
+    #: The type of service this is
+    type: ServiceType
+    #: Internal identifier of service
+    id: Optional[int] = None
+
+@dataclass
+class Resource:
+    """Dataclass representing an resource"""
+
+    #: Unique reference of the resource within the connecting system
+    reference: str
+    #: A friendly name for the resource
+    name: str
+    #: Application within which the resource sits
+    application: Application
+    #: The service which this resource belongs to (ec2, s3, dynamodb, etc)
+    service: Service
+
 
 
 class BackendFailureException(Exception):
