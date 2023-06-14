@@ -111,6 +111,8 @@ def reset_factories():
     SystemFactory.reset_sequence()
     ServiceFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
+    ApplicationEnvironmentFactory.reset_sequence()
+    ApplicationEnvironmentReferenceFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     # ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()

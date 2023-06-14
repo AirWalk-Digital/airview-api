@@ -4,6 +4,8 @@ from airview_api.services import AirViewValidationException, AirViewNotFoundExce
 from airview_api.models import (
     Application,
     System,
+    ApplicationEnvironment,
+    ApplicationEnvironmentReference,
     ApplicationType,
 )
 from airview_api.database import db
@@ -12,23 +14,28 @@ from collections import defaultdict
 import re
 
 
-def get_all(application_type: str = None):
-    if application_type is not None:
-        return Application.query.filter_by(application_type=application_type)
-
-    return Application.query.all()  #
-
-
-def get_by_id(application_id: int):
-    app = Application.query.get(application_id)
+def get_by_id(application_environment_id: int):
+    app = ApplicationEnvironment.query.get(application_environment_id)
     return app
+
+
+def get_by_reference(type, reference):
+    link = ApplicationEnvironmentReference.query.filter_by(
+        type=type, reference=reference
+    ).first()
+    if link is None:
+        raise AirViewNotFoundException()
+    return link.application_environment
 
 
 def create(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
-    app = Application(**data)
+    app = ApplicationEnvironment(**data)
     try:
+        for r in references:
+            app.references.append(ApplicationEnvironmentReference(**r))
+
         db.session.add(app)
         db.session.commit()
     except (IntegrityError, DataError) as e:
@@ -40,11 +47,10 @@ def create(data: dict):
 
 
 def update(data: dict):
-    app = Application.query.get(data["id"])
+    app = ApplicationEnvironment.query.get(data["id"])
     if app is None:
         raise AirViewNotFoundException()
-    app.name = data["name"]
-    app.application_type = ApplicationType[data["application_type"]]
+    app.environment_id = data.get("environment_id")
     try:
         db.session.commit()
     except (IntegrityError, DataError):
