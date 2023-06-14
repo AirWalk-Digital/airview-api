@@ -20,16 +20,20 @@ class CamelCaseSchema(ma.Schema):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
 
+class ApplicationSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    application_type = ma.fields.Str(required=True)
+
+
 class ApplicationReferenceSchema(CamelCaseSchema):
     type = ma.fields.Str(validate=is_allowed_reference)
     reference = ma.fields.Str(validate=is_allowed_reference)
 
 
-class ApplicationSchema(CamelCaseSchema):
+class ApplicationEnvironmentSchema(CamelCaseSchema):
     id = ma.fields.Integer()
-    name = ma.fields.Str(required=True)
-    application_type = ma.fields.Str(required=True)
-    parent_id = ma.fields.Integer(allow_none=True)
+    application = ma.fields.Nested(ApplicationSchema, allow_none=False)
     environment_id = ma.fields.Integer(allow_none=True)
     references = ma.fields.Nested(
         ApplicationReferenceSchema, many=True, allow_none=True

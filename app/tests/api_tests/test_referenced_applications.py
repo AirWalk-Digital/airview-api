@@ -20,8 +20,10 @@ def setup_app_refs():
         application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
-    ApplicationReferenceFactory(application_id=1, type="account", reference="ref-1")
-    ApplicationReferenceFactory(
+    ApplicationEnvironmentReferenceFactory(
+        application_id=1, type="account", reference="ref-1"
+    )
+    ApplicationEnvironmentReferenceFactory(
         application_id=1, type="other-account", reference="ref-1"
     )
 
@@ -31,14 +33,18 @@ def setup_app_refs():
         application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
-    ApplicationReferenceFactory(application_id=2, type="account", reference="ref-2")
+    ApplicationEnvironmentReferenceFactory(
+        application_id=2, type="account", reference="ref-2"
+    )
     ApplicationFactory(
         id=3,
         name="app three",
         application_type=ApplicationType.BUSINESS_APPLICATION,
         environment_id=1,
     )
-    ApplicationReferenceFactory(application_id=3, type="account", reference="ref-3")
+    ApplicationEnvironmentReferenceFactory(
+        application_id=3, type="account", reference="ref-3"
+    )
 
 
 def test_applications_get_by_reference(client):

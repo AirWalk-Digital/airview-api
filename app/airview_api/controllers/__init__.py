@@ -9,7 +9,7 @@ from airview_api.controllers import (
     # application_statuses,
     # exclusion_resources,
     # exclusions,
-    referenced_applications,
+    referenced_application_environments,
     # application_technical_controls,
     monitored_resources,
     compliance,

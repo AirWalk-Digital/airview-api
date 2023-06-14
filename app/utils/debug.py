@@ -8,6 +8,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 
+
 # sqlite disables fk constraints by default, this enables them
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -22,7 +23,7 @@ if os.environ.get("CREATE_DB", "") == "True":
     ctx = instance.app_context()
     ctx.push()
 
-    db.create_all(app=instance)
+    db.create_all()
     db.session.commit()
     ctx.pop()
 

@@ -4,7 +4,6 @@ from airview_api.services import AirViewValidationException, AirViewNotFoundExce
 from airview_api.models import (
     Application,
     System,
-    ApplicationReference,
     ApplicationType,
 )
 from airview_api.database import db
@@ -70,19 +69,8 @@ def _generate_unique_reference(name: str) -> str:
 def create(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
-    references = data.pop("references", [])
     app = Application(**data)
-    references.insert(
-        0,
-        {
-            "type": "_internal_reference",
-            "reference": _generate_unique_reference(app.name),
-        },
-    )
     try:
-        for r in references:
-            app.references.append(ApplicationReference(**r))
-
         db.session.add(app)
         db.session.commit()
     except (IntegrityError, DataError) as e:
@@ -99,8 +87,6 @@ def update(data: dict):
         raise AirViewNotFoundException()
     app.name = data["name"]
     app.application_type = ApplicationType[data["application_type"]]
-    app.parent_id = data.get("parent_id")
-    app.environment_id = data.get("environment_id")
     try:
         db.session.commit()
     except (IntegrityError, DataError):

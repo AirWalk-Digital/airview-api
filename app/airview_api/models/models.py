@@ -91,34 +91,52 @@ class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
     application_type = db.Column(db.Enum(ApplicationType), nullable=False)
-    environment_id = db.Column(
-        db.Integer, db.ForeignKey("environment.id"), nullable=True
-    )
-    parent_id = db.Column(db.Integer, db.ForeignKey("application.id"), nullable=True)
-    children = db.relationship(
-        "Application", backref=db.backref("parent", remote_side=[id])
-    )
-    environment = db.relationship("Environment", back_populates="applications")
-    references = db.relationship(
-        "ApplicationReference", back_populates="application", lazy="dynamic"
-    )
-    resources = db.relationship(
-        "Resource", back_populates="application", lazy="dynamic"
-    )
 
-    exclusions = db.relationship(
-        "Exclusion", back_populates="application", lazy="dynamic"
+    application_environments = db.relationship(
+        "ApplicationEnvironment", back_populates="application"
     )
 
     def __repr__(self):
         return f"{self.name}"
 
 
-class ApplicationReference(db.Model):
+class ApplicationEnvironment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     application_id = db.Column(
+        db.Integer, db.ForeignKey("application.id"), nullable=False
+    )
+    environment_id = db.Column(
+        db.Integer, db.ForeignKey("environment.id"), nullable=True
+    )
+
+    application = db.relationship(
+        "Application", back_populates="application_environments"
+    )
+    environment = db.relationship(
+        "Environment", back_populates="application_environments"
+    )
+    references = db.relationship(
+        "ApplicationEnvironmentReference",
+        back_populates="application_environment",
+        lazy="dynamic",
+    )
+    resources = db.relationship(
+        "Resource", back_populates="application_environment", lazy="dynamic"
+    )
+
+    exclusions = db.relationship(
+        "Exclusion", back_populates="application_environment", lazy="dynamic"
+    )
+
+    def __repr__(self):
+        return f"{self.name}"
+
+
+class ApplicationEnvironmentReference(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    application_environment_id = db.Column(
         db.Integer,
-        db.ForeignKey("application.id"),
+        db.ForeignKey("application_environment.id"),
         nullable=False,
     )
 
@@ -128,24 +146,26 @@ class ApplicationReference(db.Model):
         db.UniqueConstraint(
             "type",
             "reference",
-            name="uq_application_reference",
+            name="uq_application_enviroinment_reference",
         ),
         db.UniqueConstraint(
-            "application_id",
+            "application_environment_id",
             "type",
-            name="uq_application_type",
+            name="uq_application_environment_type",
         ),
     )
 
-    application = db.relationship("Application", back_populates="references")
+    application_environment = db.relationship(
+        "ApplicationEnvironment", back_populates="references"
+    )
 
 
 class Environment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     abbreviation = db.Column(db.String(10), nullable=False)
-    applications = db.relationship(
-        "Application", back_populates="environment", lazy=True
+    application_environments = db.relationship(
+        "ApplicationEnvironment", back_populates="environment", lazy=True
     )
 
     __table_args__ = (
@@ -326,12 +346,14 @@ class Resource(db.Model):
     )
     service = db.relationship("Service", back_populates="resources")
 
-    application_id = db.Column(
+    application_environment_id = db.Column(
         db.Integer,
-        db.ForeignKey("application.id"),
+        db.ForeignKey("application_environment.id"),
         nullable=True,
     )
-    application = db.relationship("Application", back_populates="resources")
+    application_environment = db.relationship(
+        "ApplicationEnvironment", back_populates="resources"
+    )
 
     monitored_resources = db.relationship(
         "MonitoredResource", back_populates="resource"
@@ -343,7 +365,7 @@ class Resource(db.Model):
     __table_args__ = (
         db.UniqueConstraint(
             "reference",
-            "application_id",
+            "application_environment_id",
             name="uq_resource",
         ),
     )
@@ -426,12 +448,14 @@ class Exclusion(db.Model):
         nullable=False,
     )
     control = db.relationship("Control", back_populates="exclusions")
-    application_id = db.Column(
+    application_environment_id = db.Column(
         db.Integer,
-        db.ForeignKey("application.id"),
+        db.ForeignKey("application_environment.id"),
         nullable=False,
     )
-    application = db.relationship("Application", back_populates="exclusions")
+    application_environment = db.relationship(
+        "ApplicationEnvironment", back_populates="exclusions"
+    )
 
     resources = db.relationship(
         "Resource", secondary=ExclusionResource.__table__, back_populates="exclusions"
