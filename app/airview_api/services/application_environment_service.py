@@ -19,6 +19,10 @@ def get_by_id(application_environment_id: int):
     return app
 
 
+def get_by_application(application_id: int):
+    return ApplicationEnvironment.query.filter_by(application_id=application_id)
+
+
 def get_by_reference(type, reference):
     link = ApplicationEnvironmentReference.query.filter_by(
         type=type, reference=reference

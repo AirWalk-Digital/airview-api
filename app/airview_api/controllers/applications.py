@@ -3,6 +3,7 @@ from pprint import pprint
 from airview_api.blueprint import Blueprint, Roles
 from airview_api.services import (
     application_service,
+    application_environment_service,
     AirViewValidationException,
     AirViewNotFoundException,
 )
@@ -13,6 +14,7 @@ from flask import request
 
 from airview_api.schemas import (
     ApplicationSchema,
+    ApplicationEnvironmentSchema,
     ControlOverviewResourceSchema,
     ControlStatusSchema,
     EnvironmentSchema,
@@ -84,12 +86,12 @@ class Applications(MethodView):
             abort(400, message=str(e))
 
 
-@blp.route("/<string:application_id>/environments")
+@blp.route("/<string:application_id>/application-environments")
 class Environments(MethodView):
-    @blp.response(200, EnvironmentSchema(many=True))
+    @blp.response(200, ApplicationEnvironmentSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self, application_id):
         """Get all environments defined for this application
         Returns a list of applications
         """
-        return application_service.get_environments(application_id)
+        return application_environment_service.get_by_application(application_id)

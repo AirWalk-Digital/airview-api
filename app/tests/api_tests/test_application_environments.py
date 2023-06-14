@@ -275,4 +275,30 @@ def test_application_put_handles_not_found(client):
     # Assert
     assert resp.status_code == 404
     items = db.session.query(Application).all()
-    assert len(items) == 0
+
+    assert items == [
+        {
+            "application": {
+                "applicationType": "BUSINESS_APPLICATION",
+                "id": 1,
+                "name": "App 1",
+            },
+            "applicationId": 1,
+            "environment": {"abbreviation": "DEV", "id": 11, "name": "Development"},
+            "environmentId": 11,
+            "id": 30,
+            "references": [],
+        },
+        {
+            "application": {
+                "applicationType": "BUSINESS_APPLICATION",
+                "id": 1,
+                "name": "App 1",
+            },
+            "applicationId": 1,
+            "environment": {"abbreviation": "PRD", "id": 12, "name": "Production"},
+            "environmentId": 12,
+            "id": 31,
+            "references": [],
+        },
+    ]
