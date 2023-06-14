@@ -25,6 +25,8 @@ def test_create_adds_when_new(client):
     ApplicationFactory(
         id=1, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
     )
+    EnvironmentFactory(id=3)
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=3)
 
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
@@ -40,7 +42,7 @@ def test_create_adds_when_new(client):
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
 
     input_data = {
@@ -77,6 +79,9 @@ def test_create_updates_when_existing_different_state(client):
         id=1, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
     )
 
+    EnvironmentFactory(id=3)
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=3)
+
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
     TechnicalControlFactory(
@@ -90,7 +95,7 @@ def test_create_updates_when_existing_different_state(client):
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
 
     time_now = datetime.utcnow()
@@ -129,9 +134,9 @@ def test_create_updates_when_existing_different_state(client):
     assert persisted.additional_data == "Old"
 
 
-def test_create_unknown_application(client):
+def test_create_unknown_technical_control(client):
     """
-    Given: existing technical control, no existing app
+    Given: unknown technical control, known resource
     When: When the api is called to create a new monitored resource
     Then: 400 status, no data returned, no data persisted
     """
@@ -141,6 +146,8 @@ def test_create_unknown_application(client):
         id=1, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
     )
 
+    EnvironmentFactory(id=3)
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=3)
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
     TechnicalControlFactory(
@@ -154,7 +161,7 @@ def test_create_unknown_application(client):
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
 
     input_data = {
@@ -183,6 +190,8 @@ def test_create_unknown_resource(client):
     ApplicationFactory(
         id=1, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
     )
+    EnvironmentFactory(id=3)
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=3)
 
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
@@ -197,7 +206,7 @@ def test_create_unknown_resource(client):
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
 
     input_data = {
