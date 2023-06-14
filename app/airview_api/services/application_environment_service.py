@@ -31,6 +31,7 @@ def get_by_reference(type, reference):
 def create(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
+    references = data.pop("references", [])
     app = ApplicationEnvironment(**data)
     try:
         for r in references:

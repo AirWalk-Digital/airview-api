@@ -62,7 +62,7 @@ class Application(MethodView):
 
 
 @blp.route("/")
-class Applications(MethodView):
+class ApplicationEnvironments(MethodView):
     @blp.response(200, ApplicationSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self):
@@ -71,15 +71,15 @@ class Applications(MethodView):
         type = request.args.get("applicationType")
         return application_service.get_all(type)
 
-    @blp.arguments(ApplicationSchema)
-    @blp.response(200, ApplicationSchema)
+    @blp.arguments(ApplicationEnvironmentSchema)
+    @blp.response(200, ApplicationEnvironmentSchema)
     @blp.role(Roles.CONTENT_WRITER)
     def post(self, data):
-        """Create a new application
-        Returns the newly created application
+        """Create a new application environment
+        Returns the newly created application environment
         """
         try:
-            app = application_service.create(data)
+            app = application_environment_service.create(data)
             return app
         except AirViewValidationException as e:
             abort(400, message=str(e))

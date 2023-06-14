@@ -20,6 +20,12 @@ class CamelCaseSchema(ma.Schema):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
 
+class EnvironmentSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    abbreviation = ma.fields.Str(required=True)
+
+
 class ApplicationSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
@@ -33,11 +39,12 @@ class ApplicationReferenceSchema(CamelCaseSchema):
 
 class ApplicationEnvironmentSchema(CamelCaseSchema):
     id = ma.fields.Integer()
-    application = ma.fields.Nested(ApplicationSchema, allow_none=False)
-    environment_id = ma.fields.Integer(allow_none=True)
-    references = ma.fields.Nested(
-        ApplicationReferenceSchema, many=True, allow_none=True
-    )
+    application_id = ma.fields.Integer(required=True)
+    environment_id = ma.fields.Integer(required=True)
+
+    application = ma.fields.Nested(ApplicationSchema)
+    environment = ma.fields.Nested(EnvironmentSchema)
+    references = ma.fields.Nested(ApplicationReferenceSchema, many=True, required=True)
 
 
 class ResourceSchema(CamelCaseSchema):
@@ -53,12 +60,6 @@ class MonitoredResourceSchema(CamelCaseSchema):
     resource_id = ma.fields.Integer(required=True)
     monitoring_state = ma.fields.Str(required=True)
     additional_data = ma.fields.Str(required=False)
-
-
-class EnvironmentSchema(CamelCaseSchema):
-    id = ma.fields.Integer()
-    name = ma.fields.Str(required=True)
-    abbreviation = ma.fields.Str(required=True)
 
 
 class IdAndNameSchema(CamelCaseSchema):

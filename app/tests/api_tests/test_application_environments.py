@@ -53,24 +53,24 @@ def test_application_environment_get_single_ok(client):
     ]
 
 
-def test_application_get_single_not_found(client):
+def test_application_environment_get_single_not_found(client):
     """
-    Given: A collection of applications exists in the database
+    Given: A collection of application environments exists in the database
     When: When the id does not exit in the database
     Then: Status 404 is returned with an empty response
     """
     # Arrange
     EnvironmentFactory(id=1)
-    ApplicationFactory.create_batch(5)
+    ApplicationEnvironmentFactory.create_batch(5)
 
     # Act
-    resp = client.get("/applications/10")
+    resp = client.get("/applications-environments/10")
 
     # Assert
     assert resp.status_code == 404
 
 
-def test_application_post_ok_response(client):
+def test_application_envionment_post_ok_response(client):
     """
     Given: An empty application collection in the db
     When: When an application definition is posted to the api
@@ -78,14 +78,14 @@ def test_application_post_ok_response(client):
     """
     # Arrange
     EnvironmentFactory(id=1)
-    SystemFactory(id=2, stage=SystemStage.BUILD)
+    ApplicationFactory(id=11, name="TestApp")
 
     # Act
     resp = client.post(
-        "/applications/",
+        "/application-environments/",
         json={
-            "name": "App 1",
-            "applicationType": "BUSINESS_APPLICATION",
+            "applicationId": 11,
+            "environmentId": 1,
             "references": [
                 {"type": "type1", "reference": "val1"},
                 {"type": "type2", "reference": "val2"},
@@ -97,20 +97,20 @@ def test_application_post_ok_response(client):
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["id"] == 1
-    assert data["name"] == "App 1"
     assert data["environmentId"] == data["environmentId"]
-    assert len(data["references"]) == 3
-    assert data["references"][1]["type"] == "type1"
-    assert data["references"][1]["reference"] == "val1"
+    assert data["applicationId"] == data["applicationId"]
+    assert len(data["references"]) == 2
+    assert data["references"][1]["type"] == "type2"
+    assert data["references"][1]["reference"] == "val2"
 
     # Assert persistance
-    items = db.session.query(Application).all()
+    items = db.session.query(ApplicationEnvironment).all()
     assert len(items) == 1
     assert items[0].id == 1
-    assert items[0].name == "App 1"
     assert items[0].environment_id == data["environmentId"]
+    assert items[0].application_id == data["applicationId"]
 
-    assert items[0].references.count() == 3
+    assert items[0].references.count() == 2
     assert items[0].references.filter_by(type="type1").first().reference == "val1"
 
 
