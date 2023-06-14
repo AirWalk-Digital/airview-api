@@ -46,15 +46,15 @@ class Application(MethodView):
 
         abort(404)
 
-    @blp.arguments(ApplicationSchema)
+    @blp.arguments(ApplicationEnvironmentSchema)
     @blp.response(204)
     @blp.role(Roles.CONTENT_WRITER)
-    def put(self, data, application_id):
+    def put(self, data, application_environment_id):
         """Update application definition matching provided id"""
-        if application_id != data["id"]:
+        if application_environment_id != data["id"]:
             abort(400, message="Id does not match payload")
         try:
-            application_service.update(data)
+            application_environment_service.update(data)
         except AirViewNotFoundException:
             abort(404)
         except AirViewValidationException as e:
@@ -63,14 +63,6 @@ class Application(MethodView):
 
 @blp.route("/")
 class ApplicationEnvironments(MethodView):
-    @blp.response(200, ApplicationSchema(many=True))
-    @blp.role(Roles.CONTENT_READER)
-    def get(self):
-        """Get all applications"""
-
-        type = request.args.get("applicationType")
-        return application_service.get_all(type)
-
     @blp.arguments(ApplicationEnvironmentSchema)
     @blp.response(200, ApplicationEnvironmentSchema)
     @blp.role(Roles.CONTENT_WRITER)
