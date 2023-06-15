@@ -12,11 +12,12 @@ import pytest
 
 def setup():
     reset_factories()
+    EnvironmentFactory(id=1)
     SystemFactory(id=2, stage=SystemStage.BUILD)
     ApplicationFactory(
         id=1, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
     )
-
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=1)
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
     TechnicalControlFactory(
@@ -30,21 +31,21 @@ def setup():
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
     ResourceFactory(
         id=12,
         name="Res Two",
         reference="res_2",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
     ResourceFactory(
         id=13,
         name="Res Deleted",
         reference="res_3",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
     )
 
     time_now = datetime.utcnow()
@@ -199,5 +200,5 @@ def test_get_complaince_ok_for_valid_query_with_missing_filter(client, test_inpu
     assert resp.status_code == 200
 
     data = resp.get_json()
-    
+
     assert data == test_input["expected"]
