@@ -389,44 +389,6 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/application-environments/{application_id}/environments": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Environment"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "summary": "Get all environments defined for this application\nReturns a list of applications",
-        "tags": [
-          "application-environments"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "parameters": [
-        {
-          "in": "path",
-          "name": "application_id",
-          "required": true,
-          "schema": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
-      ]
-    },
     "/applications/": {
       "get": {
         "responses": {
@@ -733,7 +695,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -741,7 +703,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
