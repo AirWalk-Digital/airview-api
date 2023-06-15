@@ -28,26 +28,11 @@
           "applicationType": {
             "type": "string"
           },
-          "environmentId": {
-            "nullable": true,
-            "type": "integer"
-          },
           "id": {
             "type": "integer"
           },
           "name": {
             "type": "string"
-          },
-          "parentId": {
-            "nullable": true,
-            "type": "integer"
-          },
-          "references": {
-            "items": {
-              "$ref": "#/components/schemas/ApplicationReference"
-            },
-            "nullable": true,
-            "type": "array"
           }
         },
         "required": [
@@ -56,7 +41,38 @@
         ],
         "type": "object"
       },
-      "ApplicationReference": {
+      "ApplicationEnvironment": {
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/Application"
+          },
+          "applicationId": {
+            "type": "integer"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "environmentId": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationEnvironmentReference"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "applicationId",
+          "environmentId",
+          "references"
+        ],
+        "type": "object"
+      },
+      "ApplicationEnvironmentReference": {
         "properties": {
           "reference": {
             "type": "string"
@@ -177,7 +193,7 @@
       },
       "Resource": {
         "properties": {
-          "applicationId": {
+          "applicationEnvironmentId": {
             "type": "integer"
           },
           "id": {
@@ -194,7 +210,7 @@
           }
         },
         "required": [
-          "applicationId",
+          "applicationEnvironmentId",
           "name",
           "reference"
         ],
@@ -272,6 +288,145 @@
   },
   "openapi": "3.0.2",
   "paths": {
+    "/application-environments/": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationEnvironment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationEnvironment"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new application environment\nReturns the newly created application environment",
+        "tags": [
+          "application-environments"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/application-environments/{application_environment_id}": {
+      "get": {
+        "description": "Returns application environment matching requested id",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationEnvironment"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get an application environment by id",
+        "tags": [
+          "application-environments"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_environment_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ],
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationEnvironment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Update application definition matching provided id",
+        "tags": [
+          "application-environments"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/application-environments/{application_id}/environments": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Environment"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get all environments defined for this application\nReturns a list of applications",
+        "tags": [
+          "application-environments"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      ]
+    },
     "/applications/": {
       "get": {
         "responses": {
@@ -398,7 +553,7 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/applications/{application_id}/environments": {
+    "/applications/{application_id}/application-environments": {
       "get": {
         "responses": {
           "200": {
@@ -406,7 +561,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/Environment"
+                    "$ref": "#/components/schemas/ApplicationEnvironment"
                   },
                   "type": "array"
                 }
@@ -530,7 +685,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -538,7 +693,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -573,12 +728,12 @@
         "x-api-rbac-role": "ComplianceWriter"
       }
     },
-    "/referenced-applications/": {
+    "/referenced-application-environments/": {
       "get": {
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -586,7 +741,7 @@
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -598,7 +753,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Application"
+                  "$ref": "#/components/schemas/ApplicationEnvironment"
                 }
               }
             },
@@ -969,6 +1124,10 @@
     {
       "description": "Application based resources",
       "name": "applications"
+    },
+    {
+      "description": "Application Environment based resources",
+      "name": "application-environments"
     },
     {
       "description": "resources related resources",
