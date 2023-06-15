@@ -117,11 +117,11 @@ class Application:
     #: Type of application.
     type: ApplicationType = ApplicationType.BUSINESS_APPLICATION
     #: Defintion of environment which the application sits in
-    environment: Optional[Environment] = None
+    environment: Environment = Environment(name="Unknown", abbreviation="UNK")
     #: Internal identifier of application
     id: Optional[int] = None
-    #: Internal id of parent application for nested apps
-    parent_id: Optional[int] = None
+    #: Internal id of application environment
+    application_environment_id: Optional[int] = None
 
 
 @dataclass
@@ -187,6 +187,7 @@ class Service:
     #: Internal identifier of service
     id: Optional[int] = None
 
+
 @dataclass
 class Resource:
     """Dataclass representing an resource"""
@@ -199,7 +200,6 @@ class Resource:
     application: Application
     #: The service which this resource belongs to (ec2, s3, dynamodb, etc)
     service: Service
-
 
 
 class BackendFailureException(Exception):
