@@ -19,7 +19,7 @@ def test_get_environments_by_app_service_empty_array_for_not_found_app(client):
     # Arrange
 
     # Act
-    resp = client.get("/applications/2/environments")
+    resp = client.get("/applications/2/application-environments")
 
     # Assert
     data = resp.get_json()
@@ -44,129 +44,18 @@ def test_get_environments_by_app_service_ok(client):
     EnvironmentFactory(id=12, name="Production", abbreviation="PRD")
     EnvironmentFactory(id=13, name="User Acceptance", abbreviation="UAT")
 
-    ApplicationFactory(
-        id=21,
-        parent_id=1,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=22,
-        parent_id=1,
-        environment_id=12,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=23,
-        parent_id=1,
-        environment_id=13,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-
-    ApplicationFactory(
-        id=24,
-        parent_id=2,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=25,
-        parent_id=2,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=26,
-        parent_id=2,
-        environment_id=13,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
+    ApplicationEnvironmentFactory(id=30, application_id=1, environment_id=11)
+    ApplicationEnvironmentFactory(id=31, application_id=1, environment_id=12)
+    ApplicationEnvironmentFactory(id=32, application_id=2, environment_id=12)
 
     # Act
-    resp = client.get("/applications/2/environments")
+    resp = client.get("/applications/1/application-environments")
 
     # Assert
     data = resp.get_json()
     assert resp.status_code == 200
     assert len(data) == 2
-
-    expected1 = {"abbreviation": "UAT", "id": 13, "name": "User Acceptance"}
-    expected2 = {"abbreviation": "DEV", "id": 11, "name": "Development"}
-
-    data[0] == expected1 or data[0] == expected2
-    data[1] == expected1 or data[1] == expected2
-    data[0] != data[1]
-
-
-def test_get_environments_by_app_service_handles_none_environment(client):
-    """
-    Given: A collection of application services exist in the database
-    When: When the api is called with an application id
-    Then: A unique list of environments for application services is returned with status 200
-    """
-    # Arrange
-    EnvironmentFactory(id=11, name="Development", abbreviation="DEV")
-    EnvironmentFactory(id=12, name="Production", abbreviation="PRD")
-    EnvironmentFactory(id=13, name="User Acceptance", abbreviation="UAT")
-    ApplicationFactory(
-        id=1,
-        name="App 1",
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-        environment_id=12,
-    )
-    ApplicationFactory(
-        id=2, name="App 2", application_type=ApplicationType.BUSINESS_APPLICATION
-    )
-
-    ApplicationFactory(
-        id=21,
-        parent_id=1,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=22,
-        parent_id=1,
-        environment_id=12,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=23,
-        parent_id=1,
-        environment_id=13,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-
-    ApplicationFactory(
-        id=24,
-        parent_id=2,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=25,
-        parent_id=2,
-        environment_id=11,
-        application_type=ApplicationType.BUSINESS_APPLICATION,
-    )
-    ApplicationFactory(
-        id=26, parent_id=2, application_type=ApplicationType.BUSINESS_APPLICATION
-    )
-
-    # Act
-    resp = client.get("/applications/2/environments")
-
-    # Assert
-    data = resp.get_json()
-    assert resp.status_code == 200
-    assert len(data) == 2
-
-    expected1 = {"abbreviation": "UAT", "id": 12, "name": "User Acceptance"}
-    expected2 = {"abbreviation": "DEV", "id": 11, "name": "Development"}
-
-    data[0] == expected1 or data[0] == expected2
-    data[1] == expected1 or data[1] == expected2
-    data[0] != data[1]
+    print(data)
 
 
 def test_enviromments_get_all_ok(client):

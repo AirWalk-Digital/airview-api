@@ -38,7 +38,8 @@ def persist(
         item.additional_data = additional_data
 
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError as e:
+        print(e)
         db.session.rollback()
         raise AirViewValidationException(
             "Unique Constraint Error, check reference field"

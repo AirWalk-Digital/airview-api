@@ -22,25 +22,25 @@ def create(data: dict):
 
 
 def upsert(data: dict):
-
     if "id" in data:
         raise AirViewValidationException("Id is not expected when upserting a record")
     resource = Resource.query.filter_by(
-        application_id=data['application_id'], reference=data['reference']
+        application_environment_id=data["application_environment_id"],
+        reference=data["reference"],
     ).first()
     if resource is None:
         resource = Resource(**data)
         resource.last_modified = datetime.utcnow()
 
     elif (
-        resource.application_id != data["application_id"]
+        resource.application_environment_id != data["application_environment_id"]
         or resource.service_id != data["service_id"]
         or resource.name != data["name"]
     ):
         resource.last_modified = datetime.utcnow()
 
     resource.last_seen = datetime.utcnow()
-    resource.application_id = data["application_id"]
+    resource.application_environment_id = data["application_environment_id"]
     resource.service_id = data["service_id"]
     resource.name = data["name"]
 
@@ -54,9 +54,9 @@ def upsert(data: dict):
     return resource
 
 
-def get(application_id: str, reference: str):
+def get(application_environment_id: str, reference: str):
     resource = Resource.query.filter_by(
-        application_id=application_id, reference=reference
+        application_environment_id=application_environment_id, reference=reference
     ).first()
     if resource is None:
         raise AirViewNotFoundException

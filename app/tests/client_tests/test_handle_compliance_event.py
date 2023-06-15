@@ -46,16 +46,18 @@ def test_monitored_resource_creates_missing_application(handler, compliance_even
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-other"
+    ApplicationFactory(id=2)
+    ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
+    ApplicationEnvironmentReferenceFactory(
+        application_environment_id=1, type="aws_account_id", reference="app-ref-other"
     )
+
     ResourceFactory(
         id=11,
         name="Res Other",
         reference="res-ref-other",
         service_id=10,
-        application_id=2,
+        application_environment_id=1,
     )
 
     SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
@@ -80,7 +82,7 @@ def test_monitored_resource_creates_missing_application(handler, compliance_even
 
     assert monitored[0].resource.reference == "res-ref-1"
     assert monitored[0].resource.name == "res-ref-1"
-    assert monitored[0].resource.application_id == 3
+    assert monitored[0].resource.application_environment_id == 2
 
 
 def test_monitored_resource_creates_missing_resource_existing_app(
@@ -95,16 +97,18 @@ def test_monitored_resource_creates_missing_resource_existing_app(
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+    ApplicationFactory(id=2)
+    ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
+    ApplicationEnvironmentReferenceFactory(
+        application_environment_id=1, type="aws_account_id", reference="app-ref-1"
     )
+
     ResourceFactory(
         id=11,
         name="Res Other",
         reference="res-ref-other",
         service_id=10,
-        application_id=2,
+        application_environment_id=1,
     )
 
     SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
@@ -129,7 +133,7 @@ def test_monitored_resource_creates_missing_resource_existing_app(
 
     assert monitored[0].resource.reference == "res-ref-1"
     assert monitored[0].resource.name == "res-ref-1"
-    assert monitored[0].resource.application_id == 2
+    assert monitored[0].resource.application_environment_id == 1
 
 
 def test_monitored_resource_creates_missing_control(handler, compliance_event):
@@ -139,19 +143,22 @@ def test_monitored_resource_creates_missing_control(handler, compliance_event):
     Then: The monitored resource is persisted against a new technical control
     """
     # Arrange
+
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+    ApplicationFactory(id=2)
+    ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
+    ApplicationEnvironmentReferenceFactory(
+        application_environment_id=1, type="aws_account_id", reference="app-ref-1"
     )
+
     ResourceFactory(
         id=11,
         name="Res Existing",
         reference="res-ref-1",
         service_id=10,
-        application_id=2,
+        application_environment_id=1,
     )
 
     SystemFactory(id=111, stage=api_models.SystemStage.BUILD, name="one")
@@ -176,7 +183,7 @@ def test_monitored_resource_creates_missing_control(handler, compliance_event):
 
     assert monitored[0].resource.reference == "res-ref-1"
     assert monitored[0].resource.name == "Res Existing"
-    assert monitored[0].resource.application_id == 2
+    assert monitored[0].resource.application_environment_id == 1
 
 
 def test_account_cache_handle_unexpected_code_for_get_control(
@@ -190,6 +197,19 @@ def test_account_cache_handle_unexpected_code_for_get_control(
     # Arrange
     adapter.register_uri(
         "GET",
+        f"{base_url}/environments/",
+        status_code=200,
+        json=[
+            {
+                "id": 333,
+                "name": "Unknown",
+                "abbreviation": "UNK",
+            }
+        ],
+    )
+
+    adapter.register_uri(
+        "GET",
         f"{base_url}/systems/?name=one",
         status_code=200,
         json={
@@ -200,15 +220,17 @@ def test_account_cache_handle_unexpected_code_for_get_control(
 
     adapter.register_uri(
         "GET",
-        f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
+        f"{base_url}/referenced-application-environments/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
             "id": 111,
+            "application": {
+                "id": 111,
+                "name": "app-name",
+            },
             "name": "app-name",
             "reference": "app-ref",
-            "applicationTypeId": 222,
             "environmentId": 333,
-            "parentId": 444,
         },
     )
     adapter.register_uri(
@@ -232,6 +254,19 @@ def test_triggered_resource_handle_unexpected_code_for_get_resource(
     # Arrange
     adapter.register_uri(
         "GET",
+        f"{base_url}/environments/",
+        status_code=200,
+        json=[
+            {
+                "id": 333,
+                "name": "Unknown",
+                "abbreviation": "UNK",
+            }
+        ],
+    )
+
+    adapter.register_uri(
+        "GET",
         f"{base_url}/systems/?name=one",
         status_code=200,
         json={
@@ -239,17 +274,20 @@ def test_triggered_resource_handle_unexpected_code_for_get_resource(
             "name": "name",
         },
     )
+
     adapter.register_uri(
         "GET",
-        f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
+        f"{base_url}/referenced-application-environments/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
             "id": 111,
+            "application": {
+                "id": 111,
+                "name": "app-name",
+            },
             "name": "app-name",
             "reference": "app-ref",
-            "applicationTypeId": 222,
             "environmentId": 333,
-            "parentId": 444,
         },
     )
     adapter.register_uri(
@@ -269,7 +307,7 @@ def test_triggered_resource_handle_unexpected_code_for_get_resource(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
+        f"{base_url}/resources/?applicationEnvironmentId=111&reference=res-ref-1",
         status_code=500,
     )
     # Act
@@ -285,6 +323,20 @@ def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
     When: When a call is made to set a triggered resource
     Then: An exception is raised
     """
+
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/environments/",
+        status_code=200,
+        json=[
+            {
+                "id": 333,
+                "name": "Unknown",
+                "abbreviation": "UNK",
+            }
+        ],
+    )
+
     adapter.register_uri(
         "GET",
         f"{base_url}/systems/?name=one",
@@ -294,17 +346,20 @@ def test_triggered_resource_handle_unexpected_code_for_create_technical_control(
             "name": "name",
         },
     )
+
     adapter.register_uri(
         "GET",
-        f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
+        f"{base_url}/referenced-application-environments/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
             "id": 111,
+            "application": {
+                "id": 111,
+                "name": "app-name",
+            },
             "name": "app-name",
             "reference": "app-ref",
-            "applicationTypeId": 222,
             "environmentId": 333,
-            "parentId": 444,
         },
     )
     adapter.register_uri(
@@ -331,6 +386,20 @@ def test_triggered_resource_handle_unexpected_code_for_create_resource(
     When: When a call is made to set a triggered resource
     Then: An exception is raised
     """
+
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/environments/",
+        status_code=200,
+        json=[
+            {
+                "id": 333,
+                "name": "Unknown",
+                "abbreviation": "UNK",
+            }
+        ],
+    )
+
     adapter.register_uri(
         "GET",
         f"{base_url}/systems/?name=one",
@@ -342,15 +411,17 @@ def test_triggered_resource_handle_unexpected_code_for_create_resource(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
+        f"{base_url}/referenced-application-environments/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
             "id": 111,
+            "application": {
+                "id": 111,
+                "name": "app-name",
+            },
             "name": "app-name",
             "reference": "app-ref",
-            "applicationTypeId": 222,
             "environmentId": 333,
-            "parentId": 444,
         },
     )
     adapter.register_uri(
@@ -370,7 +441,7 @@ def test_triggered_resource_handle_unexpected_code_for_create_resource(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
+        f"{base_url}/resources/?applicationEnvironmentId=111&reference=res-ref-1",
         status_code=404,
     )
 
@@ -393,6 +464,20 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
     When: When a call is made to set a triggered resource
     Then: An exception is raised
     """
+
+    adapter.register_uri(
+        "GET",
+        f"{base_url}/environments/",
+        status_code=200,
+        json=[
+            {
+                "id": 333,
+                "name": "Unknown",
+                "abbreviation": "UNK",
+            }
+        ],
+    )
+
     adapter.register_uri(
         "GET",
         f"{base_url}/systems/?name=one",
@@ -402,17 +487,20 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
             "name": "name",
         },
     )
+
     adapter.register_uri(
         "GET",
-        f"{base_url}/referenced-applications/?type=aws_account_id&reference=app-ref-1",
+        f"{base_url}/referenced-application-environments/?type=aws_account_id&reference=app-ref-1",
         status_code=200,
         json={
             "id": 111,
+            "application": {
+                "id": 111,
+                "name": "app-name",
+            },
             "name": "app-name",
             "reference": "app-ref",
-            "applicationTypeId": 222,
             "environmentId": 333,
-            "parentId": 444,
         },
     )
     adapter.register_uri(
@@ -432,7 +520,7 @@ def test_triggered_resource_handle_unexpected_code_for_monitored_resource(
     )
     adapter.register_uri(
         "GET",
-        f"{base_url}/resources/?applicationId=111&reference=res-ref-1",
+        f"{base_url}/resources/?applicationEnvironmentId=111&reference=res-ref-1",
         status_code=200,
         json={"id": 444},
     )

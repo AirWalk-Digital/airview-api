@@ -20,19 +20,32 @@ class CamelCaseSchema(ma.Schema):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
 
-class ApplicationReferenceSchema(CamelCaseSchema):
-    type = ma.fields.Str(validate=is_allowed_reference)
-    reference = ma.fields.Str(validate=is_allowed_reference)
+class EnvironmentSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    abbreviation = ma.fields.Str(required=True)
 
 
 class ApplicationSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     application_type = ma.fields.Str(required=True)
-    parent_id = ma.fields.Integer(allow_none=True)
-    environment_id = ma.fields.Integer(allow_none=True)
+
+
+class ApplicationEnvironmentReferenceSchema(CamelCaseSchema):
+    type = ma.fields.Str(validate=is_allowed_reference)
+    reference = ma.fields.Str(validate=is_allowed_reference)
+
+
+class ApplicationEnvironmentSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    application_id = ma.fields.Integer(required=True)
+    environment_id = ma.fields.Integer(required=True)
+
+    application = ma.fields.Nested(ApplicationSchema)
+    environment = ma.fields.Nested(EnvironmentSchema)
     references = ma.fields.Nested(
-        ApplicationReferenceSchema, many=True, allow_none=True
+        ApplicationEnvironmentReferenceSchema, many=True, required=True
     )
 
 
@@ -41,7 +54,7 @@ class ResourceSchema(CamelCaseSchema):
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True)
     service_id = ma.fields.Integer(required=False)
-    application_id = ma.fields.Integer(required=True)
+    application_environment_id = ma.fields.Integer(required=True)
 
 
 class MonitoredResourceSchema(CamelCaseSchema):
@@ -49,12 +62,6 @@ class MonitoredResourceSchema(CamelCaseSchema):
     resource_id = ma.fields.Integer(required=True)
     monitoring_state = ma.fields.Str(required=True)
     additional_data = ma.fields.Str(required=False)
-
-
-class EnvironmentSchema(CamelCaseSchema):
-    id = ma.fields.Integer()
-    name = ma.fields.Str(required=True)
-    abbreviation = ma.fields.Str(required=True)
 
 
 class IdAndNameSchema(CamelCaseSchema):
@@ -116,7 +123,7 @@ class ExclusionResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     technical_control_reference = ma.fields.Str()
     application_references = ma.fields.Nested(
-        ApplicationReferenceSchema, many=True, allow_none=True
+        ApplicationEnvironmentReferenceSchema, many=True, allow_none=True
     )
     reference = ma.fields.Str()
     state = ma.fields.Str(required=True)

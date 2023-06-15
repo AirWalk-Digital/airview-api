@@ -42,11 +42,19 @@ class Resources(MethodView):
     @blp.role(Roles.COMPLIANCE_READER)
     def put(self, data):
         """update the resource by its reference and applicationId"""
-        application_id: str = flask.request.args.get("applicationId")
+        application_environment_id: str = flask.request.args.get(
+            "applicationEnvironmentId"
+        )
         resource_reference: str = flask.request.args.get("reference")
 
-        if application_id != str(data['application_id']) or resource_reference!=data['reference']:
-            abort(400, message="Keys in data do not match the keys in the query parameters")
+        if (
+            application_environment_id != str(data["application_environment_id"])
+            or resource_reference != data["reference"]
+        ):
+            abort(
+                400,
+                message="Keys in data do not match the keys in the query parameters",
+            )
         data = resource_service.upsert(data)
 
         return data
@@ -55,10 +63,12 @@ class Resources(MethodView):
     @blp.role(Roles.COMPLIANCE_READER)
     def get(self):
         """update the resource by its reference and applicationId"""
-        application_id: str = flask.request.args.get("applicationId")
+        application_environment_id: str = flask.request.args.get(
+            "applicationEnvironmentId"
+        )
         resource_reference: str = flask.request.args.get("reference")
         try:
-            data = resource_service.get(application_id, resource_reference)
+            data = resource_service.get(application_environment_id, resource_reference)
 
             return data
         except AirViewNotFoundException:

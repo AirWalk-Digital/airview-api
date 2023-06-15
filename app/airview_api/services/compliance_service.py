@@ -5,6 +5,8 @@ from airview_api.models import (
     TechnicalControl,
     MonitoredResourceState,
     Control,
+    Environment,
+    ApplicationEnvironment,
 )
 from airview_api.services import AirViewValidationException
 from airview_api.database import db
@@ -29,6 +31,7 @@ def get_compliace_aggregate(filter: str, select: str):
     allowed_columns = [
         "application_id",
         "application_name",
+        "environment_name",
         "resource_reference",
         "technical_control_reference",
         "control_name",
@@ -49,23 +52,24 @@ def get_compliace_aggregate(filter: str, select: str):
             Resource.reference.label("resourcereference"),
             Application.id.label("applicationid"),
             Application.name.label("applicationname"),
+            Environment.name.label("environmentname"),
             TechnicalControl.reference.label("technicalcontrolreference"),
             Control.name.label("controlname"),
             Control.id.label("controlid"),
             case(
-                
-                    (
-                        MonitoredResource.monitoring_state
-                        == MonitoredResourceState.MONITORING,
-                        1,
-                    )
-                ,
+                (
+                    MonitoredResource.monitoring_state
+                    == MonitoredResourceState.MONITORING,
+                    1,
+                ),
                 else_=0,
             ).label("is_compliant"),
         )
         .select_from(TechnicalControl)
         .join(MonitoredResource)
         .join(Resource)
+        .join(ApplicationEnvironment)
+        .join(Environment)
         .join(Application)
         .join(Control, isouter=True)
         .where(MonitoredResource.monitoring_state != MonitoredResourceState.DELETED)
@@ -83,7 +87,10 @@ def get_compliace_aggregate(filter: str, select: str):
             where_clause = visitor.visit(ast)
             # apply the where to the subquery, creating another subquery
             orm_query = (
-                db.select(db.text("*")).select_from(orm_query).where(db.text(where_clause)).subquery()
+                db.select(db.text("*"))
+                .select_from(orm_query)
+                .where(db.text(where_clause))
+                .subquery()
             )
         except Exception as e:
             raise AirViewValidationException("The filter provided could not be parsed")
@@ -95,11 +102,13 @@ def get_compliace_aggregate(filter: str, select: str):
 
     aggreated_query = (
         db.select(
-            *([db.column(c).label(mapping[c]) for c in splits]
-            + [
-                func.sum(db.column("is_compliant")).label("is_compliant"),
-                func.count(db.column("is_compliant")).label("total"),
-            ])
+            *(
+                [db.column(c).label(mapping[c]) for c in splits]
+                + [
+                    func.sum(db.column("is_compliant")).label("is_compliant"),
+                    func.count(db.column("is_compliant")).label("total"),
+                ]
+            )
         )
         .select_from(orm_query)
         .group_by(db.text(select))

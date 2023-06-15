@@ -24,6 +24,16 @@ Create a new Application
 
 
 
+#### create_application_environment(application)
+Create a new Application Environment, returns application environment id
+
+
+* **Return type**
+
+    `Application`
+
+
+
 #### create_environment(environment)
 Create a new environment
 
@@ -34,7 +44,7 @@ Create a new environment
 
 
 
-#### create_resource(reference, application_id)
+#### create_resource(reference, application_environment_id)
 Create a barebone resource for linking compliance event to
 
 
@@ -72,7 +82,7 @@ Create a new system
 
 
 
-#### get_application_by_reference(application_reference)
+#### get_application_environment_by_reference(reference)
 Look up an application by the provided reference
 
 
@@ -90,7 +100,7 @@ Get a list of environments
 Get a list of exclusion resources by state
 
 
-#### get_resource_id(reference, application_id)
+#### get_resource_id(reference, application_environment_id)
 Get the id of a resource by its application id and reference
 
 
@@ -181,17 +191,6 @@ Get a list of exclusion resources filtered by state.
 * **Parameters**
 
     **state** – The exclusion state to filter by
-
-
-
-#### handle_application(application)
-When passed an application definition, this method will attempt to create or update the application definintion.
-Returns application with id present in response
-
-
-* **Return type**
-
-    `Application`
 
 
 
@@ -317,15 +316,19 @@ Helper method to get OAuth Token
 ## client.airviewclient.models module
 
 
-### _class_ client.airviewclient.models.Application(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
+### _class_ client.airviewclient.models.Application(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=Environment(name='Unknown', abbreviation='UNK', id=None), id=None, application_environment_id=None)
 Bases: `object`
 
 Dataclass representing application definition
 
 
-#### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=None, id=None, parent_id=None)
+#### \__init__(name, reference, type=ApplicationType.BUSINESS_APPLICATION, environment=Environment(name='Unknown', abbreviation='UNK', id=None), id=None, application_environment_id=None)
 
-#### environment(_: `Optional`[`Environment`_ _ = Non_ )
+#### application_environment_id(_: `Optional`[`int`_ _ = Non_ )
+Internal id of application environment
+
+
+#### environment(_: `Environment_ _ = Environment(name='Unknown', abbreviation='UNK', id=None_ )
 Defintion of environment which the application sits in
 
 
@@ -335,10 +338,6 @@ Internal identifier of application
 
 #### name(_: `str_ )
 Name of application
-
-
-#### parent_id(_: `Optional`[`int`_ _ = Non_ )
-Internal id of parent application for nested apps
 
 
 #### reference(_: `str_ )
@@ -513,19 +512,19 @@ An enumeration.
 
 #### USABILITY_AND_COMPATIBILITY(_ = _ )
 
-### _class_ client.airviewclient.models.Resource(reference, name, application, service)
+### _class_ client.airviewclient.models.Resource(reference, application, name=None, service=None)
 Bases: `object`
 
 Dataclass representing an resource
 
 
-#### \__init__(reference, name, application, service)
+#### \__init__(reference, application, name=None, service=None)
 
 #### application(_: `Application_ )
 Application within which the resource sits
 
 
-#### name(_: `str_ )
+#### name(_: `Optional`[`str`_ _ = Non_ )
 A friendly name for the resource
 
 
@@ -533,7 +532,7 @@ A friendly name for the resource
 Unique reference of the resource within the connecting system
 
 
-#### service(_: `Service_ )
+#### service(_: `Optional`[`Service`_ _ = Non_ )
 The service which this resource belongs to (ec2, s3, dynamodb, etc)
 
 

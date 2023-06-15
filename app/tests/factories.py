@@ -7,7 +7,8 @@ from airview_api.models import (
     Environment,
     MonitoredResource,
     Exclusion,
-    ApplicationReference,
+    ApplicationEnvironmentReference,
+    ApplicationEnvironment,
     QualityModel,
     Service,
     Resource,
@@ -47,9 +48,15 @@ class SystemFactory(factory.alchemy.SQLAlchemyModelFactory):
     name = factory.Sequence(lambda n: f"System {n}")
 
 
-class ApplicationReferenceFactory(factory.alchemy.SQLAlchemyModelFactory):
+class ApplicationEnvironmentFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
-        model = ApplicationReference
+        model = ApplicationEnvironment
+        sqlalchemy_session = db.session
+
+
+class ApplicationEnvironmentReferenceFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = ApplicationEnvironmentReference
         sqlalchemy_session = db.session
 
 
@@ -104,6 +111,8 @@ def reset_factories():
     SystemFactory.reset_sequence()
     ServiceFactory.reset_sequence()
     ApplicationFactory.reset_sequence()
+    ApplicationEnvironmentFactory.reset_sequence()
+    ApplicationEnvironmentReferenceFactory.reset_sequence()
     EnvironmentFactory.reset_sequence()
     # ApplicationTechnicalControlFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
