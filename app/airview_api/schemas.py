@@ -32,7 +32,7 @@ class ApplicationSchema(CamelCaseSchema):
     application_type = ma.fields.Str(required=True)
 
 
-class ApplicationReferenceSchema(CamelCaseSchema):
+class ApplicationEnvironmentReferenceSchema(CamelCaseSchema):
     type = ma.fields.Str(validate=is_allowed_reference)
     reference = ma.fields.Str(validate=is_allowed_reference)
 
@@ -44,7 +44,9 @@ class ApplicationEnvironmentSchema(CamelCaseSchema):
 
     application = ma.fields.Nested(ApplicationSchema)
     environment = ma.fields.Nested(EnvironmentSchema)
-    references = ma.fields.Nested(ApplicationReferenceSchema, many=True, required=True)
+    references = ma.fields.Nested(
+        ApplicationEnvironmentReferenceSchema, many=True, required=True
+    )
 
 
 class ResourceSchema(CamelCaseSchema):
@@ -121,7 +123,7 @@ class ExclusionResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     technical_control_reference = ma.fields.Str()
     application_references = ma.fields.Nested(
-        ApplicationReferenceSchema, many=True, allow_none=True
+        ApplicationEnvironmentReferenceSchema, many=True, allow_none=True
     )
     reference = ma.fields.Str()
     state = ma.fields.Str(required=True)
