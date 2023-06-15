@@ -158,6 +158,36 @@ class Backend:
         data = {
             "name": application.name,
             "applicationType": application.type.name,
+            "environmentId": environment_id,
+            "references": [
+                {
+                    "type": self._backend_config.referencing_type,
+                    "reference": application.reference,
+                }
+            ],
+        }
+        resp = self._session.post(
+            url=self.get_url("/applications/"),
+            headers=self._headers,
+            json=data,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            application.id = resp.json()["id"]
+            return application
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
+
+    def create_application_environment(
+        self, application: Application, environment_id: int = None
+    ) -> Application:
+        """
+        Create a new Application
+        """
+        data = {
+            "name": application.name,
+            "applicationType": application.type.name,
             "parentId": application.parent_id,
             "environmentId": environment_id,
             "references": [
@@ -405,44 +435,6 @@ class Handler:
         resource.service.id = service.id
         resource.application.id = application.id
         self._backend.save_resource(resource)
-
-    def handle_application(self, application: Application) -> Application:
-        """
-        When passed an application definition, this method will attempt to create or update the application definintion.
-        Returns application with id present in response
-        """
-        all_environments = self._backend.get_environments()
-
-        environment = next(
-            (
-                e
-                for e in all_environments
-                if e.abbreviation == application.environment.abbreviation
-            ),
-            None,
-        )
-        if environment is None:
-            environment = self._backend.create_environment(application.environment)
-
-        existing_application = self._backend.get_application_by_reference(
-            application_reference=application.reference
-        )
-        if existing_application is not None:
-            # Update app
-            application.id = existing_application.id
-            application.parent_id = existing_application.parent_id
-            self._backend.update_application(
-                application=application, environment_id=environment.id
-            )
-        else:
-            # Create new app
-            application = self._backend.create_application(
-                application=application, environment_id=environment.id
-            )
-
-        application.environment.id = environment.id
-        application.environment.name = environment.name
-        return application
 
     def handle_technical_control(
         self, technical_control: TechnicalControl
