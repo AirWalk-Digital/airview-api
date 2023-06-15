@@ -194,12 +194,12 @@ class Resource:
 
     #: Unique reference of the resource within the connecting system
     reference: str
-    #: A friendly name for the resource
-    name: str
     #: Application within which the resource sits
     application: Application
+    #: A friendly name for the resource
+    name: Optional[str] = None
     #: The service which this resource belongs to (ec2, s3, dynamodb, etc)
-    service: Service
+    service: Optional[Service] = None
 
 
 class BackendFailureException(Exception):

@@ -341,11 +341,13 @@ class Backend:
                 f"Status code: {resp.status_code} Message: {resp.text}"
             )
 
-    def get_resource_id(self, reference: str, application_id: int) -> Optional[int]:
+    def get_resource_id(
+        self, reference: str, application_environment_id: int
+    ) -> Optional[int]:
         """Get the id of a resource by its application id and reference"""
         resp = self._session.get(
             url=self.get_url(
-                f"/resources/?applicationId={application_id}&reference={reference}",
+                f"/resources/?applicationEnvironmentId={application_environment_id}&reference={reference}",
             ),
             headers=self._headers,
         )
@@ -357,7 +359,9 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
 
-    def create_resource(self, reference: str, application_id: int) -> Optional[int]:
+    def create_resource(
+        self, reference: str, application_environment_id: int
+    ) -> Optional[int]:
         """Create a barebone resource for linking compliance event to"""
         resp = self._session.post(
             url=self.get_url(f"/resources/"),
@@ -365,7 +369,7 @@ class Backend:
             json={
                 "name": reference,
                 "reference": reference,
-                "applicationId": application_id,
+                "applicationEnvironmentId": application_environment_id,
             },
         )
         if resp.status_code == 200:
@@ -467,26 +471,50 @@ class Handler:
 
     def handle_compliance_event(self, compliance_event: ComplianceEvent) -> None:
         """When passed a compliance event this method will attempt to create any missing defintions for Application and Technical Controls and persist the presented event"""
+        # check if env pre-exist
+        environments = self._backend.get_environments()
+        found_environment = next(
+            (
+                e
+                for e in environments
+                if e.abbreviation
+                == compliance_event.application.environment.abbreviation
+            ),
+            None,
+        )
+        if found_environment is None:
+            found_environment = self._backend.create_environment(
+                compliance_event.application.environment
+            )
+
+        compliance_event.application.environment = found_environment
+
         # check app pre-exists
-        application = self._backend.get_application_by_reference(
-            application_reference=compliance_event.application.reference
+
+        application = self._backend.get_application_environment_by_reference(
+            reference=compliance_event.application.reference
         )
 
         if application is None:
             # create new app
             application = self._backend.create_application(
-                application=compliance_event.application, environment_id=None
+                application=compliance_event.application
+            )
+
+            application = self._backend.create_application_environment(
+                application=compliance_event.application
             )
 
         control = self.handle_technical_control(compliance_event.technical_control)
 
         # Ensure resource exists
         resource_id = self._backend.get_resource_id(
-            application_id=application.id, reference=compliance_event.resource_reference
+            application_environment_id=application.application_environment_id,
+            reference=compliance_event.resource_reference,
         )
         if resource_id is None:
             resource_id = self._backend.create_resource(
-                application_id=application.id,
+                application_environment_id=application.application_environment_id,
                 reference=compliance_event.resource_reference,
             )
 

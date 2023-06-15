@@ -112,9 +112,10 @@ def test_monitored_resource_use_pre_existing_dependents(handler, mapped_resource
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="svc-ref-1", type="NETWORK")
 
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+    ApplicationFactory(id=2)
+    ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
+    ApplicationEnvironmentReferenceFactory(
+        application_environment_id=1, type="aws_account_id", reference="app-ref-1"
     )
 
     # Act
@@ -132,7 +133,7 @@ def test_monitored_resource_use_pre_existing_dependents(handler, mapped_resource
     assert len(resources) == 1
     assert resources[0].name == mapped_resource.name
     assert resources[0].reference == mapped_resource.reference
-    assert resources[0].application_id == 2
+    assert resources[0].application_environment_id == 1
     assert resources[0].service_id == 10
 
 
@@ -146,9 +147,10 @@ def test_monitored_resource_updates_existing(handler, mapped_resource):
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="svc-ref-1", type="NETWORK")
 
-    ApplicationFactory(id=2, environment_id=1)
-    ApplicationReferenceFactory(
-        application_id=2, type="aws_account_id", reference="app-ref-1"
+    ApplicationFactory(id=2)
+    ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
+    ApplicationEnvironmentReferenceFactory(
+        application_environment_id=1, type="aws_account_id", reference="app-ref-1"
     )
 
     ResourceFactory(
@@ -156,7 +158,7 @@ def test_monitored_resource_updates_existing(handler, mapped_resource):
         name="Res Other",
         reference="res-ref-1",
         service_id=10,
-        application_id=2,
+        application_environment_id=1,
     )
 
     # Act
@@ -175,5 +177,5 @@ def test_monitored_resource_updates_existing(handler, mapped_resource):
 
     assert resources[0].name == mapped_resource.name
     assert resources[0].reference == mapped_resource.reference
-    assert resources[0].application_id == 2
+    assert resources[0].application_environment_id == 1
     assert resources[0].service_id == 10
