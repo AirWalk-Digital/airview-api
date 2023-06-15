@@ -75,14 +75,3 @@ class ApplicationEnvironments(MethodView):
             return app
         except AirViewValidationException as e:
             abort(400, message=str(e))
-
-
-@blp.route("/<string:application_id>/environments")
-class Environments(MethodView):
-    @blp.response(200, EnvironmentSchema(many=True))
-    @blp.role(Roles.CONTENT_READER)
-    def get(self, application_id):
-        """Get all environments defined for this application
-        Returns a list of applications
-        """
-        return application_service.get_environments(application_id)
