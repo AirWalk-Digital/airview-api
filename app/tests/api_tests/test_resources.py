@@ -7,6 +7,18 @@ import pytest
 
 def setup():
     reset_factories()
+    EnvironmentFactory(id=1)
+    ApplicationFactory(
+        id=1, name="App One", application_type=ApplicationType.APPLICATION_SERVICE
+    )
+    ApplicationFactory(
+        id=2, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
+    )
+    ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=1)
+    ApplicationEnvironmentFactory(id=2, application_id=2, environment_id=1)
+
+    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+    ServiceFactory(id=11, name="Service Two", reference="ref_2", type="NETWORK")
 
 
 def test_resources_post_ok(client):
@@ -16,20 +28,11 @@ def test_resources_post_ok(client):
     Then: The item is persisted and the id populated
     """
     # Arrange
-    ApplicationFactory(
-        id=1, name="App One", application_type=ApplicationType.APPLICATION_SERVICE
-    )
-    ApplicationFactory(
-        id=2, name="App Other", application_type=ApplicationType.APPLICATION_SERVICE
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
-
     ResourceFactory(
         name="Res AAA",
         reference="same_app_ref",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
     )
@@ -38,7 +41,7 @@ def test_resources_post_ok(client):
         name="Res BBB",
         reference="ref_1",
         service_id=10,
-        application_id=2,
+        application_environment_id=2,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
     )
@@ -52,7 +55,7 @@ def test_resources_post_ok(client):
             "name": "Res One",
             "reference": "res_1",
             "serviceId": 10,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
@@ -61,7 +64,7 @@ def test_resources_post_ok(client):
     print(data)
     assert data["name"] == "Res One"
     assert data["reference"] == "res_1"
-    assert data["applicationId"] == 1
+    assert data["applicationEnvironmentId"] == 1
     assert data["serviceId"] == 10
 
     # Assert persistance
@@ -70,7 +73,7 @@ def test_resources_post_ok(client):
     assert items[2].id == 3
     assert items[2].name == "Res One"
     assert items[2].reference == "res_1"
-    assert items[2].application_id == 1
+    assert items[2].application_environment_id == 1
     assert items[2].service_id == 10
 
 
@@ -81,18 +84,11 @@ def test_resources_post_handle_duplicate_error(client):
     Then: The item is rejected with 409
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
     ResourceFactory(
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
     )
@@ -106,7 +102,7 @@ def test_resources_post_handle_duplicate_error(client):
             "name": "Res One",
             "reference": "res_1",
             "serviceId": 10,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
@@ -124,14 +120,6 @@ def test_resources_put_creates_new(client):
     Then: The item is updated and a 204 status returned
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
-    ServiceFactory(id=11, name="Service Two", reference="ref_2", type="NETWORK")
 
     time_now = datetime.utcnow()
 
@@ -139,12 +127,12 @@ def test_resources_put_creates_new(client):
 
     # Act
     resp = client.put(
-        "/resources/?applicationId=1&reference=res_1",
+        "/resources/?applicationEnvironmentId=1&reference=res_1",
         json={
             "name": "Res One Update",
             "reference": "res_1",
             "serviceId": 11,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
@@ -157,7 +145,7 @@ def test_resources_put_creates_new(client):
     assert items[0].id == 1
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
-    assert items[0].application_id == 1
+    assert items[0].application_environment_id == 1
     assert items[0].service_id == 11
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
@@ -170,27 +158,12 @@ def test_resources_put_updates_existing(client):
     Then: The item is updated and a 201 status returned
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ApplicationFactory(
-        id=2,
-        name="App Two",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
-    ServiceFactory(id=11, name="Service Two", reference="ref_2", type="NETWORK")
-
     time_now = datetime.utcnow()
     ResourceFactory(
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -199,12 +172,12 @@ def test_resources_put_updates_existing(client):
 
     # Act
     resp = client.put(
-        "/resources/?applicationId=1&reference=res_1",
+        "/resources/?applicationEnvironmentId=1&reference=res_1",
         json={
             "name": "Res One Update",
             "reference": "res_1",
             "serviceId": 11,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
@@ -217,7 +190,7 @@ def test_resources_put_updates_existing(client):
     assert items[0].id == 1
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
-    assert items[0].application_id == 1
+    assert items[0].application_environment_id == 1
     assert items[0].service_id == 11
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
@@ -230,21 +203,12 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
     Then: The last updated date is updated, last modified is the same and a 204 status returned
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
-    ServiceFactory(id=11, name="Service Two", reference="ref_2", type="NETWORK")
-
     time_now = datetime.utcnow()
     ResourceFactory(
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -253,12 +217,12 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
 
     # Act
     resp = client.put(
-        "/resources/?applicationId=1&reference=res_1",
+        "/resources/?applicationEnvironmentId=1&reference=res_1",
         json={
             "name": "Res One",
             "reference": "res_1",
             "serviceId": 10,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
@@ -271,7 +235,7 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
     assert items[0].id == 1
     assert items[0].name == "Res One"
     assert items[0].reference == "res_1"
-    assert items[0].application_id == 1
+    assert items[0].application_environment_id == 1
     assert items[0].service_id == 10
     assert items[0].last_seen > time_now
     assert items[0].last_modified == time_now
@@ -284,20 +248,13 @@ def test_resources_get_single(client):
     Then: The resource is mapped correctly, 200 status
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
     time_now = datetime.utcnow()
     ResourceFactory(
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -305,7 +262,7 @@ def test_resources_get_single(client):
         name="Res Two",
         reference="res_2",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -314,7 +271,7 @@ def test_resources_get_single(client):
 
     # Act
     resp = client.get(
-        "/resources/?applicationId=1&reference=res_2",
+        "/resources/?applicationEnvironmentId=1&reference=res_2",
     )
     # Assert
     assert resp.status_code == 200
@@ -325,7 +282,7 @@ def test_resources_get_single(client):
     assert data["id"] == 2
     assert data["name"] == "Res Two"
     assert data["reference"] == "res_2"
-    assert data["applicationId"] == 1
+    assert data["applicationEnvironmentId"] == 1
     assert data["serviceId"] == 10
 
 
@@ -336,20 +293,12 @@ def test_resources_get_single_not_found(client):
     Then: 404 status
     """
     # Arrange
-    ApplicationFactory(
-        id=1,
-        name="App One",
-        application_type=ApplicationType.APPLICATION_SERVICE,
-    )
-
-    ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
-
     time_now = datetime.utcnow()
     ResourceFactory(
         name="Res One",
         reference="res_1",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -357,7 +306,7 @@ def test_resources_get_single_not_found(client):
         name="Res Two",
         reference="res_2",
         service_id=10,
-        application_id=1,
+        application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
     )
@@ -366,14 +315,20 @@ def test_resources_get_single_not_found(client):
 
     # Act
     resp = client.get(
-        "/resources/?applicationId=1&reference=res_99999",
+        "/resources/?applicationEnvironmentId=1&reference=res_99999",
     )
     # Assert
     assert resp.status_code == 404
 
 
 @pytest.mark.parametrize(
-    "test_input", ["applicationId=999&reference=res_1", "applicationId=1&reference=res_blah", "reference=res_1", "applicationId=1"]
+    "test_input",
+    [
+        "applicationEnvironmentId=999&reference=res_1",
+        "applicationEnvironmentId=1&reference=res_blah",
+        "reference=res_1",
+        "applicationEnvironmentId=1",
+    ],
 )
 def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_input):
     """
@@ -390,9 +345,12 @@ def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_
             "name": "Res One",
             "reference": "res_1",
             "serviceId": 10,
-            "applicationId": 1,
+            "applicationEnvironmentId": 1,
         },
     )
     # Assert
     assert resp.status_code == 400
-    assert resp.get_json()['message'] == "Keys in data do not match the keys in the query parameters"
+    assert (
+        resp.get_json()["message"]
+        == "Keys in data do not match the keys in the query parameters"
+    )

@@ -54,7 +54,7 @@ class ResourceSchema(CamelCaseSchema):
     name = ma.fields.Str(required=True)
     reference = ma.fields.Str(required=True)
     service_id = ma.fields.Integer(required=False)
-    application_id = ma.fields.Integer(required=True)
+    application_environment_id = ma.fields.Integer(required=True)
 
 
 class MonitoredResourceSchema(CamelCaseSchema):
