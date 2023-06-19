@@ -4,10 +4,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import case
 
 
-class TechnicalControlSeverity(Enum):
-    HIGH = 1
-    MEDIUM = 2
-    LOW = 3
+class ControlSeverity(Enum):
+    CRITICAL = 1
+    HIGH = 2
+    MEDIUM = 3
+    LOW = 4
 
     def __str__(self):
         return self.name
@@ -260,6 +261,7 @@ class Control(db.Model):
         db.Integer,
         db.ForeignKey("service.id"),
     )
+    severity = db.Column(db.Enum(ControlSeverity), nullable=False)
 
     service = db.relationship("Service", back_populates="controls")
 
@@ -283,7 +285,6 @@ class TechnicalControl(db.Model):
     reference = db.Column(db.String(500), nullable=False)
     control_action = db.Column(db.Enum(TechnicalControlAction), nullable=False)
     system_id = db.Column(db.Integer, db.ForeignKey("system.id"), nullable=False)
-    # severity = db.Column(db.Enum(TechnicalControlSeverity), nullable=False)
     ttl = db.Column(db.Integer, nullable=True)
     is_blocking = db.Column(db.Boolean, nullable=False)
 
