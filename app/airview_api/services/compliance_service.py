@@ -119,6 +119,7 @@ def get_compliace_aggregate(filter: str, select: str):
     except Exception as e:
         # This is less than ideal but since there's so many permetations of the odata filter it's hard to validate
         # For now, this assumes the failure is due to a bad filter. It could be anything. But this guards against 500 errors at least.
+        print(e)
         raise AirViewValidationException(
             "The query could not be executed. Check the filter which was passed is valid"
         )

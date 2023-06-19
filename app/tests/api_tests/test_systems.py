@@ -1,4 +1,4 @@
-from airview_api.models import TechnicalControlSeverity, SystemStage
+from airview_api.models import SystemStage
 from tests.common import client
 from tests.factories import *
 

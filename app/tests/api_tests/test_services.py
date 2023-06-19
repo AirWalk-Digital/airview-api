@@ -1,4 +1,4 @@
-from airview_api.models import TechnicalControlSeverity, Service, ServiceType
+from airview_api.models import Service, ServiceType
 from tests.common import client
 from tests.factories import *
 
