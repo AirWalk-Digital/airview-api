@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airview_api.models import TechnicalControlSeverity, Resource, ApplicationType
+from airview_api.models import Resource, ApplicationType
 from tests.common import client
 from tests.factories import *
 import pytest
