@@ -8,10 +8,11 @@ from airview_api.controllers import (
     environments,
     # application_statuses,
     # exclusion_resources,
-    # exclusions,
+    exclusions,
     referenced_application_environments,
     application_environments,
     # application_technical_controls,
     monitored_resources,
     compliance,
+    aggregations,
 )
