@@ -167,20 +167,40 @@ def test_get_complaince_bad_request_for_unexecutable_filter(client):
         {
             "query": "$select=applicationName",
             "expected": [
-                {"applicationName": "App Other", "isCompliant": 1, "total": 2}
+                {
+                    "applicationName": "App Other",
+                    "isCompliant": 1,
+                    "excluded": 0,
+                    "total": 2,
+                }
             ],
         },
         {
             "query": "$select=resourceReference",
             "expected": [
-                {"isCompliant": 1, "resourceReference": "res_2", "total": 1},
-                {"isCompliant": 0, "resourceReference": "res_1", "total": 1},
+                {
+                    "isCompliant": 1,
+                    "excluded": 0,
+                    "resourceReference": "res_2",
+                    "total": 1,
+                },
+                {
+                    "isCompliant": 0,
+                    "excluded": 0,
+                    "resourceReference": "res_1",
+                    "total": 1,
+                },
             ],
         },
         {
             "query": "$select=resourceReference&$filter=resourceReference eq 'res_2'",
             "expected": [
-                {"isCompliant": 1, "resourceReference": "res_2", "total": 1},
+                {
+                    "isCompliant": 1,
+                    "excluded": 0,
+                    "resourceReference": "res_2",
+                    "total": 1,
+                },
             ],
         },
     ],

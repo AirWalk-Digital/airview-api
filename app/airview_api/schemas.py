@@ -215,9 +215,37 @@ class QualityModelSchema(CamelCaseSchema):
 class ComplianceDataSchema(CamelCaseSchema):
     application_id = ma.fields.Integer()
     application_name = ma.fields.Str()
+    environment_name = ma.fields.Str()
     resource_reference = ma.fields.Str()
     technical_control_reference = ma.fields.Str()
     control_id = ma.fields.Integer()
     control_name = ma.fields.String()
+    control_severity = ma.fields.String()
+    excluded = ma.fields.Integer()
     is_compliant = ma.fields.Integer()
     total = ma.fields.Integer()
+
+
+class ComplianceAggregationSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    environment_name = ma.fields.Str()
+    technical_control_name = ma.fields.Str()
+    control_name = ma.fields.String()
+    control_id = ma.fields.String()
+    control_severity = ma.fields.String()
+    system_name = ma.fields.String()
+    system_stage = ma.fields.String()
+    severity = ma.fields.String()
+    resources = ma.fields.List(ma.fields.Dict())
+    tickets = ma.fields.List(ma.fields.Dict())
+    raised_date_time = ma.fields.DateTime()
+
+
+class ExclusionSchema(CamelCaseSchema):
+    summary = ma.fields.Str()
+    is_limited_exclusion = ma.fields.Boolean()
+    end_date = ma.fields.DateTime()
+    control_id = ma.fields.Integer(required=True)
+    resources = ma.fields.List(ma.fields.Integer(required=True))
+    status = ma.fields.Str()
+    notes = ma.fields.Str()
