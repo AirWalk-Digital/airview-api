@@ -241,6 +241,65 @@
         ],
         "type": "object"
       },
+      "Framework": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "FrameworkControlObjective": {
+        "properties": {
+          "frameworkSectionId": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "frameworkSectionId",
+          "name"
+        ],
+        "type": "object"
+      },
+      "FrameworkSection": {
+        "properties": {
+          "frameworkId": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "frameworkId",
+          "name"
+        ],
+        "type": "object"
+      },
       "MonitoredResource": {
         "properties": {
           "additionalData": {
@@ -801,12 +860,351 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
+    "/frameworks/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Framework"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Framework"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Framework"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/frameworks/control_objectives": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FrameworkControlObjective"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrameworkControlObjective"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameworkControlObjective"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/frameworks/{framework_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Framework"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "framework_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Framework"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Framework"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/frameworks/{framework_id}/sections": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FrameworkSection"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "framework_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrameworkSection"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameworkSection"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
+    "/frameworks/{framework_id}/sections/{section_id}/control_objectives": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FrameworkControlObjective"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "section_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "framework_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrameworkControlObjective"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameworkControlObjective"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
     "/monitored-resources/": {
       "put": {
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -814,7 +1212,7 @@
           },
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -854,7 +1252,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -862,7 +1260,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1127,18 +1525,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1289,6 +1687,10 @@
     {
       "description": "Aggregation based resources",
       "name": "aggregations"
+    },
+    {
+      "description": "Framework based resources",
+      "name": "frameworks"
     }
   ]
 }
