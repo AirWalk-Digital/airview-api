@@ -11,7 +11,10 @@ from flask_smorest import abort
 import flask
 from flask import request
 
-from airview_api.schemas import ComplianceAggregationSchema
+from airview_api.schemas import (
+    ComplianceAggregationSchema,
+    ControlOverviewResourceSchema,
+)
 from airview_api.helpers import AirviewApiHelpers
 
 
@@ -33,3 +36,17 @@ class Application(MethodView):
         Returns application matching requested id
         """
         return aggregation_service.get_compliance_aggregation(application_id)
+
+
+@blp.route("control-overview-resources/<int:application_id>/")
+class ControlOverviewResources(MethodView):
+    @blp.response(200, ControlOverviewResourceSchema(many=True))
+    @blp.role(Roles.CONTENT_READER)
+    def get(self, application_id):
+        """Get an application by id
+        Returns application matching requested id
+        """
+        technical_control_id: int = flask.request.args.get("technicalControlId")
+        return aggregation_service.get_control_overview_resources(
+            application_id, technical_control_id
+        )
