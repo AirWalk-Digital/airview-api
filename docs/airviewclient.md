@@ -48,7 +48,7 @@ Create a new environment
 
 * **Return type**
 
-    `Optional`[`int`]
+    `Optional`[`Framework`]
 
 
 
@@ -56,7 +56,7 @@ Create a new environment
 
 * **Return type**
 
-    `Optional`[`int`]
+    `Optional`[`FrameworkControlObjective`]
 
 
 
@@ -64,7 +64,7 @@ Create a new environment
 
 * **Return type**
 
-    `Optional`[`int`]
+    `Optional`[`FrameworkSection`]
 
 
 
@@ -128,7 +128,7 @@ Get a list of exclusion resources by state
 
 * **Return type**
 
-    `Optional`[`int`]
+    `Optional`[`Framework`]
 
 
 
