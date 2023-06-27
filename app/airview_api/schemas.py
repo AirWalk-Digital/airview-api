@@ -151,9 +151,8 @@ class ControlOverviewResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     type = ma.fields.Str()
     reference = ma.fields.Str()
-    control_action = ma.fields.Str()
     last_seen = ma.fields.DateTime()
-    state = ma.fields.Str()
+    status = ma.fields.Str()
     environment = ma.fields.Str()
     pending = ma.fields.Boolean()
 
