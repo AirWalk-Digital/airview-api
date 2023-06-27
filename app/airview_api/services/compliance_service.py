@@ -7,10 +7,11 @@ from airview_api.models import (
     Control,
     Environment,
     ApplicationEnvironment,
+    System,
 )
 from airview_api.services import AirViewValidationException
 from airview_api.database import db
-from sqlalchemy import func, case
+from sqlalchemy import func, case, literal
 
 from odata_query.grammar import ODataParser, ODataLexer
 from odata_query.sql import AstToSqlVisitor
@@ -32,10 +33,15 @@ def get_compliace_aggregate(filter: str, select: str):
         "application_id",
         "application_name",
         "environment_name",
+        "severity",
         "resource_reference",
         "technical_control_reference",
+        "technical_control_name",
         "control_name",
         "control_id",
+        "control_severity",
+        "system_name",
+        "system_stage",
     ]
 
     # Enforce the check by ensuring all the sent 'select' proprties are a subset of the allowed ownes
@@ -54,8 +60,12 @@ def get_compliace_aggregate(filter: str, select: str):
             Application.name.label("applicationname"),
             Environment.name.label("environmentname"),
             TechnicalControl.reference.label("technicalcontrolreference"),
+            TechnicalControl.name.label("technicalcontrolname"),
             Control.name.label("controlname"),
+            Control.severity.label("controlseverity"),
             Control.id.label("controlid"),
+            System.name.label("systemname"),
+            System.stage.label("systemstage"),
             case(
                 (
                     MonitoredResource.monitoring_state
@@ -64,6 +74,7 @@ def get_compliace_aggregate(filter: str, select: str):
                 ),
                 else_=0,
             ).label("is_compliant"),
+            literal(0).label("excluded"),
         )
         .select_from(TechnicalControl)
         .join(MonitoredResource)
@@ -72,6 +83,7 @@ def get_compliace_aggregate(filter: str, select: str):
         .join(Environment)
         .join(Application)
         .join(Control, isouter=True)
+        .join(System, isouter=True)
         .where(MonitoredResource.monitoring_state != MonitoredResourceState.DELETED)
         .subquery()
     )
@@ -107,6 +119,7 @@ def get_compliace_aggregate(filter: str, select: str):
                 + [
                     func.sum(db.column("is_compliant")).label("is_compliant"),
                     func.count(db.column("is_compliant")).label("total"),
+                    func.sum(db.column("excluded")).label("excluded"),
                 ]
             )
         )

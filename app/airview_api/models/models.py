@@ -453,7 +453,7 @@ class Exclusion(db.Model):
     application_environment_id = db.Column(
         db.Integer,
         db.ForeignKey("application_environment.id"),
-        nullable=False,
+        nullable=True,
     )
     application_environment = db.relationship(
         "ApplicationEnvironment", back_populates="exclusions"
