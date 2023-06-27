@@ -68,3 +68,15 @@ def get_sections_by_framework(framework_id: int):
 
 def get_controls_by_framework_and_section(section_id: int):
     return FrameworkControlObjective.query.filter_by(framework_section_id=section_id)
+
+
+def get_framework_by_name(name: str):
+    return Framework.query.filter_by(name=name)
+
+
+def get_framework_section_by_name(name: str):
+    return FrameworkSection.query.filter_by(name=name)
+
+
+def get_control_by_name(name: str):
+    return FrameworkControlObjective.query.filter_by(name=name)

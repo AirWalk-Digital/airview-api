@@ -1,3 +1,4 @@
+from flask import request
 from flask.views import MethodView
 from airview_api.blueprint import Blueprint, Roles
 from airview_api.helpers import AirviewApiHelpers
@@ -27,8 +28,11 @@ class Framework(MethodView):
     @blp.response(200, FrameworkSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self):
-        data = framework_service.get_all()
-        return data
+        if request.args.get("name"):
+            name = request.args['name']
+            return framework_service.get_framework_by_name(name)
+        return framework_service.get_all()
+
     
     @blp.arguments(FrameworkSchema)
     @blp.response(200, FrameworkSchema)
@@ -64,8 +68,12 @@ class FrameworkSection(MethodView):
     @blp.response(200, FrameworkSectionSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self,framework_id):
+        if request.args.get("name"):
+            name = request.args['name']
+            return framework_service.get_framework_section_by_name(name)
         return framework_service.get_sections_by_framework(framework_id)
 
+    
     @blp.arguments(FrameworkSectionSchema)
     @blp.response(200, FrameworkSectionSchema)
     @blp.role(Roles.CONTENT_WRITER)
@@ -82,27 +90,10 @@ class FrameworkControlObjective(MethodView):
     @blp.response(200, FrameworkControlObjectiveSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self, framework_id, section_id):
-        data = framework_service.get_controls_by_framework_and_section(section_id)
-        return data
-    
-    @blp.arguments(FrameworkControlObjectiveSchema)
-    @blp.response(200, FrameworkControlObjectiveSchema)
-    @blp.role(Roles.CONTENT_WRITER)
-    def post(self, data, framework_id, section_id):
-        try:
-            app = framework_service.create_control_objective(data)
-            return app
-        except AirViewValidationException as e:
-            abort(400, message=str(e))
-
-
-@blp.route("/control_objectives")
-class FrameworkControlObjective(MethodView):
-    @blp.response(200, FrameworkControlObjectiveSchema(many=True))
-    @blp.role(Roles.CONTENT_READER)
-    def get(self, framework_id, section_id):
-        data = framework_service.get_controls_by_framework_and_section(section_id)
-        return data
+        if request.args.get("name"):
+            name = request.args['name']
+            return framework_service.get_control_by_name(name)
+        return framework_service.get_controls_by_framework_and_section(section_id)
     
     @blp.arguments(FrameworkControlObjectiveSchema)
     @blp.response(200, FrameworkControlObjectiveSchema)
