@@ -230,7 +230,7 @@ class ComplianceAggregationSchema(CamelCaseSchema):
     environment_name = ma.fields.Str()
     technical_control_name = ma.fields.Str()
     control_name = ma.fields.String()
-    control_id = ma.fields.String()
+    control_id = ma.fields.Integer()
     control_severity = ma.fields.String()
     system_name = ma.fields.String()
     system_stage = ma.fields.String()

@@ -79,7 +79,7 @@ def get_compliance_aggregation(application_id):
             Control.name,
             Control.id,
             Resource.id,
-            Resource.reference,
+            Resource.name,
             MonitoredResource.last_modified,
         )
         .select_from(Environment)
