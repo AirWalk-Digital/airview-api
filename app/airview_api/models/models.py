@@ -213,6 +213,7 @@ class FrameworkControlObjectiveLink(db.Model):
 class FrameworkControlObjective(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500), nullable=False)
+    name = db.Column(db.String(500), nullable=False)
     framework_section_id = db.Column(
         db.Integer,
         db.ForeignKey("framework_section.id"),

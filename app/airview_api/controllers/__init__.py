@@ -14,4 +14,6 @@ from airview_api.controllers import (
     # application_technical_controls,
     monitored_resources,
     compliance,
+    frameworks,
+    # framework_control_objectives,
 )

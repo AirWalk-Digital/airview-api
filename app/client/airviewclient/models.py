@@ -202,5 +202,39 @@ class Resource:
     service: Optional[Service] = None
 
 
+@dataclass
+class Framework:
+    #: Name of the framework
+    name: str
+    #: Link to the framework
+    link: str
+    #: Id of the framework
+    id: Optional[int] = None
+
+
+@dataclass
+class FrameworkSection:
+    #: Name of the section in the framework
+    name: str
+    #: Link to the section framework (domain)
+    link: str
+    #: Framework within which the section belongs
+    framework: Framework
+    #: Id of the framework section
+    id: Optional[int] = None
+
+
+@dataclass
+class FrameworkControlObjective:
+    #: Name of the control objective
+    name: str
+    #: Link to the control objective in the framework
+    link: str
+    # Framework section in which the control objective sits
+    framework_section: FrameworkSection
+    #: Id of the framework control objective
+    id: Optional[int] = None
+
+
 class BackendFailureException(Exception):
     pass
