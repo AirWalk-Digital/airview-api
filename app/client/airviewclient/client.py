@@ -406,7 +406,7 @@ class Backend:
             headers=self._headers
         )
         if resp.status_code == 200:
-            framework.id = resp.json()['id']
+            framework.id = resp.json()[0]['id']
             return framework
         if resp.status_code == 404:
             return None
@@ -440,7 +440,7 @@ class Backend:
             headers=self._headers
         )
         if resp.status_code == 200:
-            framework_section.id = resp.json()['id']
+            framework_section.id = resp.json()[0]['id']
             return framework_section
         if resp.status_code == 404:
             return None
@@ -475,7 +475,7 @@ class Backend:
             headers=self._headers
         )
         if resp.status_code == 200:
-            framework_control_objective.id = resp.json()['id']
+            framework_control_objective.id = resp.json()[0]['id']
             return framework_control_objective
         if resp.status_code == 404:
             return None
