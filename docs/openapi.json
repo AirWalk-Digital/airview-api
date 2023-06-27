@@ -920,66 +920,6 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/frameworks/control_objectives": {
-      "get": {
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/FrameworkControlObjective"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "tags": [
-          "frameworks"
-        ],
-        "x-api-rbac-role": "ContentReader"
-      },
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FrameworkControlObjective"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FrameworkControlObjective"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "422": {
-            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-          },
-          "default": {
-            "$ref": "#/components/responses/DEFAULT_ERROR"
-          }
-        },
-        "tags": [
-          "frameworks"
-        ],
-        "x-api-rbac-role": "ContentWriter"
-      }
-    },
     "/frameworks/{framework_id}": {
       "get": {
         "responses": {
@@ -1147,7 +1087,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1156,7 +1096,7 @@
         },
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1204,7 +1144,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1212,7 +1152,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1525,18 +1465,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "systemId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "systemId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
