@@ -24,7 +24,6 @@ def create_framework(data: dict):
 def create_framework_section(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
-    
     app = FrameworkSection(**data)
     try:
         db.session.add(app)
@@ -71,12 +70,15 @@ def get_controls_by_framework_and_section(section_id: int):
 
 
 def get_framework_by_name(name: str):
-    return Framework.query.filter_by(name=name)
+    data = Framework.query.filter_by(name=name).all()
+    return data
 
 
 def get_framework_section_by_name(name: str):
-    return FrameworkSection.query.filter_by(name=name)
+    data = FrameworkSection.query.filter_by(name=name).all()
+    return data
 
 
 def get_control_by_name(name: str):
-    return FrameworkControlObjective.query.filter_by(name=name)
+    data = FrameworkControlObjective.query.filter_by(name=name).all()
+    return data

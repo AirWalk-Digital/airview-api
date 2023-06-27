@@ -24,7 +24,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class Framework(MethodView):
+class Frameworks(MethodView):
     @blp.response(200, FrameworkSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
     def get(self):
@@ -33,7 +33,6 @@ class Framework(MethodView):
             return framework_service.get_framework_by_name(name)
         return framework_service.get_all()
 
-    
     @blp.arguments(FrameworkSchema)
     @blp.response(200, FrameworkSchema)
     @blp.role(Roles.CONTENT_WRITER)
@@ -44,6 +43,7 @@ class Framework(MethodView):
         except AirViewValidationException as e:
             abort(400, message=str(e))
 
+
 @blp.route("/<int:framework_id>")
 class Framework(MethodView):
     @blp.response(200, FrameworkSchema)
@@ -51,16 +51,6 @@ class Framework(MethodView):
     def get(self, framework_id):
         data = framework_service.get_by_id(framework_id)
         return data
-    
-    @blp.arguments(FrameworkSchema)
-    @blp.response(200, FrameworkSchema)
-    @blp.role(Roles.CONTENT_WRITER)
-    def post(self, data):
-        try:
-            app = framework_service.create_framework(data)
-            return app
-        except AirViewValidationException as e:
-            abort(400, message=str(e))
 
 
 @blp.route("/<int:framework_id>/sections")
