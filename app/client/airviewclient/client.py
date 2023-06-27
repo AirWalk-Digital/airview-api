@@ -401,7 +401,7 @@ class Backend:
     def get_framework(self, framework: Framework) -> Optional[int]:
         resp = self._session.get(
             url=self.get_url(
-                f"frameworks?name={framework.name}"
+                f"frameworks/?name={framework.name}"
             ),
             headers=self._headers
         )
