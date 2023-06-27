@@ -1087,7 +1087,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1096,7 +1096,7 @@
         },
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1144,7 +1144,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1152,7 +1152,7 @@
           },
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1192,7 +1192,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
@@ -1200,7 +1200,7 @@
           },
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
