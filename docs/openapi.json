@@ -86,7 +86,7 @@
       "ComplianceAggregation": {
         "properties": {
           "controlId": {
-            "type": "string"
+            "type": "integer"
           },
           "controlName": {
             "type": "string"
@@ -165,6 +165,68 @@
           },
           "total": {
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ControlOverview": {
+        "properties": {
+          "applied": {
+            "type": "integer"
+          },
+          "controlAction": {
+            "type": "string"
+          },
+          "exempt": {
+            "type": "integer"
+          },
+          "frameworks": {
+            "items": {
+              "$ref": "#/components/schemas/NamedUrl"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "systemName": {
+            "type": "string"
+          },
+          "systemStage": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ControlOverviewResource": {
+        "properties": {
+          "environment": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "lastSeen": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "pending": {
+            "type": "boolean"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -255,6 +317,17 @@
         ],
         "type": "object"
       },
+      "NamedUrl": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "PaginationMetadata": {
         "properties": {
           "first_page": {
@@ -277,6 +350,14 @@
           },
           "total_pages": {
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "QualityModel": {
+        "properties": {
+          "name": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -400,6 +481,44 @@
           }
         },
         "summary": "Get an application by id",
+        "tags": [
+          "aggregations"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/aggregations/control-overview-resources/{application_id}/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ControlOverviewResource"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get an application by id\nReturns application matching requested id",
         "tags": [
           "aggregations"
         ],
@@ -682,6 +801,81 @@
         }
       ]
     },
+    "/applications/{application_id}/control-overviews/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ControlOverview"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "applications"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/applications/{application_id}/quality-models/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QualityModel"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get the current control statuses of resources/controls within this application",
+        "tags": [
+          "applications"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
     "/compliance/": {
       "get": {
         "description": "Returns application matching requested id",
@@ -854,7 +1048,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -862,7 +1056,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
