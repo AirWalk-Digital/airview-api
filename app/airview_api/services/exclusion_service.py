@@ -30,7 +30,7 @@ def create(data: dict):
         exclusion = Exclusion()
         exclusion.control_id = data["control_id"]
         exclusion.summary = data["summary"]
-        exclusion.notes = data["notes"]
+        exclusion.notes = data.get("notes")
         exclusion.is_limited_exclusion = data["is_limited_exclusion"]
         exclusion.end_date = datetime.max
         # mapped = list()
