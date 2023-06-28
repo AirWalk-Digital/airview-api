@@ -13,6 +13,7 @@ from airview_api.models import (
     Service,
     Resource,
     TechnicalControlAction,
+    Control,
 )
 from airview_api.database import db
 from datetime import datetime
@@ -28,6 +29,12 @@ class TechnicalControlFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     is_blocking = False
     control_action = TechnicalControlAction.LOG
+
+
+class ControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Control
+        sqlalchemy_session = db.session
 
 
 class ServiceFactory(factory.alchemy.SQLAlchemyModelFactory):
