@@ -35,6 +35,7 @@ class MonitoredResourceState(Enum):
     FLAGGED = 1
     MONITORING = 2
     DELETED = 3
+    UNRESPONSIVE = 4
 
     def __str__(self):
         return self.name
