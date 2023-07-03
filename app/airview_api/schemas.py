@@ -40,6 +40,11 @@ class FrameworkControlObjectiveSchema(CamelCaseSchema):
     framework_section_id = ma.fields.Integer(required=True)
 
 
+class FrameworkControlObjectiveLinkSchema(CamelCaseSchema):
+    framework_control_objective_id = ma.fields.Integer()
+    control_id = ma.fields.Integer()
+
+
 class EnvironmentSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)

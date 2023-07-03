@@ -657,7 +657,9 @@ class Handler:
             self._backend.create_framework_control_objective(
                 framework_control_objective, framework_section.id, framework.id
             )
-        
+
+    def handle_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> None:
+        pass        
         
 
 

@@ -1,8 +1,12 @@
-from airview_api.models import Framework, FrameworkSection, FrameworkControlObjective
+from airview_api.models import (
+    Framework,
+    FrameworkSection,
+    FrameworkControlObjective,
+    FrameworkControlObjectiveLink
+)
 from sqlalchemy.exc import IntegrityError
 from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.database import db
-from flask import current_app
 
 def create_framework(data: dict):
     if data.get("id") is not None:
@@ -14,7 +18,6 @@ def create_framework(data: dict):
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
-        # current_app.logger.error(e)
         raise AirViewValidationException(
             "Unique Constraint Error, check reference field"
         )
@@ -46,7 +49,6 @@ def create_control_objective(data: dict):
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
-        current_app.logger.error(e)
         raise AirViewValidationException(
             "Unique Constraint Error, check reference field"
         )
@@ -82,3 +84,20 @@ def get_framework_section_by_name(name: str):
 def get_control_by_name(name: str):
     data = FrameworkControlObjective.query.filter_by(name=name).all()
     return data
+
+
+def create_control_objective_link(data: dict):
+    try:
+        app = FrameworkControlObjectiveLink(**data)
+        db.session.add(app)
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        raise AirViewValidationException(
+            "Unique Constraint Error, check reference field"
+        )
+    return app
+
+
+def get_control_objective_links():
+    return FrameworkControlObjectiveLink.query.all()
