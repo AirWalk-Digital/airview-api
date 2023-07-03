@@ -4,6 +4,7 @@ from airview_api.services import AirViewValidationException, AirViewNotFoundExce
 from airview_api.database import db
 from flask import current_app
 
+
 def create_framework(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
