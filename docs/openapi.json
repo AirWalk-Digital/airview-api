@@ -347,7 +347,7 @@
             "type": "integer"
           },
           "id": {
-            "type": "string"
+            "type": "integer"
           },
           "link": {
             "type": "string"

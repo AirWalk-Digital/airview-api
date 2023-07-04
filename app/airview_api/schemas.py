@@ -27,7 +27,7 @@ class FrameworkSchema(CamelCaseSchema):
 
 
 class FrameworkSectionSchema(CamelCaseSchema):
-    id = ma.fields.Str()
+    id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     link = ma.fields.Str()
     framework_id = ma.fields.Integer(required=True)
@@ -38,6 +38,11 @@ class FrameworkControlObjectiveSchema(CamelCaseSchema):
     link = ma.fields.Str()
     name = ma.fields.Str(required=True)
     framework_section_id = ma.fields.Integer(required=True)
+
+
+class FrameworkControlObjectiveLinkSchema(CamelCaseSchema):
+    framework_control_objective_id = ma.fields.Integer()
+    control_id = ma.fields.Integer()
 
 
 class EnvironmentSchema(CamelCaseSchema):
