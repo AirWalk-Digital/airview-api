@@ -9,7 +9,6 @@ def setup():
     reset_factories()
 
 
-
 def test_frameworks_post_ok(client):
     """
     Given: Multiple frameworks exist
