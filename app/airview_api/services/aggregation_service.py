@@ -47,7 +47,6 @@ def get_control_overviews(application_id: int, quality_model: str):
         .limit(10)
     )
     result = db.session.execute(qry).all()
-    print(result)
     return result
 
 
@@ -90,7 +89,7 @@ def get_compliance_aggregation(application_id):
         .join(Control)
         .join(System)
         .where(MonitoredResource.monitoring_state == MonitoredResourceState.FLAGGED)
-        .where(Application.id == application_id)
+        .where(ApplicationEnvironment.application_id == application_id)
     )
 
     result = db.session.execute(qry).all()
@@ -122,7 +121,6 @@ def get_compliance_aggregation(application_id):
                 "tickets": [],
             }
         )
-    print(len(d))
 
     return d
 
@@ -153,7 +151,6 @@ def get_control_overview_resources(application_id, technical_control_id):
         .where(ApplicationEnvironment.application_id == application_id)
         .where(TechnicalControl.id == technical_control_id)
     )
-    print(qry)
 
     result = db.session.execute(qry).all()
     return result
