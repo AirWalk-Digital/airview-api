@@ -44,6 +44,30 @@ Create a new environment
 
 
 
+#### create_framework(framework)
+
+* **Return type**
+
+    `Optional`[`Framework`]
+
+
+
+#### create_framework_control_objective(framework_control_objective, framework_section_id, framework_id)
+
+* **Return type**
+
+    `Optional`[`FrameworkControlObjective`]
+
+
+
+#### create_framework_section(framework_section, framework_id)
+
+* **Return type**
+
+    `Optional`[`FrameworkSection`]
+
+
+
 #### create_resource(reference, application_environment_id)
 Create a barebone resource for linking compliance event to
 
@@ -98,6 +122,30 @@ Get a list of environments
 
 #### get_exclusion_resources(state)
 Get a list of exclusion resources by state
+
+
+#### get_framework(framework)
+
+* **Return type**
+
+    `Optional`[`Framework`]
+
+
+
+#### get_framework_control_objective(framework_control_objective, framework_section_id, framework_id)
+
+* **Return type**
+
+    `Optional`[`FrameworkControlObjective`]
+
+
+
+#### get_framework_section(framework_section, framework_id)
+
+* **Return type**
+
+    `Optional`[`FrameworkSection`]
+
 
 
 #### get_resource_id(reference, application_environment_id)
@@ -201,6 +249,14 @@ When passed a compliance event this method will attempt to create any missing de
 * **Return type**
 
     `None`
+
+
+
+#### handle_framework_control_objective(framework_control_objective)
+
+* **Return type**
+
+    `FrameworkControlObjective`
 
 
 
@@ -420,6 +476,28 @@ The enum status of the event
 Technical control which this compliance event is the subject of
 
 
+### _class_ client.airviewclient.models.Control(name, quality_model=None, service_id=None, id=None)
+Bases: `object`
+
+
+#### \__init__(name, quality_model=None, service_id=None, id=None)
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Id of the framework control objective
+
+
+#### name(_: `str_ )
+Name of the control
+
+
+#### quality_model(_: `QualityModel_ _ = Non_ )
+Quality model of the control
+
+
+#### service_id(_: `Optional`[`int`_ _ = Non_ )
+Service id this control links to
+
+
 ### _class_ client.airviewclient.models.Environment(name, abbreviation, id=None)
 Bases: `object`
 
@@ -479,6 +557,86 @@ An enumeration.
 #### NONE(_ = _ )
 
 #### PENDING(_ = _ )
+
+### _class_ client.airviewclient.models.Framework(name, link, id=None)
+Bases: `object`
+
+
+#### \__init__(name, link, id=None)
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Id of the framework
+
+
+#### link(_: `str_ )
+Link to the framework
+
+
+#### name(_: `str_ )
+Name of the framework
+
+
+### _class_ client.airviewclient.models.FrameworkControlObjective(name, link, framework_section, id=None)
+Bases: `object`
+
+
+#### \__init__(name, link, framework_section, id=None)
+
+#### framework_section(_: `FrameworkSection_ )
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Id of the framework control objective
+
+
+#### link(_: `str_ )
+Link to the control objective in the framework
+
+
+#### name(_: `str_ )
+Name of the control objective
+
+
+### _class_ client.airviewclient.models.FrameworkControlObjectiveLink(control_id, id=None)
+Bases: `object`
+
+
+#### \__init__(control_id, id=None)
+
+#### control_id(_: `int_ )
+Id of the control
+
+
+#### framework_control_objective_id()
+Id of the control objective
+
+alias of `int`
+
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Id of the framework control objective
+
+
+### _class_ client.airviewclient.models.FrameworkSection(name, link, framework, id=None)
+Bases: `object`
+
+
+#### \__init__(name, link, framework, id=None)
+
+#### framework(_: `Framework_ )
+Framework within which the section belongs
+
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Id of the framework section
+
+
+#### link(_: `str_ )
+Link to the section framework (domain)
+
+
+#### name(_: `str_ )
+Name of the section in the framework
+
 
 ### _class_ client.airviewclient.models.MonitoredResourceState(value)
 Bases: `Enum`
