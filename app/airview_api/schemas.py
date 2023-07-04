@@ -20,6 +20,31 @@ class CamelCaseSchema(ma.Schema):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
 
+class FrameworkSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    link = ma.fields.Str(required=False)
+
+
+class FrameworkSectionSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    link = ma.fields.Str()
+    framework_id = ma.fields.Integer(required=True)
+
+
+class FrameworkControlObjectiveSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    link = ma.fields.Str()
+    name = ma.fields.Str(required=True)
+    framework_section_id = ma.fields.Integer(required=True)
+
+
+class FrameworkControlObjectiveLinkSchema(CamelCaseSchema):
+    framework_control_objective_id = ma.fields.Integer()
+    control_id = ma.fields.Integer()
+
+
 class EnvironmentSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
