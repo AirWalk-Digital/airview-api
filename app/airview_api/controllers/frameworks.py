@@ -45,7 +45,7 @@ class Frameworks(MethodView):
             abort(400, message=str(e))
 
 
-@blp.route("/<int:framework_id>")
+@blp.route("/<int:framework_id>/")
 class Framework(MethodView):
     @blp.response(200, FrameworkSchema)
     @blp.role(Roles.CONTENT_READER)
@@ -54,7 +54,7 @@ class Framework(MethodView):
         return data
 
 
-@blp.route("/<int:framework_id>/sections")
+@blp.route("/<int:framework_id>/sections/")
 class FrameworkSection(MethodView):
     @blp.response(200, FrameworkSectionSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
@@ -76,7 +76,7 @@ class FrameworkSection(MethodView):
             abort(400, message=str(e))
 
 
-@blp.route("/<int:framework_id>/sections/<int:section_id>/control_objectives")
+@blp.route("/<int:framework_id>/sections/<int:section_id>/control_objectives/")
 class FrameworkControlObjective(MethodView):
     @blp.response(200, FrameworkControlObjectiveSchema(many=True))
     @blp.role(Roles.CONTENT_READER)

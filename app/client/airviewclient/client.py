@@ -437,7 +437,7 @@ class Backend:
     def get_framework_section(self, framework_section: FrameworkSection, framework_id: int) -> Optional[FrameworkSection]:
         resp = self._session.get(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections?name={framework_section.name}"
+                f"/frameworks/{framework_id}/sections/?name={framework_section.name}"
             ),
             headers=self._headers
         )
@@ -455,7 +455,7 @@ class Backend:
     def create_framework_section(self, framework_section: FrameworkSection, framework_id: int) -> Optional[FrameworkSection]:
         resp = self._session.post(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections"
+                f"/frameworks/{framework_id}/sections/"
             ),
             json={
                 "name": framework_section.name,
@@ -474,7 +474,7 @@ class Backend:
     def get_framework_control_objective(self, framework_control_objective: FrameworkControlObjective, framework_section_id: int, framework_id: int) -> Optional[FrameworkControlObjective]:
         resp = self._session.get(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives?name={framework_control_objective.name}"
+                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives/?name={framework_control_objective.name}"
             ),
             headers=self._headers
         )
@@ -492,7 +492,7 @@ class Backend:
     def create_framework_control_objective(self, framework_control_objective: FrameworkControlObjective, framework_section_id: int, framework_id: int) -> Optional[FrameworkControlObjective]:
         resp = self._session.post(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives"
+                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives/"
             ),
             json={
                 "name": framework_control_objective.name,

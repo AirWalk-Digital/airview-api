@@ -1114,7 +1114,7 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/frameworks/{framework_id}": {
+    "/frameworks/{framework_id}/": {
       "get": {
         "responses": {
           "200": {
@@ -1148,7 +1148,7 @@
         }
       ]
     },
-    "/frameworks/{framework_id}/sections": {
+    "/frameworks/{framework_id}/sections/": {
       "get": {
         "responses": {
           "200": {
@@ -1219,7 +1219,7 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/frameworks/{framework_id}/sections/{section_id}/control_objectives": {
+    "/frameworks/{framework_id}/sections/{section_id}/control_objectives/": {
       "get": {
         "responses": {
           "200": {
@@ -1304,7 +1304,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1312,7 +1312,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1352,7 +1352,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "type",
+            "name": "reference",
             "required": false,
             "schema": {
               "type": "string"
@@ -1360,7 +1360,7 @@
           },
           {
             "in": "query",
-            "name": "reference",
+            "name": "type",
             "required": false,
             "schema": {
               "type": "string"
