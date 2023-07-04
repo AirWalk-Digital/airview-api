@@ -27,7 +27,7 @@ class FrameworkSchema(CamelCaseSchema):
 
 
 class FrameworkSectionSchema(CamelCaseSchema):
-    id = ma.fields.Str()
+    id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
     link = ma.fields.Str()
     framework_id = ma.fields.Integer(required=True)

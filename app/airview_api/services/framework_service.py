@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from airview_api.services import AirViewValidationException, AirViewNotFoundException
 from airview_api.database import db
 
+
 def create_framework(data: dict):
     if data.get("id") is not None:
         raise AirViewValidationException("Id is not expected when creating record")
@@ -86,18 +87,18 @@ def get_control_by_name(name: str):
     return data
 
 
-def create_control_objective_link(data: dict):
-    try:
-        app = FrameworkControlObjectiveLink(**data)
-        db.session.add(app)
-        db.session.commit()
-    except IntegrityError as e:
-        db.session.rollback()
-        raise AirViewValidationException(
-            "Unique Constraint Error, check reference field"
-        )
-    return app
+# def create_control_objective_link(data: dict):
+#     try:
+#         app = FrameworkControlObjectiveLink(**data)
+#         db.session.add(app)
+#         db.session.commit()
+#     except IntegrityError as e:
+#         db.session.rollback()
+#         raise AirViewValidationException(
+#             "Unique Constraint Error, check reference field"
+#         )
+#     return app
 
 
-def get_control_objective_links():
-    return FrameworkControlObjectiveLink.query.all()
+# def get_control_objective_links():
+#     return FrameworkControlObjectiveLink.query.all()
