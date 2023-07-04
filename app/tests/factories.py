@@ -13,6 +13,10 @@ from airview_api.models import (
     Service,
     Resource,
     TechnicalControlAction,
+    Framework,
+    FrameworkControlObjective,
+    FrameworkControlObjectiveLink,
+    FrameworkSection
     Control,
 )
 from airview_api.database import db
@@ -107,6 +111,30 @@ class MonitoredResourceFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
 
 
+class FrameworkFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Framework
+        sqlalchemy_session = db.session
+
+
+class FrameworkControlObjectiveFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = FrameworkControlObjective
+        sqlalchemy_session = db.session
+
+        
+class FrameworkControlObjectiveLinkFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = FrameworkControlObjectiveLink
+        sqlalchemy_session = db.session
+
+        
+class FrameworkSectionFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = FrameworkSection
+        sqlalchemy_session = db.session
+
+        
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = Exclusion
@@ -126,3 +154,7 @@ def reset_factories():
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
     ResourceFactory.reset_sequence()
+    FrameworkFactory.reset_sequence()
+    FrameworkControlObjectiveFactory.reset_sequence()
+    FrameworkControlObjectiveLinkFactory.reset_sequence()
+    FrameworkSectionFactory.reset_sequence()
