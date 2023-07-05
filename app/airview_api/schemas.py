@@ -175,7 +175,7 @@ class ControlOverviewSchema(CamelCaseSchema):
 class ControlOverviewResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     type = ma.fields.Str()
-    reference = ma.fields.Str()
+    name = ma.fields.Str()
     last_seen = ma.fields.DateTime()
     status = ma.fields.Str()
     environment = ma.fields.Str()
