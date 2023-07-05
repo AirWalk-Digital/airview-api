@@ -129,7 +129,7 @@ def get_control_overview_resources(application_id, technical_control_id):
     qry = (
         db.select(
             Resource.id,
-            Resource.reference,
+            Resource.name,
             Environment.name.label("environment"),
             MonitoredResource.monitoring_state.label("status"),
             literal(False).label("pending"),
