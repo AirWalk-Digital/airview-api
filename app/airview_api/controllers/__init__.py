@@ -16,4 +16,5 @@ from airview_api.controllers import (
     compliance,
     frameworks,
     aggregations,
+    controls,
 )

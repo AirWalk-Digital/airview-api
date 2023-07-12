@@ -105,3 +105,20 @@ def test_technical_control_finds_existing(handler, technical_control):
     assert returned_technical_control.name == "one"
     assert returned_technical_control.is_blocking == False
     assert returned_technical_control.control_action == models.TechnicalControlAction.INCIDENT
+
+
+def test_technical_control_creates_underlying_control(handler):
+    technical_control = models.TechnicalControl(
+        name="ctrl a",
+        reference="tc-ref-1",
+        is_blocking=True,
+        ttl=20,
+        control_action=models.TechnicalControlAction.LOG,
+        control=models.Control(
+            name="TEST_CONTROL",
+            quality_model=models.QualityModel.SECURITY,
+            service_name="TestService"
+        )
+    )
+    returned_technical_control = handler.handle_technical_control(technical_control)
+    assert returned_technical_control.control_id == 1

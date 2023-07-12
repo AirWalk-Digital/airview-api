@@ -169,6 +169,32 @@
         },
         "type": "object"
       },
+      "Control": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "qualityModel": {
+            "type": "string"
+          },
+          "serviceId": {
+            "type": "integer"
+          },
+          "severity": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "qualityModel",
+          "serviceId",
+          "severity"
+        ],
+        "type": "object"
+      },
       "ControlOverview": {
         "properties": {
           "applied": {
@@ -341,6 +367,17 @@
         ],
         "type": "object"
       },
+      "FrameworkControlObjectiveLink": {
+        "properties": {
+          "controlId": {
+            "type": "integer"
+          },
+          "frameworkControlObjectiveId": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "FrameworkSection": {
         "properties": {
           "frameworkId": {
@@ -481,6 +518,9 @@
         "properties": {
           "controlAction": {
             "type": "string"
+          },
+          "controlId": {
+            "type": "integer"
           },
           "id": {
             "type": "integer"
@@ -962,6 +1002,68 @@
         ]
       }
     },
+    "/controls/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Control"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get a list of all controls",
+        "tags": [
+          "controls"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Control"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Control"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create new control",
+        "tags": [
+          "controls"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
     "/environments/": {
       "get": {
         "responses": {
@@ -1114,6 +1216,66 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
+    "/frameworks/framework-control-objective-link/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FrameworkControlObjectiveLink"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrameworkControlObjectiveLink"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameworkControlObjectiveLink"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "tags": [
+          "frameworks"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
     "/frameworks/{framework_id}/": {
       "get": {
         "responses": {
@@ -1219,7 +1381,7 @@
         "x-api-rbac-role": "ContentWriter"
       }
     },
-    "/frameworks/{framework_id}/sections/{section_id}/control_objectives/": {
+    "/frameworks/{framework_id}/sections/{section_id}/control-objectives/": {
       "get": {
         "responses": {
           "200": {
@@ -1247,7 +1409,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1256,7 +1418,7 @@
         },
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1304,7 +1466,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1312,7 +1474,7 @@
           },
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1791,6 +1953,10 @@
     {
       "description": "Framework based resources",
       "name": "frameworks"
+    },
+    {
+      "description": "Control related resources",
+      "name": "controls"
     }
   ]
 }

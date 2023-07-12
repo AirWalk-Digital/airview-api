@@ -89,18 +89,23 @@ def get_control_by_name(name: str):
     return data
 
 
-# def create_control_objective_link(data: dict):
-#     try:
-#         app = FrameworkControlObjectiveLink(**data)
-#         db.session.add(app)
-#         db.session.commit()
-#     except IntegrityError as e:
-#         db.session.rollback()
-#         raise AirViewValidationException(
-#             "Unique Constraint Error, check reference field"
-#         )
-#     return app
+def create_control_objective_link(data: dict):
+    try:
+        app = FrameworkControlObjectiveLink(**data)
+        db.session.add(app)
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        raise AirViewValidationException(
+            "Unique Constraint Error, check reference field"
+        )
+    return app
 
 
-# def get_control_objective_links():
-#     return FrameworkControlObjectiveLink.query.all()
+def get_control_objective_link_by_id(control_id: int, framework_control_objective_id: int):
+    data =FrameworkControlObjectiveLink.query.filter_by(control_id=control_id, framework_control_objective_id=framework_control_objective_id)
+    return data
+
+
+def get_control_objective_links():
+    return FrameworkControlObjectiveLink.query.all()

@@ -243,6 +243,55 @@ class Backend:
         raise BackendFailureException(
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
+    
+    def get_control(self, control) -> Optional[Control]:
+        resp = self._session.get(
+            url=self.get_url(
+                f"/controls/?name={control.name}"
+            ),
+            headers=self._headers,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            if data == []:
+                return None
+            control = data[0]
+            return Control(
+                id=control["id"],
+                name=control["name"],
+                service_id=control["serviceId"]
+            )
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
+    
+    def create_control(self, control) -> Control:
+        data = {
+            'name': control.name,
+            'serviceId': control.service_id,
+            'qualityModel': control.quality_model.name,
+            'severity': control.severity.name
+        }
+        resp = self._session.post(
+            url=self.get_url(
+                f"/controls/"
+            ),
+            json=data,
+            headers=self._headers
+        )
+        if resp.status_code == 200:
+            control = resp.json()
+            return Control(
+                id=control["id"],
+                name=control["name"],
+                service_id=control["serviceId"],
+                quality_model=control['qualityModel']
+            )
+
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
+    
 
     def save_monitored_resource(self, technical_control_id, resource_id, state) -> None:
         """Persist the current status of a montiored resource"""
@@ -272,6 +321,7 @@ class Backend:
             "ttl": technical_control.ttl,
             "isBlocking": technical_control.is_blocking,
             "controlAction": technical_control.control_action.name,
+            "controlId": technical_control.control_id
         }
         resp = self._session.post(
             url=self.get_url("/technical-controls/"),
@@ -407,8 +457,9 @@ class Backend:
         )
         if resp.status_code == 200:
             data = resp.json()
-            if data:
-                framework.id = data[0]['id']
+            if data == []:
+                return None
+            framework.id = data[0]['id']
             return framework
         if resp.status_code == 404:
             return None
@@ -434,17 +485,18 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
     
-    def get_framework_section(self, framework_section: FrameworkSection, framework_id: int) -> Optional[FrameworkSection]:
+    def get_framework_section(self, framework_section: FrameworkSection) -> Optional[FrameworkSection]:
         resp = self._session.get(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/?name={framework_section.name}"
+                f"/frameworks/{framework_section.framework.id}/sections/?name={framework_section.name}"
             ),
             headers=self._headers
         )
         if resp.status_code == 200:
             data = resp.json()
-            if data:
-                framework_section.id = data[0]['id']
+            if data == []:
+                return None
+            framework_section.id = data[0]['id']
             return framework_section
         if resp.status_code == 404:
             return None
@@ -452,15 +504,15 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
     
-    def create_framework_section(self, framework_section: FrameworkSection, framework_id: int) -> Optional[FrameworkSection]:
+    def create_framework_section(self, framework_section: FrameworkSection) -> Optional[FrameworkSection]:
         resp = self._session.post(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/"
+                f"/frameworks/{framework_section.framework.id}/sections/"
             ),
             json={
                 "name": framework_section.name,
                 "link": framework_section.link,
-                "frameworkId": framework_id
+                "frameworkId": framework_section.framework.id
             },
             headers=self._headers
         )
@@ -471,17 +523,21 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
     
-    def get_framework_control_objective(self, framework_control_objective: FrameworkControlObjective, framework_section_id: int, framework_id: int) -> Optional[FrameworkControlObjective]:
+    def get_framework_control_objective(self, framework_control_objective: FrameworkControlObjective) -> Optional[FrameworkControlObjective]:
         resp = self._session.get(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives/?name={framework_control_objective.name}"
+                (
+                    f"/frameworks/{framework_control_objective.framework_section.framework.id}/sections"
+                    f"/{framework_control_objective.framework_section.id}/control-objectives/?name={framework_control_objective.name}"
+                )
             ),
             headers=self._headers
         )
         if resp.status_code == 200:
             data = resp.json()
-            if data:
-                framework_control_objective.id = data[0]['id']
+            if data == []:  
+                return None
+            framework_control_objective.id = data[0]['id']
             return framework_control_objective
         if resp.status_code == 404:
             return None
@@ -489,15 +545,18 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
     
-    def create_framework_control_objective(self, framework_control_objective: FrameworkControlObjective, framework_section_id: int, framework_id: int) -> Optional[FrameworkControlObjective]:
+    def create_framework_control_objective(self, framework_control_objective: FrameworkControlObjective) -> Optional[FrameworkControlObjective]:
         resp = self._session.post(
             url=self.get_url(
-                f"/frameworks/{framework_id}/sections/{framework_section_id}/control_objectives/"
+                (
+                    f"/frameworks/{framework_control_objective.framework_section.framework.id}"
+                    f"/sections/{framework_control_objective.framework_section.id}/control-objectives/"
+                )
             ),
             json={
                 "name": framework_control_objective.name,
                 "link": framework_control_objective.link,
-                "frameworkSectionId": framework_section_id
+                "frameworkSectionId": framework_control_objective.framework_section.id
             },
             headers=self._headers
         )
@@ -508,27 +567,49 @@ class Backend:
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
     
-    # def create_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> Optional[FrameworkControlObjectiveLink]:
-    #     resp = self._session.post(
-    #         url=self.get_url(
-    #             f"frameworks/framework_control_objective_link"
-    #         ),
-    #         json={
-    #             "frameworkControlObjectiveId": framework_control_objective.id,
-    #             "controlId": control.id
-    #         },
-    #         headers=self._headers
-    #     )
-    #     if resp.status_code == 200:
-    #         framework_control_objective_link = FrameworkControlObjectiveLink(
-    #             framework_control_objective_id=framework_control_objective.id,
-    #             control_id=control.id,
-    #             id=resp.json()['id']
-    #         )
-    #         return framework_control_objective_link
-    #     raise BackendFailureException(
-    #         f"Status code: {resp.status_code} Message: {resp.text}"
-    #     )
+    def get_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> Optional[FrameworkControlObjectiveLink]:
+        resp = self._session.get(
+            url=self.get_url(
+                f"/frameworks/framework-control-objective-link/?controlId={control.id}&frameworkControlObjectiveId={framework_control_objective.id}"
+            )
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            if data == []:
+                return None
+            return FrameworkControlObjectiveLink(
+                control_id=data[0]['controlId'],
+                framework_control_objective_id=data[0]['frameworkControlObjectiveId'],
+                # id=data[0]['id']
+            )
+        if resp.status_code == 404:
+            return None
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
+    
+    def create_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> Optional[FrameworkControlObjectiveLink]:
+        resp = self._session.post(
+            url=self.get_url(
+                f"/frameworks/framework-control-objective-link/"
+            ),
+            json={
+                "frameworkControlObjectiveId": framework_control_objective.id,
+                "controlId": control.id
+            },
+            headers=self._headers
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            framework_control_objective_link = FrameworkControlObjectiveLink(
+                framework_control_objective_id=framework_control_objective.id,
+                control_id=control.id,
+                # id=data['id']
+            )
+            return framework_control_objective_link
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
 
 
 class Handler:
@@ -585,6 +666,31 @@ class Handler:
         )
         self._backend.save_resource(resource)
 
+
+    def handle_control(self, control: Control) -> Control:
+        # check control pre-exists
+        backend_control = self._backend.get_control(control)
+        # NOTE: We're assuming at this point that a control links to a single service...
+        if backend_control is None:
+            if control.service_name:
+                all_services = self._backend.get_services()
+                service = next(
+                    (e for e in all_services if e.name == control.service_name),
+                    None,
+                )
+                if service is None:
+                    service = self._backend.create_service(Service(
+                        name=control.service_name,
+                        reference=control.service_name,
+                        # NOTE: UNKNOWN will have to do for now.
+                        type=ServiceType.UNKNOWN
+                    ))
+                control.service_id = service.id
+            backend_control = self._backend.create_control(
+                control
+            )
+        return backend_control
+
     def handle_technical_control(
         self, technical_control: TechnicalControl
     ) -> TechnicalControl:
@@ -593,12 +699,18 @@ class Handler:
         backend_techincal_control = self._backend.get_technical_control(
             reference=technical_control.reference
         )
+        # create / update parent control
+        backend_control = None
+        if technical_control.control and ((backend_techincal_control is None) or (backend_techincal_control.control_id is None)):
+            backend_control = self.handle_control(technical_control.control)
 
         if backend_techincal_control == None:
             # create control
             backend_techincal_control = self._backend.create_technical_control(
                 technical_control
             )
+        if backend_control:
+            backend_techincal_control.control_id = backend_control.id
         return backend_techincal_control
 
     def handle_compliance_event(self, compliance_event: ComplianceEvent) -> None:
@@ -658,36 +770,48 @@ class Handler:
         )
 
     def handle_framework_control_objective(self, framework_control_objective: FrameworkControlObjective) -> FrameworkControlObjective:
-        framework = self._backend.get_framework(
+        backend_framework = self._backend.get_framework(
             framework_control_objective.framework_section.framework
         )
-        if framework is None or framework.id is None:
-            framework = self._backend.create_framework(
+        if backend_framework is None:
+            backend_framework = self._backend.create_framework(
                 framework_control_objective.framework_section.framework
             )
-        framework_section = self._backend.get_framework_section(
-            framework_control_objective.framework_section, framework_id=framework.id
+        framework_control_objective.framework_section.framework.id = backend_framework.id
+
+        backend_framework_section = self._backend.get_framework_section(
+            framework_control_objective.framework_section
         )
-        if framework_section is None or framework_section.id is None:
-            framework_section = self._backend.create_framework_section(
-                framework_control_objective.framework_section, framework_id=framework.id
+        if backend_framework_section is None:
+            backend_framework_section = self._backend.create_framework_section(
+                framework_control_objective.framework_section
             )
-        framework_control_objective = self._backend.get_framework_control_objective(
-            framework_control_objective, framework_section.id, framework.id
+        framework_control_objective.framework_section.id = backend_framework_section.id
+
+        backend_framework_control_objective = self._backend.get_framework_control_objective(
+            framework_control_objective
         )
-        if framework_control_objective is None or framework_control_objective.id is None:
-            self._backend.create_framework_control_objective(
-                framework_control_objective, framework_section.id, framework.id
+        if backend_framework_control_objective is None:
+            backend_framework_control_objective = self._backend.create_framework_control_objective(
+                framework_control_objective
             )
+        framework_control_objective.id = backend_framework_control_objective.id
+            
         return framework_control_objective
     
 
-    # def handle_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> FrameworkControlObjectiveLink:
-    #     control_objective_link = self._backend.create_framework_control_objective_link(
-    #         framework_control_objective=framework_control_objective,
-    #         control=control
-    #     )
-    #     return control_objective_link
+    def handle_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> FrameworkControlObjectiveLink:
+        backend_framework_control_objective = self.handle_framework_control_objective(framework_control_objective)
+        backend_control = self.handle_control(control)
+
+        framework_control_objective_link = self._backend.get_framework_control_objective_link(
+            backend_framework_control_objective, backend_control
+        )
+        if framework_control_objective_link is None:
+            framework_control_objective_link = self._backend.create_framework_control_objective_link(
+                backend_framework_control_objective, backend_control
+            )
+        return framework_control_objective_link
 
 
     def set_exclusion_resource_state(

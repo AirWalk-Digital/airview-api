@@ -50,5 +50,6 @@ def create_app(app=None, db_connection_string=None):
     #    api.register_blueprint(controllers.exclusions.blp) # This is commented cos moving resources to own table broke it and it needs a rethink
     #    api.register_blueprint(controllers.search.blp)
     api.register_blueprint(controllers.frameworks.blp)
+    api.register_blueprint(controllers.controls.blp)
 
     return app

@@ -34,6 +34,14 @@ Create a new Application Environment, returns application environment id
 
 
 
+#### create_control(control)
+
+* **Return type**
+
+    `Control`
+
+
+
 #### create_environment(environment)
 Create a new environment
 
@@ -52,7 +60,7 @@ Create a new environment
 
 
 
-#### create_framework_control_objective(framework_control_objective, framework_section_id, framework_id)
+#### create_framework_control_objective(framework_control_objective)
 
 * **Return type**
 
@@ -60,7 +68,15 @@ Create a new environment
 
 
 
-#### create_framework_section(framework_section, framework_id)
+#### create_framework_control_objective_link(framework_control_objective, control)
+
+* **Return type**
+
+    `Optional`[`FrameworkControlObjectiveLink`]
+
+
+
+#### create_framework_section(framework_section)
 
 * **Return type**
 
@@ -116,6 +132,14 @@ Look up an application by the provided reference
 
 
 
+#### get_control(control)
+
+* **Return type**
+
+    `Optional`[`Control`]
+
+
+
 #### get_environments()
 Get a list of environments
 
@@ -132,7 +156,7 @@ Get a list of exclusion resources by state
 
 
 
-#### get_framework_control_objective(framework_control_objective, framework_section_id, framework_id)
+#### get_framework_control_objective(framework_control_objective)
 
 * **Return type**
 
@@ -140,7 +164,15 @@ Get a list of exclusion resources by state
 
 
 
-#### get_framework_section(framework_section, framework_id)
+#### get_framework_control_objective_link(framework_control_objective, control)
+
+* **Return type**
+
+    `Optional`[`FrameworkControlObjectiveLink`]
+
+
+
+#### get_framework_section(framework_section)
 
 * **Return type**
 
@@ -252,11 +284,27 @@ When passed a compliance event this method will attempt to create any missing de
 
 
 
+#### handle_control(control)
+
+* **Return type**
+
+    `Control`
+
+
+
 #### handle_framework_control_objective(framework_control_objective)
 
 * **Return type**
 
     `FrameworkControlObjective`
+
+
+
+#### handle_framework_control_objective_link(framework_control_objective, control)
+
+* **Return type**
+
+    `FrameworkControlObjectiveLink`
 
 
 
@@ -476,11 +524,11 @@ The enum status of the event
 Technical control which this compliance event is the subject of
 
 
-### _class_ client.airviewclient.models.Control(name, quality_model=None, service_id=None, id=None)
+### _class_ client.airviewclient.models.Control(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
 Bases: `object`
 
 
-#### \__init__(name, quality_model=None, service_id=None, id=None)
+#### \__init__(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
 Id of the framework control objective
@@ -497,6 +545,28 @@ Quality model of the control
 #### service_id(_: `Optional`[`int`_ _ = Non_ )
 Service id this control links to
 
+
+#### service_name(_: `Optional`[`str`_ _ = Non_ )
+Name of the service this control is linked to
+
+
+#### severity(_: `Optional`[`ControlSeverity`_ _ = _ )
+severity
+
+
+### _class_ client.airviewclient.models.ControlSeverity(value)
+Bases: `Enum`
+
+An enumeration.
+
+
+#### CRITICAL(_ = _ )
+
+#### HIGH(_ = _ )
+
+#### LOW(_ = _ )
+
+#### MEDIUM(_ = _ )
 
 ### _class_ client.airviewclient.models.Environment(name, abbreviation, id=None)
 Bases: `object`
@@ -596,20 +666,18 @@ Link to the control objective in the framework
 Name of the control objective
 
 
-### _class_ client.airviewclient.models.FrameworkControlObjectiveLink(control_id, id=None)
+### _class_ client.airviewclient.models.FrameworkControlObjectiveLink(framework_control_objective_id, control_id, id=None)
 Bases: `object`
 
 
-#### \__init__(control_id, id=None)
+#### \__init__(framework_control_objective_id, control_id, id=None)
 
 #### control_id(_: `int_ )
 Id of the control
 
 
-#### framework_control_objective_id()
+#### framework_control_objective_id(_: `int_ )
 Id of the control objective
-
-alias of `int`
 
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
@@ -754,16 +822,24 @@ An enumeration.
 
 #### MONITOR(_ = _ )
 
-### _class_ client.airviewclient.models.TechnicalControl(name, reference, control_action, id=None, ttl=None, is_blocking=None)
+### _class_ client.airviewclient.models.TechnicalControl(name, reference, control_action, id=None, ttl=None, is_blocking=None, control_id=None, control=None)
 Bases: `object`
 
 Dataclass representing technical control definition
 
 
-#### \__init__(name, reference, control_action, id=None, ttl=None, is_blocking=None)
+#### \__init__(name, reference, control_action, id=None, ttl=None, is_blocking=None, control_id=None, control=None)
+
+#### control(_: `Optional`[`Control`_ _ = Non_ )
+Parent control
+
 
 #### control_action(_: `TechnicalControlAction_ )
 Type of control
+
+
+#### control_id(_: `Optional`[`int`_ _ = Non_ )
+Id of parent control
 
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
@@ -783,7 +859,7 @@ Unique reference for the control within the connecting system
 
 
 #### ttl(_: `Optional`[`int`_ _ = Non_ )
-Id of parent control
+ttl of the technical control
 
 
 ### _class_ client.airviewclient.models.TechnicalControlAction(value)
