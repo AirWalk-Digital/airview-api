@@ -4,6 +4,16 @@ from typing import Optional
 from enum import Enum
 
 
+class ControlSeverity(Enum):
+    CRITICAL = 1
+    HIGH = 2
+    MEDIUM = 3
+    LOW = 4
+
+    def __str__(self):
+        return self.name
+    
+
 class ExclusionResourceState(Enum):
     NONE = 1
     PENDING = 2
@@ -136,10 +146,14 @@ class TechnicalControl:
     control_action: TechnicalControlAction
     #: Id of control
     id: Optional[int] = None
-    #: Id of parent control
+    #: ttl of the technical control
     ttl: Optional[int] = None
     #: Should a failure cause a process to exit
     is_blocking: Optional[bool] = None
+    #: Id of parent control
+    control_id: Optional[int] = None
+    #: Parent control
+    control: Optional[Control] = None
 
 
 @dataclass
@@ -239,7 +253,7 @@ class FrameworkControlObjective:
 @dataclass
 class FrameworkControlObjectiveLink:
     #: Id of the control objective
-    framework_control_objective_id = int
+    framework_control_objective_id: int
     #: Id of the control
     control_id: int
     #: Id of the framework control objective
@@ -254,8 +268,12 @@ class Control:
     quality_model: QualityModel = None
     #: Service id this control links to
     service_id: Optional[int] = None
+    #: Name of the service this control is linked to
+    service_name: Optional[str] = None
     #: Id of the framework control objective
     id: Optional[int] = None
+    #: severity
+    severity: Optional[ControlSeverity] = ControlSeverity.LOW
 
 
 class BackendFailureException(Exception):

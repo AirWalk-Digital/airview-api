@@ -346,7 +346,7 @@ def test_framework_control_objective_post_ok(client):
 
     # Act
     resp = client.post(
-        "/frameworks/1/sections/1/control_objectives/",
+        "/frameworks/1/sections/1/control-objectives/",
         json={
             "name": "Ensure 2FA is enabled",
             "link": "/nisttest/access_control/ensure_2fa_is_enabled",
@@ -430,7 +430,7 @@ def test_framework_control_objective_get_ok(client):
 
     # Act
     resp = client.get(
-        "/frameworks/2/sections/3/control_objectives/",
+        "/frameworks/2/sections/3/control-objectives/",
     )
     data = resp.get_json()
     # Assert
@@ -500,7 +500,7 @@ def test_framework_control_objective_get_by_name(client):
 
     # Act
     resp = client.get(
-        "/frameworks/2/sections/1/control_objectives/?name=Users password must be at least 20 characters long",
+        "/frameworks/2/sections/1/control-objectives/?name=Users password must be at least 20 characters long",
     )
     data = resp.get_json()
     # Assert
@@ -567,7 +567,7 @@ def test_framework_control_objective_get_missing_by_name(client):
 
     # Act
     resp = client.get(
-         "/frameworks/2/sections/1/control_objectives/?name=Users password must be at least 20 characters long",
+         "/frameworks/2/sections/1/control-objectives/?name=Users password must be at least 20 characters long",
     )
     data = resp.get_json()
     # Assert

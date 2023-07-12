@@ -43,6 +43,7 @@ class FrameworkControlObjectiveSchema(CamelCaseSchema):
 class FrameworkControlObjectiveLinkSchema(CamelCaseSchema):
     framework_control_objective_id = ma.fields.Integer()
     control_id = ma.fields.Integer()
+    # id = ma.fields.Integer()
 
 
 class EnvironmentSchema(CamelCaseSchema):
@@ -94,6 +95,14 @@ class IdAndNameSchema(CamelCaseSchema):
     name = ma.fields.Str()
 
 
+class ControlSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    service_id = ma.fields.Integer(required=True)
+    quality_model = ma.fields.Str(required=True)
+    severity = ma.fields.Str(required=True)
+
+
 class ControlStatusResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str()
@@ -134,6 +143,7 @@ class TechnicalControlSchema(CamelCaseSchema):
     reference = ma.fields.Str(required=True, validate=is_allowed_reference)
     system_id = ma.fields.Integer(required=True)
     ttl = ma.fields.Integer(required=False)
+    control_id = ma.fields.Integer(required=False)
     is_blocking = ma.fields.Boolean(required=False, missing=False)
     control_action = ma.fields.Str(required=True)
 

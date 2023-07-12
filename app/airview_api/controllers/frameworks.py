@@ -58,7 +58,7 @@ class Framework(MethodView):
 class FrameworkSection(MethodView):
     @blp.response(200, FrameworkSectionSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
-    def get(self,framework_id):
+    def get(self, framework_id):
         if request.args.get("name"):
             name = request.args['name']
             return framework_service.get_framework_section_by_name(name)
@@ -76,7 +76,7 @@ class FrameworkSection(MethodView):
             abort(400, message=str(e))
 
 
-@blp.route("/<int:framework_id>/sections/<int:section_id>/control_objectives/")
+@blp.route("/<int:framework_id>/sections/<int:section_id>/control-objectives/")
 class FrameworkControlObjective(MethodView):
     @blp.response(200, FrameworkControlObjectiveSchema(many=True))
     @blp.role(Roles.CONTENT_READER)
@@ -97,22 +97,23 @@ class FrameworkControlObjective(MethodView):
             abort(400, message=str(e))
 
 
-# @blp.route("/framework_control_objective_link")
-# class FrameworkControlObjectiveLink(MethodView):
-#     @blp.response(200, FrameworkControlObjectiveLinkSchema(many=True))
-#     @blp.role(Roles.CONTENT_READER)
-#     def get(self):
-#         # if request.args.get("name"):
-#         #     name = request.args['name']
-#         #     return framework_service.get_control_by_name(name)
-#         return framework_service.get_control_objective_links()
+@blp.route("/framework-control-objective-link/")
+class FrameworkControlObjectiveLink(MethodView):
+    @blp.response(200, FrameworkControlObjectiveLinkSchema(many=True))
+    @blp.role(Roles.CONTENT_READER)
+    def get(self):
+        if request.args.get("controlId") and request.args.get("frameworkControlObjectiveId"):
+            control_id = request.args['controlId']
+            framework_control_objective_id = request.args['frameworkControlObjectiveId']
+            return framework_service.get_control_objective_link_by_id(control_id, framework_control_objective_id)
+        return framework_service.get_control_objective_links()
 
-#     @blp.arguments(FrameworkControlObjectiveLinkSchema)
-#     @blp.response(200, FrameworkControlObjectiveLinkSchema)
-#     @blp.role(Roles.CONTENT_WRITER)
-#     def post(self, data):
-#         try:
-#             app = framework_service.create_control_objective_link(data)
-#             return app
-#         except AirViewValidationException as e:
-#             abort(400, message=str(e))
+    @blp.arguments(FrameworkControlObjectiveLinkSchema)
+    @blp.response(200, FrameworkControlObjectiveLinkSchema)
+    @blp.role(Roles.CONTENT_WRITER)
+    def post(self, data):
+        try:
+            app = framework_service.create_control_objective_link(data)
+            return app
+        except AirViewValidationException as e:
+            abort(400, message=str(e))
