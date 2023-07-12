@@ -76,9 +76,9 @@ def get_compliance_aggregation(application_id):
             System.name,
             System.stage,
             TechnicalControl.name,
-            Control.severity,
-            Control.name,
-            Control.id,
+            coalesce(Control.severity, literal("HIGH")),
+            coalesce(Control.name, literal("Unmapped")),
+            coalesce(Control.id, literal(0)),
             Resource.id,
             Resource.name,
             MonitoredResource.last_modified,
@@ -88,8 +88,8 @@ def get_compliance_aggregation(application_id):
         .join(Resource)
         .join(MonitoredResource)
         .join(TechnicalControl)
-        .join(Control)
-        .join(System)
+        .join(Control, isouter=True)
+        .join(System, isouter=True)
         .where(MonitoredResource.monitoring_state == MonitoredResourceState.FLAGGED)
         .where(ApplicationEnvironment.application_id == application_id)
     )
