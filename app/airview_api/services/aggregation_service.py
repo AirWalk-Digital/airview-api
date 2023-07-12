@@ -1,5 +1,6 @@
 from airview_api.database import db
 from sqlalchemy import func, literal
+from sqlalchemy.sql.functions import coalesce
 import itertools
 from datetime import datetime
 import json
@@ -36,6 +37,7 @@ def get_control_overviews(application_id: int, quality_model: str):
         .join(Control)
         .join(System)
         .join(Service)
+        .join(Resource)
         .group_by(
             TechnicalControl.id,
             TechnicalControl.name,
@@ -131,7 +133,10 @@ def get_control_overview_resources(application_id, technical_control_id):
             Resource.id,
             Resource.name,
             Environment.name.label("environment"),
-            MonitoredResource.monitoring_state.label("status"),
+            coalesce(
+                MonitoredResource.monitoring_state,
+                literal("MONITORING"),
+            ).label("status"),
             literal(False).label("pending"),
         )
         .select_from(ApplicationEnvironment)
