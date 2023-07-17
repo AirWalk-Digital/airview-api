@@ -63,3 +63,5 @@ SQLite is ok for dev, but for a more representative environment postgres should 
 docker run --name some-postgres -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres
 FLASK_APP=./utils/debug.py FLASK_DEBUG=True DATABASE_URI=postgresql://postgres:password@192.168.231.111/airview CREATE_DB=True flask run
 ```
+
+
