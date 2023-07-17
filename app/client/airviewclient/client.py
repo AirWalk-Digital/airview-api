@@ -571,7 +571,8 @@ class Backend:
         resp = self._session.get(
             url=self.get_url(
                 f"/frameworks/framework-control-objective-link/?controlId={control.id}&frameworkControlObjectiveId={framework_control_objective.id}"
-            )
+            ),
+            headers=self._headers
         )
         if resp.status_code == 200:
             data = resp.json()
