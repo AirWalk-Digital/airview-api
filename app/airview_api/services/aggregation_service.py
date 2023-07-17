@@ -1,5 +1,6 @@
 from airview_api.database import db
 from sqlalchemy import func, literal
+from sqlalchemy.sql.functions import coalesce
 import itertools
 from datetime import datetime
 import json
@@ -36,6 +37,7 @@ def get_control_overviews(application_id: int, quality_model: str):
         .join(Control)
         .join(System)
         .join(Service)
+        .join(Resource)
         .group_by(
             TechnicalControl.id,
             TechnicalControl.name,
@@ -74,9 +76,9 @@ def get_compliance_aggregation(application_id):
             System.name,
             System.stage,
             TechnicalControl.name,
-            Control.severity,
-            Control.name,
-            Control.id,
+            coalesce(Control.severity, literal("HIGH")),
+            coalesce(Control.name, literal("Unmapped")),
+            coalesce(Control.id, literal(0)),
             Resource.id,
             Resource.name,
             MonitoredResource.last_modified,
@@ -86,8 +88,8 @@ def get_compliance_aggregation(application_id):
         .join(Resource)
         .join(MonitoredResource)
         .join(TechnicalControl)
-        .join(Control)
-        .join(System)
+        .join(Control, isouter=True)
+        .join(System, isouter=True)
         .where(MonitoredResource.monitoring_state == MonitoredResourceState.FLAGGED)
         .where(ApplicationEnvironment.application_id == application_id)
     )
@@ -131,7 +133,10 @@ def get_control_overview_resources(application_id, technical_control_id):
             Resource.id,
             Resource.name,
             Environment.name.label("environment"),
-            MonitoredResource.monitoring_state.label("status"),
+            coalesce(
+                MonitoredResource.monitoring_state,
+                literal("MONITORING"),
+            ).label("status"),
             literal(False).label("pending"),
         )
         .select_from(ApplicationEnvironment)
