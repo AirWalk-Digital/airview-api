@@ -571,7 +571,8 @@ class Backend:
         resp = self._session.get(
             url=self.get_url(
                 f"/frameworks/framework-control-objective-link/?controlId={control.id}&frameworkControlObjectiveId={framework_control_objective.id}"
-            )
+            ),
+            headers=self._headers
         )
         if resp.status_code == 200:
             data = resp.json()
@@ -799,7 +800,6 @@ class Handler:
             
         return framework_control_objective
     
-
     def handle_framework_control_objective_link(self, framework_control_objective: FrameworkControlObjective, control: Control) -> FrameworkControlObjectiveLink:
         backend_framework_control_objective = self.handle_framework_control_objective(framework_control_objective)
         backend_control = self.handle_control(control)
@@ -812,7 +812,6 @@ class Handler:
                 backend_framework_control_objective, backend_control
             )
         return framework_control_objective_link
-
 
     def set_exclusion_resource_state(
         self, id: int, state: ExclusionResourceState
