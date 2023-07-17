@@ -242,11 +242,11 @@
             "format": "date-time",
             "type": "string"
           },
+          "name": {
+            "type": "string"
+          },
           "pending": {
             "type": "boolean"
-          },
-          "reference": {
-            "type": "string"
           },
           "status": {
             "type": "string"
@@ -1409,7 +1409,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1418,7 +1418,7 @@
         },
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1466,7 +1466,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "resourceId",
+            "name": "technicalControlId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1474,7 +1474,7 @@
           },
           {
             "in": "query",
-            "name": "technicalControlId",
+            "name": "resourceId",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1787,18 +1787,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "systemId",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
             "name": "reference",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "systemId",
+            "required": true,
+            "schema": {
+              "type": "integer"
             }
           }
         ],
