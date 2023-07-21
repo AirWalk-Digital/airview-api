@@ -19,6 +19,9 @@ def setup():
     )
     ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=1)
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
 
     TechnicalControlFactory(
         id=1,
@@ -30,21 +33,21 @@ def setup():
         id=11,
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
     ResourceFactory(
         id=12,
         name="Res Two",
         reference="res_2",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
     ResourceFactory(
         id=13,
         name="Res Deleted",
         reference="res_3",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
