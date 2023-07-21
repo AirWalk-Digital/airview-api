@@ -34,14 +34,14 @@ def upsert(data: dict):
 
     elif (
         resource.application_environment_id != data["application_environment_id"]
-        or resource.service_id != data["service_id"]
+        or resource.resource_type_id != data["resource_type_id"]
         or resource.name != data["name"]
     ):
         resource.last_modified = datetime.utcnow()
 
     resource.last_seen = datetime.utcnow()
     resource.application_environment_id = data["application_environment_id"]
-    resource.service_id = data["service_id"]
+    resource.resource_type_id = data["resource_type_id"]
     resource.name = data["name"]
 
     try:

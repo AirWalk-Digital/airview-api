@@ -20,6 +20,13 @@ def setup():
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
     ServiceFactory(id=11, name="Service Two", reference="ref_2", type="NETWORK")
 
+    ResourceTypeFactory(
+        id=20, name="res type one", reference="res-type-1", service_id=10
+    )
+    ResourceTypeFactory(
+        id=21, name="res type two", reference="res-type-2", service_id=10
+    )
+
 
 def test_resources_post_ok(client):
     """
@@ -31,7 +38,7 @@ def test_resources_post_ok(client):
     ResourceFactory(
         name="Res AAA",
         reference="same_app_ref",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
@@ -40,7 +47,7 @@ def test_resources_post_ok(client):
     ResourceFactory(
         name="Res BBB",
         reference="ref_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=2,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
@@ -54,7 +61,7 @@ def test_resources_post_ok(client):
         json={
             "name": "Res One",
             "reference": "res_1",
-            "serviceId": 10,
+            "resourceTypeId": 20,
             "applicationEnvironmentId": 1,
         },
     )
@@ -65,7 +72,7 @@ def test_resources_post_ok(client):
     assert data["name"] == "Res One"
     assert data["reference"] == "res_1"
     assert data["applicationEnvironmentId"] == 1
-    assert data["serviceId"] == 10
+    assert data["resourceTypeId"] == 20
 
     # Assert persistance
     items = db.session.query(Resource).all()
@@ -74,7 +81,7 @@ def test_resources_post_ok(client):
     assert items[2].name == "Res One"
     assert items[2].reference == "res_1"
     assert items[2].application_environment_id == 1
-    assert items[2].service_id == 10
+    assert items[2].resource_type_id == 20
 
 
 def test_resources_post_handle_duplicate_error(client):
@@ -87,7 +94,7 @@ def test_resources_post_handle_duplicate_error(client):
     ResourceFactory(
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),
@@ -101,7 +108,7 @@ def test_resources_post_handle_duplicate_error(client):
         json={
             "name": "Res One",
             "reference": "res_1",
-            "serviceId": 10,
+            "resourceTypeId": 20,
             "applicationEnvironmentId": 1,
         },
     )
@@ -131,7 +138,7 @@ def test_resources_put_creates_new(client):
         json={
             "name": "Res One Update",
             "reference": "res_1",
-            "serviceId": 11,
+            "resourceTypeId": 21,
             "applicationEnvironmentId": 1,
         },
     )
@@ -146,7 +153,7 @@ def test_resources_put_creates_new(client):
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
     assert items[0].application_environment_id == 1
-    assert items[0].service_id == 11
+    assert items[0].resource_type_id == 21
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
 
@@ -162,7 +169,7 @@ def test_resources_put_updates_existing(client):
     ResourceFactory(
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -176,7 +183,7 @@ def test_resources_put_updates_existing(client):
         json={
             "name": "Res One Update",
             "reference": "res_1",
-            "serviceId": 11,
+            "resourceTypeId": 21,
             "applicationEnvironmentId": 1,
         },
     )
@@ -191,7 +198,7 @@ def test_resources_put_updates_existing(client):
     assert items[0].name == "Res One Update"
     assert items[0].reference == "res_1"
     assert items[0].application_environment_id == 1
-    assert items[0].service_id == 11
+    assert items[0].resource_type_id == 21
     assert items[0].last_seen > time_now
     assert items[0].last_modified > time_now
 
@@ -207,7 +214,7 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
     ResourceFactory(
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -221,7 +228,7 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
         json={
             "name": "Res One",
             "reference": "res_1",
-            "serviceId": 10,
+            "resourceTypeId": 20,
             "applicationEnvironmentId": 1,
         },
     )
@@ -236,7 +243,7 @@ def test_resources_put_does_not_change_modify_when_no_change(client):
     assert items[0].name == "Res One"
     assert items[0].reference == "res_1"
     assert items[0].application_environment_id == 1
-    assert items[0].service_id == 10
+    assert items[0].resource_type_id == 20
     assert items[0].last_seen > time_now
     assert items[0].last_modified == time_now
 
@@ -253,7 +260,7 @@ def test_resources_get_single(client):
     ResourceFactory(
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -261,7 +268,7 @@ def test_resources_get_single(client):
     ResourceFactory(
         name="Res Two",
         reference="res_2",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -283,7 +290,7 @@ def test_resources_get_single(client):
     assert data["name"] == "Res Two"
     assert data["reference"] == "res_2"
     assert data["applicationEnvironmentId"] == 1
-    assert data["serviceId"] == 10
+    assert data["resourceTypeId"] == 20
 
 
 def test_resources_get_single_not_found(client):
@@ -297,7 +304,7 @@ def test_resources_get_single_not_found(client):
     ResourceFactory(
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -305,7 +312,7 @@ def test_resources_get_single_not_found(client):
     ResourceFactory(
         name="Res Two",
         reference="res_2",
-        service_id=10,
+        resource_type_id=20,
         application_environment_id=1,
         last_modified=time_now,
         last_seen=time_now,
@@ -344,7 +351,7 @@ def test_resources_put_throws_bad_request_when_params_do_not_match(client, test_
         json={
             "name": "Res One",
             "reference": "res_1",
-            "serviceId": 10,
+            "resourceTypeId": 20,
             "applicationEnvironmentId": 1,
         },
     )
