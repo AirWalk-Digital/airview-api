@@ -28,6 +28,9 @@ def test_create_adds_when_new(client):
     EnvironmentFactory(id=3)
     ApplicationEnvironmentFactory(id=1, application_id=1, environment_id=3)
 
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
     TechnicalControlFactory(
@@ -41,7 +44,7 @@ def test_create_adds_when_new(client):
         id=11,
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
@@ -84,6 +87,10 @@ def test_create_updates_when_existing_different_state(client):
 
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
 
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
+
     TechnicalControlFactory(
         id=1,
         reference="1",
@@ -94,7 +101,7 @@ def test_create_updates_when_existing_different_state(client):
         id=11,
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
@@ -160,7 +167,7 @@ def test_create_unknown_technical_control(client):
         id=11,
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
@@ -205,7 +212,7 @@ def test_create_unknown_resource(client):
         id=11,
         name="Res One",
         reference="res_1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
