@@ -369,6 +369,13 @@ class ResourceType(db.Model):
         secondaryjoin=id == ResourceTypeControl.control_id,
     )
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            name="uq_resource_type_reference",
+        ),
+    )
+
 
 class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -75,6 +75,13 @@ class ApplicationEnvironmentSchema(CamelCaseSchema):
     )
 
 
+class ResourceTypeSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    name = ma.fields.Str(required=True)
+    reference = ma.fields.Str(required=True)
+    service_id = ma.fields.Integer()
+
+
 class ResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
