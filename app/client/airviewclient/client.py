@@ -255,9 +255,7 @@ class Backend:
             if data == []:
                 return None
             control = data[0]
-            return Control(
-                id=control["id"], name=control["name"], service_id=control["serviceId"]
-            )
+            return Control(id=control["id"], name=control["name"])
         raise BackendFailureException(
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
@@ -265,7 +263,6 @@ class Backend:
     def create_control(self, control) -> Control:
         data = {
             "name": control.name,
-            "serviceId": control.service_id,
             "qualityModel": control.quality_model.name,
             "severity": control.severity.name,
         }
@@ -277,7 +274,6 @@ class Backend:
             return Control(
                 id=control["id"],
                 name=control["name"],
-                service_id=control["serviceId"],
                 quality_model=control["qualityModel"],
             )
 
@@ -733,7 +729,9 @@ class Handler:
         # check control pre-exists
         backend_control = self._backend.get_control(control)
         # NOTE: We're assuming at this point that a control links to a single service...
+        # ALSO NOTE: Services are now mapped to controls through resource types. This code will need fixing to match. For now the control will not map to a service
         if backend_control is None:
+            """
             if control.service_name:
                 all_services = self._backend.get_services()
                 service = next(
@@ -750,6 +748,7 @@ class Handler:
                         )
                     )
                 control.service_id = service.id
+            """
             backend_control = self._backend.create_control(control)
         return backend_control
 

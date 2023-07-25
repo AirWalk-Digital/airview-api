@@ -105,7 +105,6 @@ class IdAndNameSchema(CamelCaseSchema):
 class ControlSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)
-    service_id = ma.fields.Integer(required=True)
     quality_model = ma.fields.Str(required=True)
     severity = ma.fields.Str(required=True)
 

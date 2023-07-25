@@ -280,10 +280,6 @@ class Control:
     name: str
     #: Quality model of the control
     quality_model: QualityModel = None
-    #: Service id this control links to
-    service_id: Optional[int] = None
-    #: Name of the service this control is linked to
-    service_name: Optional[str] = None
     #: Id of the framework control objective
     id: Optional[int] = None
     #: severity

@@ -29,7 +29,6 @@ def setup():
 
 
 def test_technical_control_creates_missing(handler, technical_control):
-    
     """
     Given: A technical control which is not findable within the api
     When: When a call is made to persist a technical control
@@ -61,10 +60,12 @@ def test_technical_control_creates_missing(handler, technical_control):
     assert returned_technical_control.reference == "tc-ref-1"
     assert returned_technical_control.name == "ctrl a"
     assert returned_technical_control.is_blocking == True
-    assert returned_technical_control.control_action == models.TechnicalControlAction.LOG
+    assert (
+        returned_technical_control.control_action == models.TechnicalControlAction.LOG
+    )
+
 
 def test_technical_control_finds_existing(handler, technical_control):
-    
     """
     Given: A technical control which is present in the api
     When: When a call is made to persist a technical control
@@ -98,13 +99,19 @@ def test_technical_control_finds_existing(handler, technical_control):
     assert technical_controls[1].reference == "tc-ref-1"
     assert technical_controls[1].name == "one"
     assert technical_controls[1].is_blocking == False
-    assert technical_controls[1].control_action == api_models.TechnicalControlAction.INCIDENT
+    assert (
+        technical_controls[1].control_action
+        == api_models.TechnicalControlAction.INCIDENT
+    )
 
     assert returned_technical_control.id == 1000
     assert returned_technical_control.reference == "tc-ref-1"
     assert returned_technical_control.name == "one"
     assert returned_technical_control.is_blocking == False
-    assert returned_technical_control.control_action == models.TechnicalControlAction.INCIDENT
+    assert (
+        returned_technical_control.control_action
+        == models.TechnicalControlAction.INCIDENT
+    )
 
 
 def test_technical_control_creates_underlying_control(handler):
@@ -117,8 +124,7 @@ def test_technical_control_creates_underlying_control(handler):
         control=models.Control(
             name="TEST_CONTROL",
             quality_model=models.QualityModel.SECURITY,
-            service_name="TestService"
-        )
+        ),
     )
     returned_technical_control = handler.handle_technical_control(technical_control)
     assert returned_technical_control.control_id == 1
