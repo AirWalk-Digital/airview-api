@@ -17,6 +17,8 @@ from airview_api.models import (
     System,
     QualityModel,
     Service,
+    ResourceType,
+    ResourceTypeControl,
 )
 
 
@@ -35,6 +37,8 @@ def get_control_overviews(application_id: int, quality_model: str):
         )
         .select_from(TechnicalControl)
         .join(Control)
+        .join(ResourceTypeControl)
+        .join(ResourceType)
         .join(System)
         .join(Service)
         .join(Resource)
@@ -57,7 +61,8 @@ def get_application_quality_models(application_id):
         db.select(Control.quality_model)
         .select_from(ApplicationEnvironment)
         .join(Resource)
-        .join(Service)
+        .join(ResourceType)
+        .join(ResourceTypeControl)
         .join(Control)
         .where(ApplicationEnvironment.application_id == application_id)
         .distinct()
@@ -142,8 +147,10 @@ def get_control_overview_resources(application_id, technical_control_id):
         .select_from(ApplicationEnvironment)
         .join(Environment)
         .join(Resource)
-        .join(Service)
+        .join(ResourceType)
+        .join(ResourceTypeControl)
         .join(Control)
+        .join(Service)
         .join(TechnicalControl)
         .join(
             MonitoredResource,
