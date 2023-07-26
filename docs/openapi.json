@@ -180,9 +180,6 @@
           "qualityModel": {
             "type": "string"
           },
-          "serviceId": {
-            "type": "integer"
-          },
           "severity": {
             "type": "string"
           }
@@ -190,7 +187,6 @@
         "required": [
           "name",
           "qualityModel",
-          "serviceId",
           "severity"
         ],
         "type": "object"
@@ -472,12 +468,33 @@
           "reference": {
             "type": "string"
           },
-          "serviceId": {
+          "resourceTypeId": {
             "type": "integer"
           }
         },
         "required": [
           "applicationEnvironmentId",
+          "name",
+          "reference"
+        ],
+        "type": "object"
+      },
+      "ResourceType": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "serviceId": {
+            "type": "integer"
+          }
+        },
+        "required": [
           "name",
           "reference"
         ],
@@ -1409,7 +1426,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1418,7 +1435,7 @@
         },
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1552,6 +1569,65 @@
           "referenced-applications"
         ],
         "x-api-rbac-role": "ContentReader"
+      }
+    },
+    "/resource-types/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceType"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "update the resource by its reference and applicationId",
+        "tags": [
+          "resource-types"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceType"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceType"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new resource\nReturns the newly created resource",
+        "tags": [
+          "resource-types"
+        ],
+        "x-api-rbac-role": "ContentWriter"
       }
     },
     "/resources/": {
@@ -1787,18 +1863,18 @@
         "parameters": [
           {
             "in": "query",
-            "name": "reference",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "systemId",
             "required": true,
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reference",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1913,6 +1989,10 @@
     {
       "description": "resources related resources",
       "name": "resources"
+    },
+    {
+      "description": "resources type related resources",
+      "name": "resource-types"
     },
     {
       "description": "Technical Control related resources",

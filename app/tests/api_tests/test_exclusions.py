@@ -35,10 +35,13 @@ def test_post_exclusion(client):
         type="NETWORK",
     )
 
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
+
     ControlFactory(
         id=21,
         name="Ctrl 1",
-        service_id=10,
         quality_model=QualityModel.COST_OPTIMISATION,
         severity=ControlSeverity.HIGH,
     )
@@ -47,7 +50,7 @@ def test_post_exclusion(client):
         id=31,
         name="Res AAA",
         reference="app_one",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),

@@ -12,6 +12,7 @@ from airview_api.models import (
     QualityModel,
     Service,
     Resource,
+    ResourceType,
     TechnicalControlAction,
     Framework,
     FrameworkControlObjective,
@@ -122,22 +123,28 @@ class FrameworkControlObjectiveFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = FrameworkControlObjective
         sqlalchemy_session = db.session
 
-        
+
 class FrameworkControlObjectiveLinkFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = FrameworkControlObjectiveLink
         sqlalchemy_session = db.session
 
-        
+
 class FrameworkSectionFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = FrameworkSection
         sqlalchemy_session = db.session
 
-        
+
 class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = Exclusion
+        sqlalchemy_session = db.session
+
+
+class ResourceTypeFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = ResourceType
         sqlalchemy_session = db.session
 
 
@@ -154,6 +161,7 @@ def reset_factories():
     ExclusionFactory.reset_sequence()
     MonitoredResourceFactory.reset_sequence()
     ResourceFactory.reset_sequence()
+    ResourceTypeFactory.reset_sequence()
     FrameworkFactory.reset_sequence()
     FrameworkControlObjectiveFactory.reset_sequence()
     FrameworkControlObjectiveLinkFactory.reset_sequence()

@@ -94,6 +94,16 @@ Create a barebone resource for linking compliance event to
 
 
 
+#### create_resource_type(resource_type)
+Create a resource type
+
+
+* **Return type**
+
+    `ResourceType`
+
+
+
 #### create_service(service)
 Create a new service
 
@@ -187,6 +197,16 @@ Get the id of a resource by its application id and reference
 * **Return type**
 
     `Optional`[`int`]
+
+
+
+#### get_resource_type(reference)
+Get the id of a resource by its application id and reference
+
+
+* **Return type**
+
+    `Optional`[`ResourceType`]
 
 
 
@@ -313,6 +333,14 @@ When passed a compliance event this method will attempt to create any missing de
 * **Return type**
 
     `None`
+
+
+
+#### handle_resource_type(resource_type)
+
+* **Return type**
+
+    `ResourceType`
 
 
 
@@ -524,11 +552,11 @@ The enum status of the event
 Technical control which this compliance event is the subject of
 
 
-### _class_ client.airviewclient.models.Control(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
+### _class_ client.airviewclient.models.Control(name, quality_model=None, id=None, severity=ControlSeverity.LOW)
 Bases: `object`
 
 
-#### \__init__(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
+#### \__init__(name, quality_model=None, id=None, severity=ControlSeverity.LOW)
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
 Id of the framework control objective
@@ -540,14 +568,6 @@ Name of the control
 
 #### quality_model(_: `QualityModel_ _ = Non_ )
 Quality model of the control
-
-
-#### service_id(_: `Optional`[`int`_ _ = Non_ )
-Service id this control links to
-
-
-#### service_name(_: `Optional`[`str`_ _ = Non_ )
-Name of the service this control is linked to
 
 
 #### severity(_: `Optional`[`ControlSeverity`_ _ = _ )
@@ -738,13 +758,13 @@ An enumeration.
 
 #### USABILITY_AND_COMPATIBILITY(_ = _ )
 
-### _class_ client.airviewclient.models.Resource(reference, application, name=None, service=None)
+### _class_ client.airviewclient.models.Resource(reference, application, name=None, resource_type=None)
 Bases: `object`
 
 Dataclass representing an resource
 
 
-#### \__init__(reference, application, name=None, service=None)
+#### \__init__(reference, application, name=None, resource_type=None)
 
 #### application(_: `Application_ )
 Application within which the resource sits
@@ -758,8 +778,32 @@ A friendly name for the resource
 Unique reference of the resource within the connecting system
 
 
+#### resource_type(_: `Optional`[`ResourceType`_ _ = Non_ )
+The resource type which this resource belongs to
+
+
+### _class_ client.airviewclient.models.ResourceType(reference, name, id=None, service=None)
+Bases: `object`
+
+Dataclass representing a resource type
+
+
+#### \__init__(reference, name, id=None, service=None)
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Internal identifier of resource type
+
+
+#### name(_: `str_ )
+A friendly name for the resource type
+
+
+#### reference(_: `str_ )
+Unique reference of the resouce type
+
+
 #### service(_: `Optional`[`Service`_ _ = Non_ )
-The service which this resource belongs to (ec2, s3, dynamodb, etc)
+The service which this resource belongs to
 
 
 ### _class_ client.airviewclient.models.Service(reference, name, type, id=None)

@@ -45,6 +45,9 @@ def test_monitored_resource_creates_missing_application(handler, compliance_even
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
 
     ApplicationFactory(id=2)
     ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
@@ -56,7 +59,7 @@ def test_monitored_resource_creates_missing_application(handler, compliance_even
         id=11,
         name="Res Other",
         reference="res-ref-other",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
@@ -96,6 +99,9 @@ def test_monitored_resource_creates_missing_resource_existing_app(
     # Arrange
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
 
     ApplicationFactory(id=2)
     ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
@@ -107,7 +113,7 @@ def test_monitored_resource_creates_missing_resource_existing_app(
         id=11,
         name="Res Other",
         reference="res-ref-other",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 
@@ -146,6 +152,9 @@ def test_monitored_resource_creates_missing_control(handler, compliance_event):
 
     EnvironmentFactory(id=1, name="Env One", abbreviation="ONE")
     ServiceFactory(id=10, name="Service One", reference="ref_1", type="NETWORK")
+    ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
 
     ApplicationFactory(id=2)
     ApplicationEnvironmentFactory(id=1, application_id=2, environment_id=1)
@@ -157,7 +166,7 @@ def test_monitored_resource_creates_missing_control(handler, compliance_event):
         id=11,
         name="Res Existing",
         reference="res-ref-1",
-        service_id=10,
+        resource_type_id=10,
         application_environment_id=1,
     )
 

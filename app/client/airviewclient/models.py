@@ -12,7 +12,7 @@ class ControlSeverity(Enum):
 
     def __str__(self):
         return self.name
-    
+
 
 class ExclusionResourceState(Enum):
     NONE = 1
@@ -203,6 +203,20 @@ class Service:
 
 
 @dataclass
+class ResourceType:
+    """Dataclass representing a resource type"""
+
+    #: Unique reference of the resouce type
+    reference: str
+    #: A friendly name for the resource type
+    name: str
+    #: Internal identifier of resource type
+    id: Optional[int] = None
+    #: The service which this resource belongs to
+    service: Optional[Service] = None
+
+
+@dataclass
 class Resource:
     """Dataclass representing an resource"""
 
@@ -212,8 +226,8 @@ class Resource:
     application: Application
     #: A friendly name for the resource
     name: Optional[str] = None
-    #: The service which this resource belongs to (ec2, s3, dynamodb, etc)
-    service: Optional[Service] = None
+    #: The resource type which this resource belongs to
+    resource_type: Optional[ResourceType] = None
 
 
 @dataclass
@@ -266,10 +280,6 @@ class Control:
     name: str
     #: Quality model of the control
     quality_model: QualityModel = None
-    #: Service id this control links to
-    service_id: Optional[int] = None
-    #: Name of the service this control is linked to
-    service_name: Optional[str] = None
     #: Id of the framework control objective
     id: Optional[int] = None
     #: severity

@@ -187,8 +187,7 @@ class Service(db.Model):
     reference = db.Column(db.String(500), nullable=False)
     type = db.Column(db.Enum(ServiceType), nullable=False)
 
-    controls = db.relationship("Control", back_populates="service")
-    resources = db.relationship("Resource", back_populates="service")
+    resource_types = db.relationship("ResourceType", back_populates="service")
 
     __table_args__ = (
         db.UniqueConstraint(
@@ -255,17 +254,23 @@ class Framework(db.Model):
     framework_sections = db.relationship("FrameworkSection", back_populates="framework")
 
 
+class ResourceTypeControl(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resource_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey("resource_type.id"),
+    )
+    control_id = db.Column(
+        db.Integer,
+        db.ForeignKey("control.id"),
+    )
+
+
 class Control(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     quality_model = db.Column(db.Enum(QualityModel), nullable=False)
-    service_id = db.Column(
-        db.Integer,
-        db.ForeignKey("service.id"),
-    )
     severity = db.Column(db.Enum(ControlSeverity), nullable=False)
-
-    service = db.relationship("Service", back_populates="controls")
 
     exclusions = db.relationship("Exclusion", back_populates="control", lazy="dynamic")
 
@@ -278,6 +283,14 @@ class Control(db.Model):
         primaryjoin=id == FrameworkControlObjectiveLink.control_id,  # Update this line
         secondaryjoin=id
         == FrameworkControlObjectiveLink.framework_control_objective_id,
+    )
+
+    resource_types = db.relationship(
+        "ResourceType",
+        secondary=ResourceTypeControl.__table__,
+        back_populates="controls",
+        primaryjoin=id == ResourceTypeControl.control_id,  # Update this line
+        secondaryjoin=id == ResourceTypeControl.resource_type_id,
     )
 
 
@@ -336,18 +349,46 @@ class ExclusionResource(db.Model):
     )
 
 
-class Resource(db.Model):
+class ResourceType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
-    reference = db.Column(db.String(500), nullable=False)
-    last_modified = db.Column(db.DateTime, nullable=False)
-    last_seen = db.Column(db.DateTime, nullable=False)
     service_id = db.Column(
         db.Integer,
         db.ForeignKey("service.id"),
         nullable=True,
     )
-    service = db.relationship("Service", back_populates="resources")
+    service = db.relationship("Service", back_populates="resource_types")
+    resources = db.relationship("Resource", back_populates="resource_type")
+    reference = db.Column(db.String(500), nullable=False)
+    name = db.Column(db.String(500), nullable=False)
+
+    controls = db.relationship(
+        "Control",
+        secondary=ResourceTypeControl.__table__,
+        back_populates="resource_types",
+        primaryjoin=id == ResourceTypeControl.resource_type_id,  # Update this line
+        secondaryjoin=id == ResourceTypeControl.control_id,
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "reference",
+            name="uq_resource_type_reference",
+        ),
+    )
+
+
+class Resource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    reference = db.Column(db.String(500), nullable=False)
+    resource_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey("resource_type.id"),
+        nullable=True,
+    )
+    resource_type = db.relationship("ResourceType", back_populates="resources")
+    last_modified = db.Column(db.DateTime, nullable=False)
+    last_seen = db.Column(db.DateTime, nullable=False)
 
     application_environment_id = db.Column(
         db.Integer,

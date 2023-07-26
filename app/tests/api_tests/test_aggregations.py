@@ -30,7 +30,6 @@ def test_get_application_compliance_aggregation(client):
     control = ControlFactory(
         id=21,
         name="Ctrl 1",
-        service_id=10,
         quality_model=QualityModel.COST_OPTIMISATION,
         severity=ControlSeverity.HIGH,
     )
@@ -46,11 +45,16 @@ def test_get_application_compliance_aggregation(client):
     service = ServiceFactory(
         id=10, name="Service One", reference="ref_1", type="NETWORK"
     )
+
+    resource_type = ResourceTypeFactory(
+        id=10, name="res type one", reference="res-type-1", service_id=10
+    )
+
     resource = ResourceFactory(
         id=1,
         name="Res BBB",
         reference="ref_1",
-        service_id=service.id,
+        resource_type_id=resource_type.id,
         application_environment_id=1,
         last_modified=datetime.utcnow(),
         last_seen=datetime.utcnow(),

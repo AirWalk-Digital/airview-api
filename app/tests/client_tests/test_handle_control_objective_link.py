@@ -16,32 +16,24 @@ def setup():
 
 
 def test_handle_control_objective_link_creates_link(handler):
-    framework = FrameworkFactory(
-        name="TestFramework",
-        link="/testframework"
-    )
+    framework = FrameworkFactory(name="TestFramework", link="/testframework")
 
     framework_section = FrameworkSectionFactory(
-        name="TestFrameworkSection",
-        link="/testframework/testsection",
-        framework_id=1
+        name="TestFrameworkSection", link="/testframework/testsection", framework_id=1
     )
     framework_section.framework = framework
 
     framework_control_objective = FrameworkControlObjectiveFactory(
-        name="AC-12",
-        link="/testframework/testsection/ac-12",
-        framework_section_id=1
+        name="AC-12", link="/testframework/testsection/ac-12", framework_section_id=1
     )
     framework_control_objective.framework_section = framework_section
-    
+
     ServiceFactory(id=1, name="Service One", reference="ref_1", type="NETWORK")
 
     control = ControlFactory(
         name="testcontrol",
         quality_model=api_models.QualityModel.SECURITY,
-        service_id=1,
-        severity=api_models.ControlSeverity.LOW
+        severity=api_models.ControlSeverity.LOW,
     )
 
     control.id = None
