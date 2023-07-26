@@ -552,11 +552,11 @@ The enum status of the event
 Technical control which this compliance event is the subject of
 
 
-### _class_ client.airviewclient.models.Control(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
+### _class_ client.airviewclient.models.Control(name, quality_model=None, id=None, severity=ControlSeverity.LOW)
 Bases: `object`
 
 
-#### \__init__(name, quality_model=None, service_id=None, service_name=None, id=None, severity=ControlSeverity.LOW)
+#### \__init__(name, quality_model=None, id=None, severity=ControlSeverity.LOW)
 
 #### id(_: `Optional`[`int`_ _ = Non_ )
 Id of the framework control objective
@@ -568,14 +568,6 @@ Name of the control
 
 #### quality_model(_: `QualityModel_ _ = Non_ )
 Quality model of the control
-
-
-#### service_id(_: `Optional`[`int`_ _ = Non_ )
-Service id this control links to
-
-
-#### service_name(_: `Optional`[`str`_ _ = Non_ )
-Name of the service this control is linked to
 
 
 #### severity(_: `Optional`[`ControlSeverity`_ _ = _ )

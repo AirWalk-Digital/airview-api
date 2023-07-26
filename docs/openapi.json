@@ -180,9 +180,6 @@
           "qualityModel": {
             "type": "string"
           },
-          "serviceId": {
-            "type": "integer"
-          },
           "severity": {
             "type": "string"
           }
@@ -190,7 +187,6 @@
         "required": [
           "name",
           "qualityModel",
-          "serviceId",
           "severity"
         ],
         "type": "object"
