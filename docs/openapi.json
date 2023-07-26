@@ -1426,7 +1426,7 @@
       "parameters": [
         {
           "in": "path",
-          "name": "section_id",
+          "name": "framework_id",
           "required": true,
           "schema": {
             "minimum": 0,
@@ -1435,7 +1435,7 @@
         },
         {
           "in": "path",
-          "name": "framework_id",
+          "name": "section_id",
           "required": true,
           "schema": {
             "minimum": 0,
