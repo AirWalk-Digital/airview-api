@@ -500,6 +500,20 @@
         ],
         "type": "object"
       },
+      "ResourceTypeControl": {
+        "properties": {
+          "controlId": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "resourceTypeId": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "Service": {
         "properties": {
           "id": {
@@ -1571,6 +1585,65 @@
         "x-api-rbac-role": "ContentReader"
       }
     },
+    "/resource-types-controls/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTypeControl"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "update the resource by its reference and applicationId",
+        "tags": [
+          "resource-types-controls"
+        ],
+        "x-api-rbac-role": "ComplianceReader"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceTypeControl"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTypeControl"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Create a new resource\nReturns the newly created resource",
+        "tags": [
+          "resource-types-controls"
+        ],
+        "x-api-rbac-role": "ContentWriter"
+      }
+    },
     "/resource-types/": {
       "get": {
         "responses": {
@@ -1993,6 +2066,10 @@
     {
       "description": "resources type related resources",
       "name": "resource-types"
+    },
+    {
+      "description": "resources type control relations",
+      "name": "resource-types-controls"
     },
     {
       "description": "Technical Control related resources",
