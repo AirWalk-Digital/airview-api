@@ -219,12 +219,12 @@ class ResourceType:
 @dataclass
 class ResourceTypeControl:
     """Dataclass representing a resource type"""
-    #: Internal identifier of resource type
-    id: Optional[int] = None
     #: Identifier for the control id
     control_id: int
     #: Resource type identifier
     resource_type_id: int
+    #: Internal identifier of resource type
+    id: Optional[int] = None
 
 
 @dataclass

@@ -288,10 +288,10 @@ class Backend:
         )
         if resp.status_code == 200:
             data = resp.json()
-            if data is None
-                return None
             id = data['id']
             return ResourceTypeControl(id=id, control_id=control_id, resource_type_id=resource_type_id)
+        if resp.status_code == 404:
+            return None
         raise BackendFailureException(
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
@@ -924,6 +924,21 @@ class Handler:
                 )
             )
         return framework_control_objective_link
+    
+
+    def handle_resource_type_control_link(self, control: Control, resource_type: ResourceType) -> ResourceTypeControl:
+        backend_control = self.handle_control(control)
+        backend_resource_type = self.handle_resource_type(resource_type)
+        
+        resource_type_control = self._backend.get_resource_type_control_link(
+            resource_type_id=backend_resource_type.id, control_id=backend_control.id
+        )
+        if resource_type_control is None:
+            resource_type_control = self._backend.create_resource_type_control_link(
+                resource_type_id=backend_resource_type.id, control_id=backend_control.id
+            )
+        return resource_type_control
+
 
     def set_exclusion_resource_state(
         self, id: int, state: ExclusionResourceState

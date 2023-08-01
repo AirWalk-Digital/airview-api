@@ -24,21 +24,21 @@ def test_handle_control_objective_link_creates_link(handler):
     framework_section.framework = framework
 
     framework_control_objective = FrameworkControlObjectiveFactory(
-        name="AC-12", link="/testframework/testsection/ac-12", framework_section_id=1
+        id=3, name="AC-12", link="/testframework/testsection/ac-12", framework_section_id=1
     )
     framework_control_objective.framework_section = framework_section
 
     ServiceFactory(id=1, name="Service One", reference="ref_1", type="NETWORK")
 
     control = ControlFactory(
+        id=44,
         name="testcontrol",
         quality_model=api_models.QualityModel.SECURITY,
         severity=api_models.ControlSeverity.LOW,
     )
 
-    control.id = None
-    framework_control_objective.id = None
-
-    handler.handle_framework_control_objective_link(
+    framework_control_objective_link = handler.handle_framework_control_objective_link(
         framework_control_objective, control
     )
+    assert framework_control_objective_link.framework_control_objective_id == 3
+    assert framework_control_objective_link.control_id == 44
