@@ -35,6 +35,7 @@ def create_app(app=None, db_connection_string=None):
     api.register_blueprint(controllers.application_environments.blp)
     api.register_blueprint(controllers.resources.blp)
     api.register_blueprint(controllers.resource_types.blp)
+    api.register_blueprint(controllers.resource_types_controls.blp)
     api.register_blueprint(controllers.technical_controls.blp)
     api.register_blueprint(controllers.systems.blp)
     api.register_blueprint(controllers.services.blp)

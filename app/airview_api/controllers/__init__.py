@@ -3,6 +3,7 @@ from airview_api.controllers import (
     technical_controls,
     resources,
     resource_types,
+    resource_types_controls,
     services,
     systems,
     # control_statuses,
