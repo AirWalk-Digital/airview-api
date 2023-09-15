@@ -188,6 +188,13 @@ class ControlOverviewSchema(CamelCaseSchema):
     frameworks = ma.fields.List(ma.fields.Nested(NamedUrlSchema))
 
 
+class ControlOverviewTotalSchema(CamelCaseSchema):
+    total = ma.fields.Integer()
+    low = ma.fields.Integer()
+    medium = ma.fields.Integer()
+    high = ma.fields.Integer()
+
+
 class ControlOverviewResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     type = ma.fields.Str()

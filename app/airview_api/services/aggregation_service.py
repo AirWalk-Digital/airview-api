@@ -1,5 +1,5 @@
 from airview_api.database import db
-from sqlalchemy import func, literal
+from sqlalchemy import distinct, func, join, literal, case
 from sqlalchemy.sql.functions import coalesce
 import itertools
 from datetime import datetime
@@ -22,6 +22,70 @@ from airview_api.models import (
 )
 
 
+def get_control_overview_totals(application_id: int):
+    total = (
+        db.select(func.count(distinct(Control.id)).label("total"))
+        .select_from(Control)
+        .join(ResourceTypeControl)
+        .join(ResourceType)
+        .join(Resource)
+        .join(ApplicationEnvironment)
+        .where(ApplicationEnvironment.application_id == application_id)
+        .subquery()
+    )
+    sev = (
+        db.select(func.count(distinct(Control.id)).label("id"))
+        .select_from(Control)
+        .join(ResourceTypeControl)
+        .join(ResourceType)
+        .join(Resource)
+        .join(ApplicationEnvironment)
+        .join(MonitoredResource)
+        .join(TechnicalControl)
+        .where(ApplicationEnvironment.application_id == application_id)
+        .where(MonitoredResource.monitoring_state == "FLAGGED")
+    )
+
+    qry = (
+        db.select(
+            total.c.total,
+            func.sum(
+                case(
+                    (
+                        Control.severity == "LOW",
+                        1,
+                    ),
+                    else_=0,
+                )
+            ).label("low"),
+            func.sum(
+                case(
+                    (
+                        Control.severity == "MEDIUM",
+                        1,
+                    ),
+                    else_=0,
+                )
+            ).label("medium"),
+            func.sum(
+                case(
+                    (
+                        Control.severity == "HIGH",
+                        1,
+                    ),
+                    else_=0,
+                )
+            ).label("high"),
+        )
+        .select_from(sev)
+        .join(Control, sev.c.id == Control.id)
+        .group_by(total.c.total)
+    )
+    print(qry)
+    result = db.session.execute(qry).all()
+    return result[0]
+
+
 def get_control_overviews(application_id: int, quality_model: str):
     qry = (
         db.select(
@@ -42,6 +106,8 @@ def get_control_overviews(application_id: int, quality_model: str):
         .join(System)
         .join(Service)
         .join(Resource)
+        .join(ApplicationEnvironment)
+        .where(ApplicationEnvironment.application_id == application_id)
         .group_by(
             TechnicalControl.id,
             TechnicalControl.name,
@@ -52,6 +118,7 @@ def get_control_overviews(application_id: int, quality_model: str):
         )
         .limit(10)
     )
+    print(qry)
     result = db.session.execute(qry).all()
     return result
 
@@ -135,6 +202,7 @@ def get_compliance_aggregation(application_id):
 def get_control_overview_resources(application_id, technical_control_id):
     qry = (
         db.select(
+            Service.type,
             Resource.id,
             Resource.name,
             Environment.name.label("environment"),
@@ -165,4 +233,5 @@ def get_control_overview_resources(application_id, technical_control_id):
     )
 
     result = db.session.execute(qry).all()
+    print(qry)
     return result
