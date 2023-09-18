@@ -82,6 +82,12 @@ class ResourceTypeSchema(CamelCaseSchema):
     service_id = ma.fields.Integer()
 
 
+class ResourceTypeControlSchema(CamelCaseSchema):
+    id = ma.fields.Integer()
+    resource_type_id = ma.fields.Integer()
+    control_id = ma.fields.Integer()
+
+
 class ResourceSchema(CamelCaseSchema):
     id = ma.fields.Integer()
     name = ma.fields.Str(required=True)

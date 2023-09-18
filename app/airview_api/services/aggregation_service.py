@@ -83,7 +83,9 @@ def get_control_overview_totals(application_id: int):
     )
     print(qry)
     result = db.session.execute(qry).all()
-    return result[0]
+    if len(result) == 1:
+        return result[0]
+    return None
 
 
 def get_control_overviews(application_id: int, quality_model: str):
@@ -118,7 +120,6 @@ def get_control_overviews(application_id: int, quality_model: str):
         )
         .limit(10)
     )
-    print(qry)
     result = db.session.execute(qry).all()
     return result
 
@@ -233,5 +234,4 @@ def get_control_overview_resources(application_id, technical_control_id):
     )
 
     result = db.session.execute(qry).all()
-    print(qry)
     return result

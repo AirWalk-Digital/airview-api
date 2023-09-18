@@ -104,6 +104,14 @@ Create a resource type
 
 
 
+#### create_resource_type_control_link(control_id, resource_type_id)
+
+* **Return type**
+
+    `ResourceTypeControl`
+
+
+
 #### create_service(service)
 Create a new service
 
@@ -207,6 +215,14 @@ Get the id of a resource by its application id and reference
 * **Return type**
 
     `Optional`[`ResourceType`]
+
+
+
+#### get_resource_type_control_link(control_id, resource_type_id)
+
+* **Return type**
+
+    `Optional`[`ResourceTypeControl`]
 
 
 
@@ -341,6 +357,14 @@ When passed a compliance event this method will attempt to create any missing de
 * **Return type**
 
     `ResourceType`
+
+
+
+#### handle_resource_type_control_link(control, resource_type)
+
+* **Return type**
+
+    `ResourceTypeControl`
 
 
 
@@ -804,6 +828,26 @@ Unique reference of the resouce type
 
 #### service(_: `Optional`[`Service`_ _ = Non_ )
 The service which this resource belongs to
+
+
+### _class_ client.airviewclient.models.ResourceTypeControl(control_id, resource_type_id, id=None)
+Bases: `object`
+
+Dataclass representing a resource type
+
+
+#### \__init__(control_id, resource_type_id, id=None)
+
+#### control_id(_: `int_ )
+Identifier for the control id
+
+
+#### id(_: `Optional`[`int`_ _ = Non_ )
+Internal identifier of resource type
+
+
+#### resource_type_id(_: `int_ )
+Resource type identifier
 
 
 ### _class_ client.airviewclient.models.Service(reference, name, type, id=None)

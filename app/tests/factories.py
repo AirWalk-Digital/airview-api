@@ -19,6 +19,7 @@ from airview_api.models import (
     FrameworkControlObjectiveLink,
     FrameworkSection,
     Control,
+    ResourceTypeControl
 )
 from airview_api.database import db
 from datetime import datetime
@@ -145,6 +146,12 @@ class ExclusionFactory(factory.alchemy.SQLAlchemyModelFactory):
 class ResourceTypeFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = ResourceType
+        sqlalchemy_session = db.session
+
+
+class ResourceTypeControlFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = ResourceTypeControl
         sqlalchemy_session = db.session
 
 

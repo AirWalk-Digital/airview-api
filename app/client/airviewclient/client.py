@@ -280,6 +280,41 @@ class Backend:
         raise BackendFailureException(
             f"Status code: {resp.status_code} Message: {resp.text}"
         )
+    
+    def get_resource_type_control_link(self, control_id, resource_type_id) -> Optional[ResourceTypeControl]:
+        resp = self._session.get(
+            url=self.get_url(f"/resource-types-controls/?controlId={control_id}&resourceTypeId={resource_type_id}"),
+            headers=self._headers,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            id = data['id']
+            return ResourceTypeControl(id=id, control_id=control_id, resource_type_id=resource_type_id)
+        if resp.status_code == 404:
+            return None
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
+     
+    def create_resource_type_control_link(self, control_id, resource_type_id) -> ResourceTypeControl:
+        data = {
+            "controlId": control_id,
+            "resourceTypeId": resource_type_id
+        }
+        resp = self._session.post(
+            url=self.get_url(f"/resource-types-controls/"), json=data, headers=self._headers
+        )
+        if resp.status_code == 200:
+            res = resp.json()
+            return ResourceTypeControl(
+                id=res["id"],
+                control_id=control_id,
+                resource_type_id=resource_type_id
+            )
+
+        raise BackendFailureException(
+            f"Status code: {resp.status_code} Message: {resp.text}"
+        )
 
     def save_monitored_resource(self, technical_control_id, resource_id, state) -> None:
         """Persist the current status of a montiored resource"""
@@ -889,6 +924,21 @@ class Handler:
                 )
             )
         return framework_control_objective_link
+    
+
+    def handle_resource_type_control_link(self, control: Control, resource_type: ResourceType) -> ResourceTypeControl:
+        backend_control = self.handle_control(control)
+        backend_resource_type = self.handle_resource_type(resource_type)
+        
+        resource_type_control = self._backend.get_resource_type_control_link(
+            resource_type_id=backend_resource_type.id, control_id=backend_control.id
+        )
+        if resource_type_control is None:
+            resource_type_control = self._backend.create_resource_type_control_link(
+                resource_type_id=backend_resource_type.id, control_id=backend_control.id
+            )
+        return resource_type_control
+
 
     def set_exclusion_resource_state(
         self, id: int, state: ExclusionResourceState
