@@ -253,6 +253,23 @@
         },
         "type": "object"
       },
+      "ControlOverviewTotal": {
+        "properties": {
+          "high": {
+            "type": "integer"
+          },
+          "low": {
+            "type": "integer"
+          },
+          "medium": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "Environment": {
         "properties": {
           "abbreviation": {
@@ -649,6 +666,41 @@
           }
         },
         "summary": "Get an application by id\nReturns application matching requested id",
+        "tags": [
+          "aggregations"
+        ],
+        "x-api-rbac-role": "ContentReader"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "application_id",
+          "required": true,
+          "schema": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/aggregations/control-overview-totals/{application_id}/": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlOverviewTotal"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Get control totals by application id\nReturns totals for requested id",
         "tags": [
           "aggregations"
         ],

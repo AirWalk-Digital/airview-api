@@ -14,6 +14,7 @@ from flask import request
 from airview_api.schemas import (
     ComplianceAggregationSchema,
     ControlOverviewResourceSchema,
+    ControlOverviewTotalSchema,
 )
 from airview_api.helpers import AirviewApiHelpers
 
@@ -36,6 +37,17 @@ class Application(MethodView):
         Returns application matching requested id
         """
         return aggregation_service.get_compliance_aggregation(application_id)
+
+
+@blp.route("control-overview-totals/<int:application_id>/")
+class ControlOverviewTotal(MethodView):
+    @blp.response(200, ControlOverviewTotalSchema())
+    @blp.role(Roles.CONTENT_READER)
+    def get(self, application_id):
+        """Get control totals by application id
+        Returns totals for requested id
+        """
+        return aggregation_service.get_control_overview_totals(application_id)
 
 
 @blp.route("control-overview-resources/<int:application_id>/")
